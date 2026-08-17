@@ -99,14 +99,19 @@ function showLogin() {
     setLoading(btn, true);
     clearError('login-error');
 
-    const { error } = await HQ_SUPABASE.auth.signInWithPassword({ email, password });
-    setLoading(btn, false);
-    if (error) {
-      showError('login-error', error.message);
-    } else {
-      const { data: { session } } = await HQ_SUPABASE.auth.getSession();
-      State.user = session?.user;
-      navigate('/host');
+    try {
+      const { error } = await HQ_SUPABASE.auth.signInWithPassword({ email, password });
+      setLoading(btn, false);
+      if (error) {
+        showError('login-error', error.message);
+      } else {
+        const { data: { session } } = await HQ_SUPABASE.auth.getSession();
+        State.user = session?.user;
+        navigate('/host');
+      }
+    } catch (err) {
+      setLoading(btn, false);
+      showError('login-error', err.message || 'Network error occurred');
     }
   });
 
@@ -131,15 +136,20 @@ function showLogin() {
     setLoading(btn, true);
     clearError('signup-error');
 
-    const { error } = await HQ_SUPABASE.auth.signUp({
-      email, password,
-      options: { data: { display_name: name } }
-    });
-    setLoading(btn, false);
-    if (error) {
-      showError('signup-error', error.message);
-    } else {
-      showError('signup-error', 'Account created! Please check your email to confirm, then sign in.', 'success');
+    try {
+      const { error } = await HQ_SUPABASE.auth.signUp({
+        email, password,
+        options: { data: { display_name: name } }
+      });
+      setLoading(btn, false);
+      if (error) {
+        showError('signup-error', error.message);
+      } else {
+        showError('signup-error', 'Account created! Please check your email to confirm, then sign in.', 'success');
+      }
+    } catch (err) {
+      setLoading(btn, false);
+      showError('signup-error', err.message || 'Network error occurred');
     }
   });
 }
