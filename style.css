@@ -374,6 +374,38 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   text-decoration: underline;
 }
 
+/* Light Theme Overrides for Host Lobby View */
+#view-host-lobby {
+  background-color: #f8fafc;
+  color: var(--navy);
+  background-image: none;
+}
+#view-host-lobby .lobby-quiz-title { color: var(--navy); }
+#view-host-lobby .lobby-quiz-meta { color: var(--grey-500); }
+#view-host-lobby .pin-section,
+#view-host-lobby .lobby-players-section {
+  background: #ffffff;
+  border-color: var(--grey-200);
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+#view-host-lobby .pin-label { color: var(--grey-500); }
+#view-host-lobby .pin-url { color: var(--grey-700); }
+#view-host-lobby #lobby-pin { 
+  color: var(--navy);
+  text-shadow: none;
+}
+#view-host-lobby .player-pill {
+  background: #f1f5f9;
+  color: var(--navy);
+  border: 1px solid var(--grey-200);
+}
+#view-host-lobby .player-count-badge {
+  background: var(--yellow);
+  color: var(--navy);
+}
+#view-host-lobby .lobby-players-title { color: var(--navy); }
+#view-host-lobby .waiting-text { color: var(--grey-500); }
+
 .login-footer a {
   color:       var(--yellow);
   font-weight: 600;
@@ -1615,3 +1647,33 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   #sq-answer-blocks { gap: 2px; }
   .student-answer-btn { min-height: 100px; }
 }
+
+/* Light Theme Overrides for Host Game Views */
+#view-host-question, #view-host-reveal, #view-host-results {
+  background-color: #f8fafc;
+  color: var(--navy);
+  background-image: none;
+}
+
+/* Host Question View */
+#view-host-question .hq-top-bar { color: var(--navy); }
+#view-host-question .hq-answered-badge { background: #ffffff; border: 1px solid var(--grey-300); color: var(--navy); }
+#view-host-question #hq-question-text { color: var(--navy); }
+#view-host-question .timer-ring-wrap { background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+#view-host-question #timer-number { color: var(--navy); }
+
+/* Host Reveal View */
+#view-host-reveal .hr-progress { color: var(--navy); }
+#view-host-reveal #hr-question-text { color: var(--navy); }
+#view-host-reveal .hr-bars-title, #view-host-reveal .hr-lb-title { color: var(--grey-600); }
+#view-host-reveal .lb-row { background: #ffffff; border: 1px solid var(--grey-200); }
+#view-host-reveal .lb-row .lb-name { color: var(--navy); }
+#view-host-reveal .hr-bar-label { color: var(--navy); }
+#view-host-reveal .hr-bar-bg { background: #e2e8f0; }
+#view-host-reveal .hr-bar-count { color: var(--navy); }
+
+/* Host Results View */
+#view-host-results .results-title { color: var(--navy); }
+#view-host-results .results-subtitle { color: var(--grey-600); }
+#view-host-results .lb-full-row { background: #ffffff; border: 1px solid var(--grey-200); color: var(--navy); }
+#view-host-results .lb-full-row .lb-name { color: var(--navy); }
