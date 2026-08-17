@@ -1442,6 +1442,11 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   padding:               3px;
 }
 
+.sq-open-ended-wrap {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+}
+
 .student-answer-btn {
   border:          none;
   border-radius:   var(--radius);
