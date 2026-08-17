@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>HubQuiz — Live Quiz by ComedKares</title>
+  <meta name="description" content="HubQuiz is a live Kahoot-style quiz platform by ComedKares. Mentors host, students play on their phones — real-time, no accounts needed.">
+  <meta name="theme-color" content="#0F1B35">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="HubQuiz by ComedKares">
+  <meta property="og:description" content="Live quiz platform for ComedKares mentor sessions.">
+  <meta property="og:type" content="website">
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Favicon (inline SVG as data URI) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230F1B35'/><text y='.9em' font-size='80' x='10'>🎯</text></svg>">
+</head>
+<body>
+
+<!-- ============================================================
+     VIEW: LOGIN
+     ============================================================ -->
+<section id="view-login" class="view">
+  <div class="login-container">
+
+    <!-- Logo + branding -->
+    <div class="login-logo-wrap">
+      <img src="assets/logo.png" alt="ComedKares" class="login-logo" onerror="this.style.display='none'">
+      <div class="login-brand-name">ComedKares</div>
+      <div class="login-hubquiz">HubQuiz</div>
+    </div>
+
+    <!-- Login panel -->
+    <div id="login-panel" class="login-card">
+      <div class="login-form-title">Mentor Sign In</div>
+      <form id="login-form" class="login-stack">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email</label>
+          <input type="email" id="login-email" class="input-field" placeholder="you@example.com" autocomplete="email" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Password</label>
+          <input type="password" id="login-password" class="input-field" placeholder="••••••••" autocomplete="current-password" required>
+        </div>
+        <div id="login-error" class="form-msg error" role="alert"></div>
+        <button type="submit" id="login-btn" class="btn btn-primary btn-lg btn-full">Sign In</button>
+      </form>
+      <div class="login-footer">
+        New mentor? <a id="show-signup" role="button">Create account</a>
+      </div>
+    </div>
+
+    <!-- Sign-up panel (hidden by default) -->
+    <div id="signup-panel" class="login-card hidden">
+      <div class="login-form-title">Create Mentor Account</div>
+      <form id="signup-form" class="login-stack">
+        <div class="form-group">
+          <label class="form-label" for="signup-name">Display Name</label>
+          <input type="text" id="signup-name" class="input-field" placeholder="Your name" autocomplete="name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="signup-email">Email</label>
+          <input type="email" id="signup-email" class="input-field" placeholder="you@example.com" autocomplete="email" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="signup-password">Password</label>
+          <input type="password" id="signup-password" class="input-field" placeholder="Min. 8 characters" autocomplete="new-password" minlength="8" required>
+        </div>
+        <div id="signup-error" class="form-msg error" role="alert"></div>
+        <button type="submit" id="signup-btn" class="btn btn-primary btn-lg btn-full">Create Account</button>
+      </form>
+      <div class="login-footer">
+        Already have an account? <a id="back-to-login" role="button">Sign in</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     VIEW: DASHBOARD
+     ============================================================ -->
+<section id="view-dashboard" class="view hidden">
+  <!-- Header -->
+  <header class="dash-header">
+    <div class="dash-logo">
+      HubQuiz<span>Mentor Dashboard</span>
+    </div>
+    <div class="dash-header-actions">
+      <button id="host-mute" class="mute-btn mute-light" aria-label="Toggle sound" title="Toggle sound">🔊</button>
+      <button id="logout-btn" class="btn btn-ghost">Sign Out</button>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="dash-content">
+    <div class="dash-section-header">
+      <h1 class="dash-section-title">Your Quizzes</h1>
+      <button id="new-quiz-btn" class="btn btn-primary">+ New Quiz</button>
+    </div>
+    <div id="quiz-list">
+      <div class="loading-spinner">Loading...</div>
+    </div>
+  </main>
+
+  <!-- Quiz Create/Edit Modal -->
+  <div id="quiz-modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-box">
+      <h2 id="modal-title" class="modal-title">Quiz</h2>
+      <form id="quiz-modal-form">
+        <div class="form-group">
+          <label class="form-label" for="qm-title">Quiz Title</label>
+          <input type="text" id="qm-title" class="input-field" placeholder="e.g. Python Basics Q1" required>
+        </div>
+
+        <div id="qm-questions"></div>
+
+        <div class="qm-add-row" style="margin-top:16px;">
+          <button type="button" id="qm-add-question" class="btn btn-ghost">+ Add Question</button>
+        </div>
+
+        <div id="qm-error" class="form-msg error" role="alert" style="margin-top:12px;"></div>
+
+        <div class="modal-footer">
+          <button type="button" id="qm-cancel" class="btn btn-ghost">Cancel</button>
+          <button type="submit" id="qm-save" class="btn btn-primary">Save Quiz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     VIEW: HOST LOBBY
+     ============================================================ -->
+<section id="view-host-lobby" class="view hidden">
+  <button id="lobby-mute" class="mute-btn" aria-label="Toggle sound" title="Toggle sound">🔊</button>
+
+  <div class="lobby-content">
+    <div class="lobby-hubquiz-logo">🎯 HubQuiz</div>
+    <div class="lobby-quiz-title" id="lobby-quiz-title">Quiz Title</div>
+    <div class="lobby-quiz-meta" id="lobby-q-count">0 questions</div>
+
+    <!-- PIN display -->
+    <div class="pin-section">
+      <div class="pin-label">Game PIN</div>
+      <div class="pin-url">Go to <strong>hubquiz.app</strong> and enter:</div>
+      <div id="lobby-pin" role="text" aria-label="Game PIN">000 000</div>
+      <div class="pin-actions">
+        <button id="copy-pin-btn" class="btn btn-ghost" style="color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.2);">
+          📋 Copy PIN
+        </button>
+      </div>
+    </div>
+
+    <!-- Player list -->
+    <div class="lobby-players-section">
+      <div class="lobby-players-header">
+        <span class="lobby-players-title">Players Joined</span>
+        <span class="player-count-badge"><span id="player-count">0</span> players</span>
+      </div>
+      <div id="player-list">
+        <p class="waiting-text">Waiting for players to join...</p>
+      </div>
+    </div>
+
+    <!-- Start button -->
+    <button id="start-quiz-btn" class="btn btn-primary btn-lg">
+      ▶ Start Quiz
+    </button>
+  </div>
+</section>
+
+<!-- ============================================================
+     VIEW: HOST QUESTION
+     ============================================================ -->
+<section id="view-host-question" class="view hidden">
+  <button id="hq-mute" class="mute-btn" aria-label="Toggle sound">🔊</button>
+
+  <div class="hq-top-bar">
+    <span class="hq-progress" id="hq-q-num">Q1 of 5</span>
+    <div class="hq-answered-badge">
+      <span id="hq-answered-count">0</span> / <span id="hq-total-count">0</span> answered
+    </div>
+  </div>
+
+  <div class="hq-main">
+    <!-- Timer ring -->
+    <div class="timer-ring-wrap" role="timer" aria-label="Time remaining">
+      <svg class="timer-ring-svg" viewBox="0 0 100 100">
+        <circle class="timer-ring-bg" cx="50" cy="50" r="45"/>
+        <circle id="timer-ring-progress" cx="50" cy="50" r="45"
+                stroke-dasharray="283" stroke-dashoffset="0"/>
+      </svg>
+      <div id="timer-number" aria-live="polite">30</div>
+    </div>
+
+    <!-- Question text -->
+    <h2 id="hq-question-text">Question text here</h2>
+
+    <!-- Answer blocks -->
+    <div id="hq-answer-blocks" role="list" aria-label="Answer options">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     VIEW: HOST REVEAL
+     ============================================================ -->
+<section id="view-host-reveal" class="view hidden">
+  <button id="hr-mute" class="mute-btn" aria-label="Toggle sound">🔊</button>
+
+  <div style="max-width:1100px;margin:0 auto;width:100%;padding:8px 0 24px;">
+    <div class="hr-header">
+      <span class="hr-progress" id="hr-q-num">Q1 of 5</span>
+    </div>
+
+    <p id="hr-question-text">Question text</p>
+
+    <div class="hr-main">
+      <!-- Answer distribution bars -->
+      <div class="hr-bars-section">
+        <div class="hr-bars-title">Answer Distribution</div>
+        <div id="hr-answer-bars"><!-- Rendered by JS --></div>
+      </div>
+
+      <!-- Running leaderboard -->
+      <div class="hr-lb-section">
+        <div class="hr-lb-title">Top Players</div>
+        <div id="hr-leaderboard"><!-- Rendered by JS --></div>
+      </div>
+    </div>
+
+    <div class="hr-next-wrap">
+      <button id="hr-next-btn" class="btn btn-primary btn-lg">
+        ⏭ Next Question
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     VIEW: HOST FINAL LEADERBOARD
+     ============================================================ -->
+<section id="view-host-leaderboard" class="view hidden">
+  <button id="hl-mute" class="mute-btn" aria-label="Toggle sound">🔊</button>
+
+  <h1 class="hl-title">🏆 Game Over!</h1>
+  <p class="hl-subtitle">Final Leaderboard</p>
+
+  <div id="podium" role="list" aria-label="Top 3 players">
+    <!-- Rendered by JS -->
+  </div>
+
+  <p class="hl-list-title">All Players</p>
+  <div id="full-leaderboard" role="list">
+    <!-- Rendered by JS -->
+  </div>
+
+  <div class="hl-footer">
+    <button id="hl-end-btn" class="btn btn-ghost" style="color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.2);">
+      ← Back to Dashboard
+    </button>
+  </div>
+</section>
+
+<!-- ============================================================
+     VIEW: STUDENT JOIN
+     ============================================================ -->
+<section id="view-student-join" class="view hidden">
+  <div class="join-card">
+    <div class="join-logo">
+      <div class="join-hubquiz-name">Hub<span>Quiz</span></div>
+      <div class="join-tagline">Enter your PIN to join the game</div>
+    </div>
+
+    <form id="join-form" class="join-form-stack">
+      <div class="form-group">
+        <label class="form-label" for="join-pin">Game PIN</label>
+        <input type="tel" id="join-pin" class="input-field join-pin-input"
+               placeholder="000 000"
+               maxlength="7"
+               inputmode="numeric"
+               autocomplete="off"
+               aria-label="6-digit game PIN"
+               required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="join-name">Your Name</label>
+        <input type="text" id="join-name" class="input-field"
+               placeholder="e.g. Ravi Kumar"
+               maxlength="30"
+               autocomplete="nickname"
+               aria-label="Your display name"
+               required>
+      </div>
+
+      <div id="join-error" class="form-msg error" role="alert"></div>
+
+      <button type="submit" id="join-btn" class="btn btn-primary btn-lg btn-full">
+        Join Game
+      </button>
+    </form>
+
+    <div class="join-footer">
+      Are you a mentor? <a id="mentor-login-link" role="button">Sign in here</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     VIEW: STUDENT LOBBY (WAITING)
+     ============================================================ -->
+<section id="view-student-lobby" class="view hidden">
+  <button id="sl-mute" class="mute-btn" aria-label="Toggle sound">🔊</button>
+
+  <div class="sl-emoji" aria-hidden="true">🎮</div>
+  <div class="sl-name" id="sl-player-name">Player Name</div>
+  <div class="sl-status">
+    You're in! Waiting for the host to start<span class="sl-waiting-dots" aria-hidden="true"></span>
+  </div>
+
+  <div style="
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:16px;
+    padding:20px 32px;
+    margin-top:16px;
+    font-size:0.875rem;
+    color:rgba(255,255,255,0.4);
+    max-width:300px;
+    text-align:center;
+  ">
+    Get ready! The quiz will start soon. Keep your eyes on the host screen.
+  </div>
+</section>
+
+<!-- ============================================================
+     VIEW: STUDENT QUESTION
+     ============================================================ -->
+<section id="view-student-question" class="view hidden">
+
+  <!-- Timer bar -->
+  <div class="sq-timer-wrap" role="progressbar" aria-label="Time remaining" aria-valuemin="0" aria-valuemax="30">
+    <div id="sq-timer-bar" style="width:100%;"></div>
+  </div>
+
+  <!-- Header -->
+  <div class="sq-header">
+    <span id="sq-q-num">Q1</span>
+    <button id="sq-mute" class="mute-btn" style="position:static;background:transparent;border:none;color:rgba(255,255,255,0.5);font-size:1.1rem;width:auto;height:auto;backdrop-filter:none;" aria-label="Toggle sound">🔊</button>
+  </div>
+
+  <!-- Answer blocks -->
+  <div id="sq-answer-blocks" role="group" aria-label="Choose your answer">
+    <!-- Rendered by JS -->
+  </div>
+
+  <!-- Status area -->
+  <div class="sq-status-area">
+    <div id="sq-locked-msg" class="hidden"></div>
+    <div id="sq-result" class="sq-result hidden" role="status" aria-live="polite"></div>
+    <div id="sq-waiting-reveal" class="hidden">Waiting for host to reveal the answer...</div>
+  </div>
+
+</section>
+
+<!-- ============================================================
+     VIEW: STUDENT FINAL SCREEN
+     ============================================================ -->
+<section id="view-student-final" class="view hidden">
+  <div class="sf-card">
+    <div id="sf-medal" aria-label="Your medal">⭐</div>
+    <div class="sf-game-over">Game Over</div>
+    <div id="sf-rank" aria-label="Your rank">#?</div>
+    <div id="sf-total">of ? players</div>
+    <div class="sf-score-label">Total Score</div>
+    <div id="sf-score" aria-label="Your score">0</div>
+    <button id="sf-play-again" class="btn btn-primary btn-lg btn-full">
+      Play Again
+    </button>
+  </div>
+</section>
+
+<!-- ============================================================
+     VIEW: STUDENT DISCONNECTED
+     ============================================================ -->
+<section id="view-student-disconnected" class="view hidden">
+  <div class="sd-icon" aria-hidden="true">📡</div>
+  <h2 class="sd-title">Connection Lost</h2>
+  <p class="sd-desc">You've been disconnected from the game.</p>
+  <button id="sd-rejoin-btn" class="btn btn-primary btn-lg">
+    Rejoin Game
+  </button>
+  <p style="font-size:0.8rem;color:var(--grey-500);margin-top:8px;">
+    Re-enter your PIN and name to continue.
+  </p>
+</section>
+
+<!-- ============================================================
+     Scripts (order matters)
+     ============================================================ -->
+<script src="supabase.js"></script>
+<script src="audio.js"></script>
+<script src="confetti.js"></script>
+<script src="app.js"></script>
+
+<!-- History API polyfill for static hosting (Netlify/Vercel handle this via _redirects) -->
+<script>
+  // If the server serves index.html for all routes, the app.js router handles the rest.
+  // For GitHub Pages, use hash-based fallback automatically:
+  (function() {
+    const path = window.location.pathname;
+    if (path !== '/' && path !== '/index.html' && !path.endsWith('.js') && !path.endsWith('.css')) {
+      // Let app.js handle it via route()
+    }
+  })();
+</script>
+
+</body>
+</html>
