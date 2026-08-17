@@ -335,13 +335,45 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 }
 
 .login-stack { display: flex; flex-direction: column; gap: 16px; }
-
 .login-footer {
-  margin-top: 20px;
+  margin-top: 24px;
   text-align: center;
   font-size:  0.875rem;
-  color:      rgba(255,255,255,0.5);
+  color:      var(--grey-400);
 }
+
+/* Light Theme Overrides for Login View */
+#view-login {
+  background-color: #f8fafc;
+  color: var(--navy);
+}
+#view-login .login-brand-name { color: var(--grey-600); }
+#view-login .login-hubquiz { color: var(--navy); }
+#view-login .login-card {
+  background: #ffffff;
+  border-color: var(--grey-200);
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+}
+#view-login .login-form-title { color: var(--navy); }
+#view-login .login-footer { color: var(--grey-600); }
+#view-login .form-label { color: var(--grey-700); }
+#view-login .input-field {
+  background: #ffffff;
+  border-color: var(--grey-300);
+  color: var(--navy);
+}
+#view-login .input-field:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
+}
+#view-login .input-field::placeholder { color: var(--grey-400); }
+
+#view-login .login-footer a {
+  color: var(--navy);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
 .login-footer a {
   color:       var(--yellow);
   font-weight: 600;

@@ -133,6 +133,12 @@ function showLogin() {
     const password = document.getElementById('signup-password').value;
     const name     = document.getElementById('signup-name').value.trim();
     const btn      = document.getElementById('signup-btn');
+
+    if (!email.endsWith('@erafoundationindia.org') && !email.endsWith('@comedkares.org')) {
+      showError('signup-error', 'Mentors must use an @erafoundationindia.org or @comedkares.org email.');
+      return;
+    }
+
     setLoading(btn, true);
     clearError('signup-error');
 
