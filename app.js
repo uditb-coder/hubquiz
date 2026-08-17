@@ -282,18 +282,29 @@ function addQuestionRow(q = null) {
   div.innerHTML = `
     <div class="q-header">
       <span class="q-num">Q${idx + 1}</span>
-      <button type="button" class="btn btn-icon q-remove" title="Remove question">✕</button>
+      <select class="input-field q-type-select" style="width: auto; padding: 4px 8px; font-size: 0.9rem; margin-left: auto; margin-right: 12px; height: 32px; border-radius: 6px;">
+        <option value="mcq" ${q?.question_type !== 'open_ended' ? 'selected' : ''}>Multiple Choice</option>
+        <option value="open_ended" ${q?.question_type === 'open_ended' ? 'selected' : ''}>Open Ended</option>
+      </select>
+      <button type="button" class="btn btn-icon q-remove" title="Remove question">🗑</button>
     </div>
     <textarea class="q-text input-field" placeholder="Question text..." required>${escHtml(q?.question_text || '')}</textarea>
-    <div class="q-options">
+    <div class="q-options" style="${q?.question_type === 'open_ended' ? 'display:none;' : ''}">
       ${['a','b','c','d'].map(opt => `
         <label class="option-row option-${opt}">
-          <input type="radio" name="correct-${idx}" value="${opt}" ${q?.correct_option === opt ? 'checked' : ''} required>
+          <input type="radio" name="correct-${idx}" value="${opt}" ${q?.correct_option === opt ? 'checked' : ''}>
           <span class="opt-label">${opt.toUpperCase()}</span>
-          <input type="text" class="input-field opt-input" placeholder="Option ${opt.toUpperCase()}" value="${escHtml(q?.['option_'+opt] || '')}" required>
+          <input type="text" class="input-field opt-input" placeholder="Option ${opt.toUpperCase()}" value="${escHtml(q?.['option_'+opt] || '')}">
         </label>
       `).join('')}
     </div>`;
+
+  const typeSelect = div.querySelector('.q-type-select');
+  const optionsDiv = div.querySelector('.q-options');
+  typeSelect.addEventListener('change', (e) => {
+    optionsDiv.style.display = e.target.value === 'open_ended' ? 'none' : 'grid';
+  });
+  
   div.querySelector('.q-remove').addEventListener('click', () => {
     div.remove();
     renumberQuestions();
@@ -328,23 +339,28 @@ async function saveQuiz(quizId) {
   let valid = true;
   rows.forEach((row, i) => {
     const text    = row.querySelector('.q-text').value.trim();
+    const qType   = row.querySelector('.q-type-select').value;
     const opts    = row.querySelectorAll('.opt-input');
     const correct = row.querySelector('input[type="radio"]:checked')?.value;
-    if (!text || !correct) { valid = false; return; }
+    
+    if (!text) { valid = false; return; }
+    if (qType === 'mcq' && !correct) { valid = false; return; }
+
     questions.push({
       question_text: text,
-      option_a:      opts[0].value.trim(),
-      option_b:      opts[1].value.trim(),
-      option_c:      opts[2].value.trim(),
-      option_d:      opts[3].value.trim(),
-      correct_option: correct,
+      question_type: qType,
+      option_a:      qType === 'mcq' ? opts[0].value.trim() : null,
+      option_b:      qType === 'mcq' ? opts[1].value.trim() : null,
+      option_c:      qType === 'mcq' ? opts[2].value.trim() : null,
+      option_d:      qType === 'mcq' ? opts[3].value.trim() : null,
+      correct_option: qType === 'mcq' ? correct : null,
       order_index:   i,
       quiz_id:       null, // filled after upsert
       id:            row.dataset.questionId || undefined,
     });
   });
 
-  if (!valid) { showError('qm-error', 'All questions need text and a correct answer selected.'); setLoading(btn, false); return; }
+  if (!valid) { showError('qm-error', 'Please fill all question texts, and select correct answers for MCQs.'); setLoading(btn, false); return; }
 
   try {
     let finalQuizId = quizId;
@@ -606,13 +622,17 @@ async function hostShowQuestion(index) {
 
   // Render answer blocks
   const blocksEl = document.getElementById('hq-answer-blocks');
-  blocksEl.innerHTML = ['a','b','c','d'].map(opt => `
-    <div class="host-answer-block answer-${opt}">
-      <span class="answer-symbol">${ANSWER_COLORS[opt].symbol}</span>
-      <span class="answer-opt-label">${opt.toUpperCase()}</span>
-      <span class="answer-opt-text">${escHtml(q['option_'+opt])}</span>
-    </div>`
-  ).join('');
+  if (q.question_type === 'open_ended') {
+    blocksEl.innerHTML = `<div style="text-align:center; padding: 48px; color: var(--grey-500); font-size: 1.5rem;">Waiting for participants to type their answers...</div>`;
+  } else {
+    blocksEl.innerHTML = ['a','b','c','d'].map(opt => `
+      <div class="host-answer-block answer-${opt}">
+        <span class="answer-symbol">${ANSWER_COLORS[opt].symbol}</span>
+        <span class="answer-opt-label">${opt.toUpperCase()}</span>
+        <span class="answer-opt-text">${escHtml(q['option_'+opt])}</span>
+      </div>`
+    ).join('');
+  }
 
   // Start timer ring
   startHostTimer(QUESTION_TIME, now);
@@ -721,12 +741,6 @@ async function hostShowReveal(questionId) {
     correct_option: q.correct_option,
   });
 
-  // Fetch answer distribution
-  const { data: counts } = await HQ_SUPABASE.rpc('get_question_answer_counts', {
-    p_session_id:  State.session.id,
-    p_question_id: questionId,
-  });
-
   // Fetch leaderboard
   const { data: leaders } = await HQ_SUPABASE.rpc('get_session_leaderboard', {
     p_session_id: State.session.id,
@@ -740,25 +754,51 @@ async function hostShowReveal(questionId) {
   document.getElementById('hr-q-num').textContent = `Q${index + 1} of ${State.questions.length}`;
   document.getElementById('hr-question-text').textContent = q.question_text;
 
-  // Render answer bars
-  const total = counts?.total_players || 1;
   const barsEl = document.getElementById('hr-answer-bars');
-  barsEl.innerHTML = ['a','b','c','d'].map(opt => {
-    const count = counts?.[opt] ?? 0;
-    const pct   = Math.round((count / total) * 100);
-    const isCorrect = opt === q.correct_option;
-    return `
-      <div class="reveal-bar-row ${isCorrect ? 'correct-answer' : ''}">
-        <div class="reveal-bar-label answer-${opt}">
-          ${ANSWER_COLORS[opt].symbol} ${opt.toUpperCase()}
-          ${isCorrect ? '<span class="correct-tick">✓</span>' : ''}
+  
+  if (q.question_type === 'open_ended') {
+    // Fetch text answers directly
+    const { data: textAnswers } = await HQ_SUPABASE.from('answers')
+      .select('chosen_text, players!inner(name, session_id)')
+      .eq('question_id', questionId)
+      .eq('players.session_id', State.session.id)
+      .not('chosen_text', 'is', null);
+
+    if (textAnswers && textAnswers.length > 0) {
+      barsEl.innerHTML = '<div style="display:flex; flex-wrap:wrap; gap:12px; margin-top: 16px;">' + textAnswers.map(ans => `
+        <div style="background:var(--grey-100); color:var(--navy); padding:12px 16px; border-radius:12px; font-size:1.1rem; box-shadow:0 2px 4px rgba(0,0,0,0.05); max-width: 100%;">
+          <div style="font-size:0.8rem; font-weight:700; color:var(--grey-500); margin-bottom:4px;">${escHtml(ans.players.name)}</div>
+          <div>${escHtml(ans.chosen_text)}</div>
         </div>
-        <div class="reveal-bar-track">
-          <div class="reveal-bar-fill answer-${opt}" style="width:${pct}%"></div>
-        </div>
-        <span class="reveal-bar-count">${count}</span>
-      </div>`;
-  }).join('');
+      `).join('') + '</div>';
+    } else {
+      barsEl.innerHTML = '<div style="color:var(--grey-500); padding: 24px 0;">No answers submitted.</div>';
+    }
+  } else {
+    // Fetch answer distribution for MCQ
+    const { data: counts } = await HQ_SUPABASE.rpc('get_question_answer_counts', {
+      p_session_id:  State.session.id,
+      p_question_id: questionId,
+    });
+    
+    const total = counts?.total_players || 1;
+    barsEl.innerHTML = ['a','b','c','d'].map(opt => {
+      const count = counts?.[opt] ?? 0;
+      const pct   = Math.round((count / total) * 100);
+      const isCorrect = opt === q.correct_option;
+      return `
+        <div class="reveal-bar-row ${isCorrect ? 'correct-answer' : ''}">
+          <div class="reveal-bar-label answer-${opt}">
+            ${ANSWER_COLORS[opt].symbol} ${opt.toUpperCase()}
+            ${isCorrect ? '<span class="correct-tick">✓</span>' : ''}
+          </div>
+          <div class="reveal-bar-track">
+            <div class="reveal-bar-fill answer-${opt}" style="width:${pct}%"></div>
+          </div>
+          <span class="reveal-bar-count">${count}</span>
+        </div>`;
+    }).join('');
+  }
 
   // Render mini leaderboard
   const lbEl = document.getElementById('hr-leaderboard');
@@ -1006,34 +1046,54 @@ async function studentShowQuestion(payload) {
 
   document.getElementById('sq-q-num').textContent = `Q${question_index + 1}`;
 
-  // Render tappable color blocks
+  // Render tappable color blocks or text area
   const blocksEl = document.getElementById('sq-answer-blocks');
-  blocksEl.innerHTML = ['a','b','c','d'].map(opt => `
-    <button class="student-answer-btn answer-${opt}" data-opt="${opt}" id="sq-btn-${opt}" aria-label="Option ${opt.toUpperCase()}: ${escHtml(q['option_'+opt])}">
-      <span class="sa-symbol">${ANSWER_COLORS[opt].symbol}</span>
-      <span class="sa-label">${opt.toUpperCase()}</span>
-    </button>`
-  ).join('');
-
-  // Start progress bar
-  startStudentTimer(QUESTION_TIME, question_started_at);
-
-  // Attach answer handlers
-  blocksEl.querySelectorAll('.student-answer-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      if (btn.disabled) return;
-      // Lock all buttons
-      blocksEl.querySelectorAll('.student-answer-btn').forEach(b => b.disabled = true);
-      btn.classList.add('selected');
+  if (q.question_type === 'open_ended') {
+    blocksEl.innerHTML = `
+      <div class="sq-open-ended-wrap" style="width:100%; display:flex; flex-direction:column; gap:16px;">
+        <textarea id="sq-text-input" class="input-field" placeholder="Type your answer here..." style="min-height: 150px; font-size: 1.2rem; padding: 16px; resize: none;"></textarea>
+        <button id="sq-submit-text-btn" class="btn btn-primary btn-lg">Submit Answer</button>
+      </div>
+    `;
+    
+    const submitBtn = document.getElementById('sq-submit-text-btn');
+    const textInput = document.getElementById('sq-text-input');
+    
+    submitBtn.addEventListener('click', async () => {
+      const text = textInput.value.trim();
+      if (!text) return;
+      submitBtn.disabled = true;
+      textInput.disabled = true;
       AudioEngine.playAnswerLocked();
-
-      const chosenOpt = btn.dataset.opt;
-      showStudentAnswerLocked(btn);
-
-      // Submit to server
-      await submitStudentAnswer(question_id, chosenOpt);
+      
+      showStudentAnswerLocked(submitBtn);
+      await submitStudentOpenAnswer(question_id, text);
     });
-  });
+  } else {
+    blocksEl.innerHTML = ['a','b','c','d'].map(opt => `
+      <button class="student-answer-btn answer-${opt}" data-opt="${opt}" id="sq-btn-${opt}" aria-label="Option ${opt.toUpperCase()}: ${escHtml(q['option_'+opt])}">
+        <span class="sa-symbol">${ANSWER_COLORS[opt].symbol}</span>
+        <span class="sa-label">${opt.toUpperCase()}</span>
+      </button>`
+    ).join('');
+
+    // Attach answer handlers
+    blocksEl.querySelectorAll('.student-answer-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (btn.disabled) return;
+        // Lock all buttons
+        blocksEl.querySelectorAll('.student-answer-btn').forEach(b => b.disabled = true);
+        btn.classList.add('selected');
+        AudioEngine.playAnswerLocked();
+
+        const chosenOpt = btn.dataset.opt;
+        showStudentAnswerLocked(btn);
+
+        // Submit to server
+        await submitStudentAnswer(question_id, chosenOpt);
+      });
+    });
+  }
 }
 
 function startStudentTimer(seconds, startedAt) {
@@ -1065,6 +1125,34 @@ function showStudentAnswerLocked(btn) {
     lockEl.classList.remove('hidden');
     lockEl.textContent = '✓ Answer locked in!';
   }
+}
+
+async function submitStudentOpenAnswer(questionId, text) {
+  const playerId = State.playerSelf?.id || localStorage.getItem('hq_player_id');
+  if (!playerId) return;
+
+  const { data, error } = await HQ_SUPABASE.rpc('submit_open_answer', {
+    p_player_id:   playerId,
+    p_question_id: questionId,
+    p_chosen_text: text,
+  });
+
+  if (error) {
+    console.warn('Answer submit error:', error.message);
+    return;
+  }
+
+  // Show result on student device immediately
+  const lockEl = document.getElementById('sq-locked-msg');
+  const resultsEl = document.getElementById('sq-result');
+
+  if (resultsEl) {
+    resultsEl.classList.remove('hidden');
+    resultsEl.className = 'sq-result correct';
+    resultsEl.innerHTML = `<span class="result-icon">✓</span><span>Answer Submitted!</span>`;
+    AudioEngine.playCorrect();
+  }
+  if (lockEl) lockEl.classList.add('hidden');
 }
 
 async function submitStudentAnswer(questionId, chosenOption) {
