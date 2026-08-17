@@ -619,6 +619,14 @@ async function hostShowQuestion(index) {
 
   // Subscribe to answer inserts for count
   subscribeAnswerCount(q.id);
+
+  const skipBtn = document.getElementById('hq-skip-btn');
+  if (skipBtn) {
+    skipBtn.onclick = () => {
+      clearTimer();
+      hostShowReveal(q.id);
+    };
+  }
 }
 
 let _answerCountCh = null;

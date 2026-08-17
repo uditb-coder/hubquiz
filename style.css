@@ -1661,19 +1661,22 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 #view-host-question #hq-question-text { color: var(--navy); }
 #view-host-question .timer-ring-wrap { background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
 #view-host-question #timer-number { color: var(--navy); }
+#view-host-question .hq-progress { color: var(--grey-600) !important; }
 
 /* Host Reveal View */
-#view-host-reveal .hr-progress { color: var(--navy); }
-#view-host-reveal #hr-question-text { color: var(--navy); }
-#view-host-reveal .hr-bars-title, #view-host-reveal .hr-lb-title { color: var(--grey-600); }
+#view-host-reveal .hr-progress { color: var(--grey-600) !important; }
+#view-host-reveal #hr-question-text { color: var(--navy) !important; }
+#view-host-reveal .hr-bars-title, #view-host-reveal .hr-lb-title { color: var(--grey-600) !important; }
 #view-host-reveal .lb-row { background: #ffffff; border: 1px solid var(--grey-200); }
-#view-host-reveal .lb-row .lb-name { color: var(--navy); }
-#view-host-reveal .hr-bar-label { color: var(--navy); }
-#view-host-reveal .hr-bar-bg { background: #e2e8f0; }
-#view-host-reveal .hr-bar-count { color: var(--navy); }
+#view-host-reveal .lb-row .lb-name, 
+#view-host-reveal .lb-row .lb-score { color: var(--navy) !important; }
+#view-host-reveal .reveal-bar-label { color: var(--navy) !important; }
+#view-host-reveal .reveal-bar-track { background: var(--grey-200) !important; }
+#view-host-reveal .reveal-bar-count { color: var(--navy) !important; }
 
 /* Host Results View */
-#view-host-results .results-title { color: var(--navy); }
-#view-host-results .results-subtitle { color: var(--grey-600); }
+#view-host-results .results-title { color: var(--navy) !important; }
+#view-host-results .results-subtitle { color: var(--grey-600) !important; }
 #view-host-results .lb-full-row { background: #ffffff; border: 1px solid var(--grey-200); color: var(--navy); }
-#view-host-results .lb-full-row .lb-name { color: var(--navy); }
+#view-host-results .lb-full-row .lb-name,
+#view-host-results .lb-full-row .lb-score { color: var(--navy) !important; }
