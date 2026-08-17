@@ -110,12 +110,14 @@ function showLogin() {
     }
   });
 
-  signupLink?.addEventListener('click', () => {
+  document.getElementById('show-signup').addEventListener('click', (e) => {
+    e.preventDefault();
     document.getElementById('login-panel').classList.add('hidden');
     document.getElementById('signup-panel').classList.remove('hidden');
   });
 
-  backLink?.addEventListener('click', () => {
+  document.getElementById('back-to-login').addEventListener('click', (e) => {
+    e.preventDefault();
     document.getElementById('signup-panel').classList.add('hidden');
     document.getElementById('login-panel').classList.remove('hidden');
   });
