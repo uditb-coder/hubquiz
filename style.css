@@ -1898,6 +1898,14 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   --answer-d: #2E7D5E;   /* muted emerald */
 }
 
+/* Ensure the ComedKares logo is visible on the dark background */
+body.gameplay img[src*="logo.png"],
+body.gameplay img[src*="logo.jpg"] {
+  background-color: white;
+  padding: 4px;
+  border-radius: 4px;
+}
+
 /* --- Keyframes --- */
 @keyframes gameGradientFlow {
   0%   { background-position: 0% 50%; }
