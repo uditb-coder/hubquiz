@@ -1581,8 +1581,10 @@ function studentShowReveal(payload) {
       resultsEl.innerHTML = `
         <div class="feedback-card">
            <div class="feedback-icon correct-icon">✓</div>
-           <div class="feedback-title">Correct! +${data.points_awarded}</div>
-           <div class="feedback-encouragement">${encouragement}</div>
+           <div class="feedback-content">
+             <div class="feedback-title">Correct! +${data.points_awarded}</div>
+             <div class="feedback-encouragement">${encouragement}</div>
+           </div>
            <div class="feedback-stats">
               <div class="stat-box">
                  <div class="stat-label">Rank</div>
@@ -1601,8 +1603,10 @@ function studentShowReveal(payload) {
       resultsEl.innerHTML = `
         <div class="feedback-card">
            <div class="feedback-icon incorrect-icon">❌</div>
-           <div class="feedback-title">Incorrect</div>
-           <div class="feedback-encouragement">Keep going! Don't give up! 💪</div>
+           <div class="feedback-content">
+             <div class="feedback-title">Incorrect</div>
+             <div class="feedback-encouragement">Keep going! Don't give up! 💪</div>
+           </div>
            <div class="feedback-stats">
               <div class="stat-box">
                  <div class="stat-label">Rank</div>
