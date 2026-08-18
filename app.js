@@ -194,6 +194,9 @@ async function showDashboard() {
         hostShowQuestion(s.current_question_index);
       }
       return;
+    } else {
+      // Mark as finished so it doesn't pop up again
+      await HQ_SUPABASE.from('game_sessions').update({ status: 'finished' }).eq('id', s.id);
     }
   }
 
