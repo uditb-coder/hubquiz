@@ -75,46 +75,22 @@ const AudioEngine = (() => {
 
   // ---- Lobby music (looping ambient pulsed chords) ----
 
+  let lobbyAudio = null;
+
   function startLobbyMusic() {
-    if (muted || lobbyNodes) return;
-    const ac = getCtx();
-    lobbyNodes = [];
-
-    // Simple upbeat loop using a ScriptProcessor-free approach:
-    // Schedule repeated notes into the future
-    const notes = [261.63, 329.63, 392.00, 523.25]; // C4 E4 G4 C5
-    const interval = 0.5; // seconds per note
-    let time = ac.currentTime + 0.1;
-
-    function scheduleLoop() {
-      if (!lobbyNodes || muted) return;
-      for (let i = 0; i < 8; i++) {
-        const freq = notes[i % notes.length];
-        const osc = ac.createOscillator();
-        const gain = ac.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, time + i * interval);
-        gain.gain.setValueAtTime(0.0001, time + i * interval);
-        gain.gain.linearRampToValueAtTime(0.12, time + i * interval + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.0001, time + i * interval + interval * 0.8);
-        osc.connect(gain);
-        gain.connect(ac.destination);
-        osc.start(time + i * interval);
-        osc.stop(time + i * interval + interval);
-        lobbyNodes.push(osc);
-      }
-      time += 8 * interval;
-      lobbyNodes._timer = setTimeout(scheduleLoop, 3000);
+    if (muted) return;
+    if (!lobbyAudio) {
+      lobbyAudio = new Audio('/assets/lobby.mp3');
+      lobbyAudio.loop = true;
     }
-
-    scheduleLoop();
+    lobbyAudio.play().catch(e => console.warn('Lobby audio autoplay blocked:', e));
   }
 
   function stopLobbyMusic() {
-    if (!lobbyNodes) return;
-    clearTimeout(lobbyNodes._timer);
-    lobbyNodes.forEach(n => { try { n.stop(); } catch(e) {} });
-    lobbyNodes = null;
+    if (lobbyAudio) {
+      lobbyAudio.pause();
+      lobbyAudio.currentTime = 0;
+    }
   }
 
   // ---- Countdown tension music ----
