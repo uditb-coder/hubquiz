@@ -246,6 +246,99 @@ async function showDashboard() {
   document.getElementById('new-quiz-btn')?.addEventListener('click', () => {
     showQuizModal(null);
   });
+
+  document.getElementById('template-vtu-btn')?.addEventListener('click', async (e) => {
+    const btn = e.target;
+    const originalText = btn.textContent;
+    btn.textContent = 'Importing Curriculum...';
+    btn.disabled = true;
+
+    try {
+      const vtuCurriculum = [
+        {
+          title: 'VTU Week 1-3: Orientation & Team Formation',
+          questions: [
+            { order_index: 0, question_text: 'What is the key difference between Innovation and Invention?', option_a: 'Invention is creating something new; Innovation adds value to it', option_b: 'Innovation is just an idea; Invention is a physical product', option_c: 'They are exactly the same thing', option_d: 'Invention is only for engineers; Innovation is for managers', correct_option: 'a' },
+            { order_index: 1, question_text: 'What are the 5 core stages of Design Thinking in the correct order?', option_a: 'Empathize, Define, Ideate, Prototype, Test', option_b: 'Define, Empathize, Prototype, Ideate, Test', option_c: 'Ideate, Prototype, Empathize, Define, Test', option_d: 'Test, Prototype, Ideate, Define, Empathize', correct_option: 'a' },
+            { order_index: 2, question_text: 'Why are interdisciplinary teams important in Design Thinking?', option_a: 'To finish the project faster', option_b: 'To bring diverse perspectives and skills to problem-solving', option_c: 'Because it is a university rule', option_d: 'To reduce the total cost of the project', correct_option: 'b' },
+            { order_index: 3, question_text: 'What is the primary purpose of the warm-up activities in Week 3?', option_a: 'To assess individual programming skills', option_b: 'To finalize the business model', option_c: 'To foster creative thinking and team bonding', option_d: 'To pitch to the jury', correct_option: 'c' }
+          ]
+        },
+        {
+          title: 'VTU Week 4-5: Empathy & Field Exploration',
+          questions: [
+            { order_index: 0, question_text: 'Which of the following is an example of field exploration?', option_a: 'Reading a textbook in the library', option_b: 'Visiting a village or NGO to observe user challenges', option_c: 'Watching a tutorial video online', option_d: 'Writing code in the lab', correct_option: 'b' },
+            { order_index: 1, question_text: 'Why is stakeholder interaction crucial during the Empathy stage?', option_a: 'To understand the real needs and pain points of the users', option_b: 'To convince them to buy the product', option_c: 'To ask them for funding', option_d: 'To show off the final prototype', correct_option: 'a' },
+            { order_index: 2, question_text: 'Where must all field interaction and observations be recorded?', option_a: 'On a personal blog', option_b: 'In a digital word document', option_c: 'In the handwritten activity book prescribed by the University', option_d: 'They do not need to be recorded', correct_option: 'c' },
+            { order_index: 3, question_text: 'Empathy in design thinking means:', option_a: 'Feeling sorry for the users', option_b: 'Putting yourself in the user\\'s shoes to deeply understand their experience', option_c: 'Designing what you personally think is best', option_d: 'Ignoring user feedback', correct_option: 'b' }
+          ]
+        },
+        {
+          title: 'VTU Week 6-8: Problem Definition',
+          questions: [
+            { order_index: 0, question_text: 'What does "HMW" stand for in problem framing?', option_a: 'How Might We', option_b: 'How Many Ways', option_c: 'Have More Wisdom', option_d: 'Help Me Win', correct_option: 'a' },
+            { order_index: 1, question_text: 'Which tool is used to group related user insights?', option_a: '3D Printer', option_b: 'Affinity Clustering', option_c: 'Arduino', option_d: 'Digital Multimeter', correct_option: 'b' },
+            { order_index: 2, question_text: 'What is the purpose of a Problem Tree?', option_a: 'To plant trees for eco-friendly ideas', option_b: 'To map out the root causes and effects of a core problem', option_c: 'To design the aesthetic of the product', option_d: 'To track team attendance', correct_option: 'b' },
+            { order_index: 3, question_text: 'A clearly defined challenge statement should be:', option_a: 'Vague and open-ended', option_b: 'Focused purely on technology', option_c: 'Human-centered and actionable', option_d: 'Written by the jury', correct_option: 'c' }
+          ]
+        },
+        {
+          title: 'VTU Week 9-11: Ideation Sprint',
+          questions: [
+            { order_index: 0, question_text: 'What is the main goal of an Ideation Sprint?', option_a: 'Generating a large quantity of diverse ideas', option_b: 'Selecting just one perfect idea immediately', option_c: 'Building the final prototype', option_d: 'Writing the final report', correct_option: 'a' },
+            { order_index: 1, question_text: 'What is Mind Mapping used for?', option_a: 'Testing electrical circuits', option_b: 'Visually organizing information and ideas around a central concept', option_c: 'Calculating the budget', option_d: 'Creating 3D models', correct_option: 'b' },
+            { order_index: 2, question_text: 'During Idea Filtering, which criteria are emphasized for selecting a suitable idea?', option_a: 'Expensive, complex, and trendy', option_b: 'Creative, eco-friendly, and feasible', option_c: 'Random, untested, and easy', option_d: 'Profitable, loud, and digital', correct_option: 'b' },
+            { order_index: 3, question_text: 'What happens immediately after the best idea is shortlisted in Week 10?', option_a: 'The project is considered finished', option_b: 'The team pitches to the jury', option_c: 'Designing and Structuring of the Prototype model begins', option_d: 'Another field visit is scheduled', correct_option: 'c' }
+          ]
+        },
+        {
+          title: 'VTU Week 12-14: Rapid Prototyping',
+          questions: [
+            { order_index: 0, question_text: 'What is a "low-fidelity" prototype?', option_a: 'A fully functional, expensive product ready for market', option_b: 'A quick, simple, and cheap representation of the idea (e.g., using cardboard or paper)', option_c: 'A prototype that does not work at all', option_d: 'A prototype built with low-quality materials that breaks easily', correct_option: 'b' },
+            { order_index: 1, question_text: 'Which of the following tools might be used in the Atal Idea Lab for fabrication?', option_a: 'Only Microsoft Word', option_b: 'Arduino, electronics kits, and 3D printers', option_c: 'Only handwritten activity books', option_d: 'Microscopes and test tubes', correct_option: 'b' },
+            { order_index: 2, question_text: 'What is the purpose of User Testing in Week 14?', option_a: 'To test the students\\' knowledge', option_b: 'To collect feedback from users to iterate and improve the design', option_c: 'To grade the prototype', option_d: 'To sell the prototype', correct_option: 'b' },
+            { order_index: 3, question_text: 'What document is drafted alongside the iterations in Week 14?', option_a: 'A social venture plan / business model for impact', option_b: 'The final exam question paper', option_c: 'A personal diary', option_d: 'A legal patent application', correct_option: 'a' }
+          ]
+        },
+        {
+          title: 'VTU Week 15-16: Final Demo & Social Pitch',
+          questions: [
+            { order_index: 0, question_text: 'What is the primary focus of the final social pitch?', option_a: 'Only the technical details of the code', option_b: 'Presenting the project impact, prototype, and sustainability plan', option_c: 'Explaining how hard the team worked', option_d: 'Asking for good grades', correct_option: 'b' },
+            { order_index: 1, question_text: 'What is the minimum qualifying score for the Continuous Internal Evaluation (CIE)?', option_a: '18 out of 50', option_b: '20 out of 50', option_c: '35 out of 50', option_d: '40 out of 50', correct_option: 'b' },
+            { order_index: 2, question_text: 'What percentage of the overall course grade is determined by the Semester End Examination (SEE)?', option_a: '20%', option_b: '30%', option_c: '50%', option_d: '100%', correct_option: 'c' },
+            { order_index: 3, question_text: 'Who evaluates the SEE exhibition and Viva-voce?', option_a: 'Only the internal faculty', option_b: 'Only external industry experts', option_c: 'One Internal and one External Examiner', option_d: 'The students grade each other', correct_option: 'c' }
+          ]
+        }
+      ];
+
+      for (const template of vtuCurriculum) {
+        // Create quiz
+        const { data: qz, error: qzErr } = await HQ_SUPABASE.from('quizzes')
+          .insert([{ title: template.title, created_by: State.user.id }])
+          .select().single();
+        
+        if (qzErr) throw qzErr;
+
+        // Attach quiz_id to questions
+        const questions = template.questions.map(q => ({
+          ...q,
+          quiz_id: qz.id
+        }));
+
+        // Insert questions
+        const { error: qsErr } = await HQ_SUPABASE.from('questions').insert(questions);
+        if (qsErr) throw qsErr;
+      }
+
+      await loadQuizList();
+      alert('Success! All 6 VTU curriculum quizzes have been imported into your account.');
+    } catch (err) {
+      alert('Error importing template: ' + err.message);
+    } finally {
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }
+  });
 }
 
 async function loadQuizList() {
