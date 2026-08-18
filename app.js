@@ -554,6 +554,9 @@ function showHostLobby() {
   // QR Enlarge handler
   const qrImg = document.getElementById('lobby-qr-img');
   if (qrImg) {
+    const joinUrl = encodeURIComponent(`https://hubquiz.vercel.app/?pin=${pin}`);
+    qrImg.src = `https://quickchart.io/qr?text=${joinUrl}&size=300&margin=1`;
+    
     qrImg.onclick = (e) => {
       e.target.classList.toggle('qr-enlarged');
     };
@@ -998,10 +1001,22 @@ function showStudentJoin() {
   const pinInput = document.getElementById('join-pin');
   const nameInput = document.getElementById('join-name');
 
+  // Check URL for pin (e.g. from QR scan)
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlPin = urlParams.get('pin');
+
   // Auto-fill previous details
   const lastPin = localStorage.getItem('hq_session_pin');
   const lastName = localStorage.getItem('hq_player_name');
-  if (lastPin && pinInput) pinInput.value = formatPin(lastPin);
+  
+  if (urlPin && pinInput) {
+    pinInput.value = formatPin(urlPin);
+    // Clear the URL parameter so it doesn't linger
+    window.history.replaceState({}, '', window.location.pathname);
+  } else if (lastPin && pinInput) {
+    pinInput.value = formatPin(lastPin);
+  }
+
   if (lastName && nameInput) nameInput.value = lastName;
 
   form?.addEventListener('submit', async (e) => {
