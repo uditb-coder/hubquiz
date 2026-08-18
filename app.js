@@ -1375,14 +1375,14 @@ function studentShowReveal(payload) {
   if (waitEl) waitEl.classList.add('hidden');
   
   const resultsEl = document.getElementById('sq-result');
-  const playerId = State.playerSelf?.id || localStorage.getItem('hq_player_id');
+  const playerName = State.playerSelf?.name || localStorage.getItem('hq_player_name');
   let myRank = '?';
   let myScore = 0;
   
-  if (payload.leaders && playerId) {
-    const p = payload.leaders.find(l => l.id === playerId);
+  if (payload.leaders && playerName) {
+    const p = payload.leaders.find(l => l.name === playerName);
     if (p) {
-      myRank = p.rank || (payload.leaders.findIndex(l => l.id === playerId) + 1);
+      myRank = p.rank || (payload.leaders.findIndex(l => l.name === playerName) + 1);
       myScore = p.score;
     }
   }
