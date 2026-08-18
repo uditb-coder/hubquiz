@@ -167,6 +167,32 @@ function showLogin() {
 async function showDashboard() {
   if (!State.user) { navigate('/login'); return; }
 
+  // Check for active session recovery
+  const { data: activeSessions } = await HQ_SUPABASE.from('game_sessions')
+    .select('*, quiz:quizzes(*, questions(*))')
+    .eq('host_id', State.user.id)
+    .in('status', ['lobby', 'active', 'question_active', 'question_review'])
+    .order('created_at', { ascending: false })
+    .limit(1);
+
+  if (activeSessions && activeSessions.length > 0) {
+    const s = activeSessions[0];
+    if (confirm('You have an active game session running. Do you want to resume it?')) {
+      State.session = s;
+      State.quiz = s.quiz;
+      State.questions = s.quiz.questions.sort((a,b) => a.order_num - b.order_num);
+      
+      if (s.status === 'lobby') {
+        showHostLobby(s.quiz.id, s.pin);
+      } else if (s.status === 'question_review') {
+        hostShowReveal(s.questions[s.current_question_index]?.id);
+      } else {
+        hostShowQuestion(s.current_question_index);
+      }
+      return;
+    }
+  }
+
   renderView('dashboard');
   setupMuteToggle('host-mute');
   loadQuizList();
@@ -542,19 +568,9 @@ function subscribeHostChannel() {
     renderPlayerList();
   });
 
-  // Answer submitted (track count for auto-advance)
-  ch.on('postgres_changes', {
-    event: 'INSERT',
-    schema: 'public',
-    table: 'answers',
-  }, () => {
-    checkAllAnswered();
-  });
-
   // Broadcast events FROM host TO students (and self)
   ch.on('broadcast', { event: 'game:event' }, (payload) => {
     // Host receives its own broadcast — ignore if we're the sender
-    // (used mainly by students)
   });
 
   ch.subscribe();
@@ -631,7 +647,9 @@ async function hostShowQuestion(index) {
   if (q.question_type === 'open_ended') {
     blocksEl.innerHTML = `<div style="text-align:center; padding: 48px; color: var(--grey-500); font-size: 1.5rem;">Waiting for participants to type their answers...</div>`;
   } else {
-    blocksEl.innerHTML = ['a','b','c','d'].map(opt => `
+    blocksEl.innerHTML = ['a','b','c','d']
+      .filter(opt => q['option_'+opt] && q['option_'+opt].trim() !== '')
+      .map(opt => `
       <div class="host-answer-block answer-${opt}">
         <span class="answer-symbol">${ANSWER_COLORS[opt].symbol}</span>
         <span class="answer-opt-label">${opt.toUpperCase()}</span>
@@ -651,6 +669,16 @@ async function hostShowQuestion(index) {
     skipBtn.onclick = () => {
       clearTimer();
       hostShowReveal(q.id);
+    };
+  }
+
+  const endBtn = document.getElementById('hq-end-early-btn');
+  if (endBtn) {
+    endBtn.onclick = () => {
+      if (confirm('Are you sure you want to end the quiz early?')) {
+        clearTimer();
+        hostShowFinalLeaderboard();
+      }
     };
   }
 }
@@ -741,16 +769,17 @@ async function hostShowReveal(questionId) {
   await HQ_SUPABASE.from('game_sessions').update({ status: 'question_review' }).eq('id', State.session.id);
   State.session.status = 'question_review';
 
+  // Fetch leaderboard
+  const { data: leaders } = await HQ_SUPABASE.rpc('get_session_leaderboard', {
+    p_session_id: State.session.id,
+    p_limit: 100,
+  });
+
   // Broadcast reveal to students
   await broadcastGameEvent('question:reveal', {
     question_index: index,
     correct_option: q.correct_option,
-  });
-
-  // Fetch leaderboard
-  const { data: leaders } = await HQ_SUPABASE.rpc('get_session_leaderboard', {
-    p_session_id: State.session.id,
-    p_limit: 5,
+    leaders: leaders || [],
   });
 
   renderView('host-reveal');
@@ -812,15 +841,24 @@ async function hostShowReveal(questionId) {
     `<div class="lb-row"><span class="lb-rank">#${p.rank}</span><span class="lb-name">${escHtml(p.name)}</span><span class="lb-score">${p.score}</span></div>`
   ).join('');
 
-  const isLast = index >= State.questions.length - 1;
   const nextBtn = document.getElementById('hr-next-btn');
   if (nextBtn) {
+    const isLast = index >= State.questions.length - 1;
     nextBtn.textContent = isLast ? '🏆 See Final Results' : '⏭ Next Question';
     nextBtn.onclick = async () => {
       if (isLast) {
         hostShowFinalLeaderboard();
       } else {
         hostShowQuestion(index + 1);
+      }
+    };
+  }
+  
+  const endBtn = document.getElementById('hr-end-early-btn');
+  if (endBtn) {
+    endBtn.onclick = () => {
+      if (confirm('Are you sure you want to end the quiz early?')) {
+        hostShowFinalLeaderboard();
       }
     };
   }
@@ -901,10 +939,19 @@ function showStudentJoin() {
   renderView('student-join');
 
   const form = document.getElementById('join-form');
+  const pinInput = document.getElementById('join-pin');
+  const nameInput = document.getElementById('join-name');
+
+  // Auto-fill previous details
+  const lastPin = localStorage.getItem('hq_session_pin');
+  const lastName = localStorage.getItem('hq_player_name');
+  if (lastPin && pinInput) pinInput.value = formatPin(lastPin);
+  if (lastName && nameInput) nameInput.value = lastName;
+
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const pin  = document.getElementById('join-pin').value.trim().replace(/\s/g, '');
-    const name = document.getElementById('join-name').value.trim();
+    const pin  = pinInput.value.trim().replace(/\s/g, '');
+    const name = nameInput.value.trim();
     const btn  = document.getElementById('join-btn');
     setLoading(btn, true);
     clearError('join-error');
@@ -940,6 +987,13 @@ async function joinSession(pin, name, btn) {
 
   const session = sessions[0];
 
+  // Validate Name
+  if (!/^[A-Za-z0-9 ]+$/.test(name)) {
+    showError('join-error', 'Name can only contain letters, numbers, and spaces.');
+    setLoading(btn, false);
+    return;
+  }
+
   // Check name availability
   const { data: existing } = await HQ_SUPABASE
     .from('players')
@@ -971,6 +1025,7 @@ async function joinSession(pin, name, btn) {
   localStorage.setItem('hq_player_id', player.id);
   localStorage.setItem('hq_session_id', session.id);
   localStorage.setItem('hq_player_name', name);
+  localStorage.setItem('hq_session_pin', cleanPin);
 
   State.playerSelf = player;
   State.session    = session;
@@ -1033,7 +1088,7 @@ function subscribeStudentChannel(sessionId) {
       if (status === 'SUBSCRIBED') {
         // Good to go
       } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-        showDisconnected();
+        console.warn('Realtime channel disconnected. Attempting to auto-reconnect...');
       }
     });
 
@@ -1108,7 +1163,9 @@ async function studentShowQuestion(payload) {
       await submitStudentOpenAnswer(question_id, text);
     });
   } else {
-    blocksEl.innerHTML = ['a','b','c','d'].map(opt => `
+    blocksEl.innerHTML = ['a','b','c','d']
+      .filter(opt => q['option_'+opt] && q['option_'+opt].trim() !== '')
+      .map(opt => `
       <button class="student-answer-btn answer-${opt}" data-opt="${opt}" id="sq-btn-${opt}" aria-label="Option ${opt.toUpperCase()}: ${escHtml(q['option_'+opt])}">
         <span class="sa-symbol">${ANSWER_COLORS[opt].symbol}</span>
         <span class="sa-label">${opt.toUpperCase()}</span>
@@ -1184,15 +1241,10 @@ async function submitStudentOpenAnswer(questionId, text) {
   const lockEl = document.getElementById('sq-locked-msg');
   const resultsEl = document.getElementById('sq-result');
 
-  let msg = 'Answer Submitted!';
-  const elapsed = (Date.now() - new Date(State.session.question_started_at).getTime()) / 1000;
-  if (elapsed < 3) msg = 'Lightning fast! ⚡';
-  else if (elapsed < 8) msg = 'Nice speed! 🔥';
-
   if (resultsEl) {
     resultsEl.classList.remove('hidden');
     resultsEl.className = 'sq-result correct';
-    resultsEl.innerHTML = `<span class="result-icon">✓</span><span>${msg}</span>`;
+    resultsEl.innerHTML = `<span class="result-icon">✓</span><span>Answer Submitted! ⏳</span>`;
     AudioEngine.playCorrect();
   }
   if (lockEl) lockEl.classList.add('hidden');
@@ -1217,31 +1269,49 @@ async function submitStudentAnswer(questionId, chosenOption) {
   const lockEl = document.getElementById('sq-locked-msg');
   const resultsEl = document.getElementById('sq-result');
 
-  if (resultsEl) {
+    // Save for reveal
+    State._lastAnswerResult = data;
+    
+    resultsEl.classList.remove('hidden');
+    resultsEl.className = 'sq-result correct';
+    resultsEl.innerHTML = `<span class="result-icon">✓</span><span>Answer Submitted! ⏳</span>`;
+    AudioEngine.playCorrect();
+  }
+  if (lockEl) lockEl.classList.add('hidden');
+}
+
+function studentShowReveal(payload) {
+  const waitEl = document.getElementById('sq-waiting-reveal');
+  if (waitEl) waitEl.classList.add('hidden');
+  
+  const resultsEl = document.getElementById('sq-result');
+  const playerId = State.playerSelf?.id || localStorage.getItem('hq_player_id');
+  let myRank = '?';
+  
+  if (payload.leaders && playerId) {
+    const idx = payload.leaders.findIndex(l => l.id === playerId);
+    if (idx !== -1) myRank = idx + 1;
+  }
+  
+  if (resultsEl && State._lastAnswerResult) {
+    const data = State._lastAnswerResult;
     resultsEl.classList.remove('hidden');
     if (data.correct) {
       resultsEl.className = 'sq-result correct';
-      
       let msg = `Correct! +${data.points_awarded} pts`;
+      
       const elapsed = (Date.now() - new Date(State.session.question_started_at).getTime()) / 1000;
       if (elapsed < 3) msg += ' ⚡ Lightning fast!';
       else if (elapsed < 8) msg += ' 🔥 Great speed!';
       
-      resultsEl.innerHTML = `<span class="result-icon">✓</span><span>${msg}</span>`;
+      resultsEl.innerHTML = `<span class="result-icon">✓</span><span>${msg}</span><div style="font-size: 1.1rem; margin-top: 8px; opacity: 0.9;">Current Rank: #${myRank}</div>`;
       AudioEngine.playCorrect();
     } else {
       resultsEl.className = 'sq-result incorrect';
-      resultsEl.innerHTML = `<span class="result-icon">✗</span><span>Incorrect</span>`;
+      resultsEl.innerHTML = `<span class="result-icon">✗</span><span>Incorrect</span><div style="font-size: 1.1rem; margin-top: 8px; opacity: 0.9;">Current Rank: #${myRank}</div>`;
       AudioEngine.playIncorrect();
     }
   }
-}
-
-function studentShowReveal(payload) {
-  // Wait for reveal from host — student already got feedback, just show "waiting"
-  const resultsEl = document.getElementById('sq-result');
-  const waitEl    = document.getElementById('sq-waiting-reveal');
-  if (waitEl) waitEl.classList.remove('hidden');
   clearTimer();
 }
 

@@ -203,7 +203,6 @@
     <div class="hq-answered-badge">
       <span id="hq-answered-count">0</span> / <span id="hq-total-count">0</span> answered
     </div>
-    <button id="hq-skip-btn" class="btn btn-primary btn-small" style="margin-left:auto; margin-right:16px;">⏭ Skip Timer</button>
   </div>
 
   <div class="hq-main">
@@ -224,6 +223,11 @@
     <div id="hq-answer-blocks" role="list" aria-label="Answer options">
       <!-- Rendered by JS -->
     </div>
+  </div>
+  
+  <div class="hq-bottom-bar" style="display:flex; justify-content:space-between; align-items:center; padding: 0 24px 24px;">
+    <button id="hq-end-early-btn" class="btn btn-outline" style="border-color: #E74C3C; color: #E74C3C;">End Quiz</button>
+    <button id="hq-skip-btn" class="btn btn-primary btn-small">⏭ Skip Timer</button>
   </div>
 </section>
 
@@ -254,7 +258,8 @@
       </div>
     </div>
 
-    <div class="hr-next-wrap">
+    <div class="hr-next-wrap" style="display:flex; justify-content:space-between; align-items:center; padding: 0 24px;">
+      <button id="hr-end-early-btn" class="btn btn-outline" style="border-color: #E74C3C; color: #E74C3C;">End Quiz</button>
       <button id="hr-next-btn" class="btn btn-primary btn-lg">
         ⏭ Next Question
       </button>
