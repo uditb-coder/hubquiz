@@ -1906,6 +1906,13 @@ body.gameplay img[src*="logo.jpg"] {
   border-radius: 4px;
 }
 
+/* Premium moving background for entire gameplay */
+body.gameplay {
+  background: linear-gradient(-45deg, #0B1D3A, #172f54, #0f2547, #091830) !important;
+  background-size: 400% 400% !important;
+  animation: gameGradientFlow 15s ease infinite !important;
+}
+
 /* --- Keyframes --- */
 @keyframes gameGradientFlow {
   0%   { background-position: 0% 50%; }
@@ -1969,7 +1976,7 @@ body.gameplay img[src*="logo.jpg"] {
    HOST LOBBY — Dark game-show lobby
    ============================================================ */
 #view-host-lobby {
-  background: linear-gradient(150deg, var(--game-bg) 0%, var(--game-bg-end) 100%) !important;
+  background: transparent !important;
   background-image: none;
   position: relative;
   overflow: hidden;
@@ -2062,7 +2069,7 @@ body.gameplay img[src*="logo.jpg"] {
    HOST QUESTION — Dark question screen
    ============================================================ */
 #view-host-question {
-  background: linear-gradient(150deg, var(--game-bg) 0%, var(--game-bg-end) 100%) !important;
+  background: transparent !important;
 }
 
 #view-host-question .hq-top-bar       { color: var(--game-white-dim); }
@@ -2149,7 +2156,7 @@ body.gameplay img[src*="logo.jpg"] {
    HOST REVEAL — Dark reveal screen
    ============================================================ */
 #view-host-reveal {
-  background: linear-gradient(150deg, var(--game-bg) 0%, var(--game-bg-end) 100%) !important;
+  background: transparent !important;
 }
 
 #view-host-reveal .hr-progress    { color: var(--game-white-dim) !important; }
@@ -2208,7 +2215,7 @@ body.gameplay img[src*="logo.jpg"] {
    HOST LEADERBOARD — Dark podium with gold framing
    ============================================================ */
 #view-host-leaderboard {
-  background: linear-gradient(150deg, var(--game-bg) 0%, var(--game-bg-end) 100%) !important;
+  background: transparent !important;
 }
 
 #view-host-leaderboard .hl-title {
@@ -2262,7 +2269,7 @@ body.gameplay img[src*="logo.jpg"] {
    STUDENT LOBBY — "You're in!" waiting screen
    ============================================================ */
 #view-student-lobby {
-  background: linear-gradient(150deg, var(--game-bg) 0%, var(--game-bg-end) 100%) !important;
+  background: transparent !important;
   animation: none !important;
 }
 
@@ -2343,7 +2350,7 @@ body.gameplay img[src*="logo.jpg"] {
    STUDENT FINAL SCREEN — Dark celebratory result
    ============================================================ */
 #view-student-final {
-  background: linear-gradient(150deg, var(--game-bg) 0%, var(--game-bg-end) 100%) !important;
+  background: transparent !important;
 }
 
 #sf-rank  { color: var(--game-gold) !important; text-shadow: 0 0 24px var(--game-gold-glow); }
