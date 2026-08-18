@@ -1025,28 +1025,36 @@ async function joinSession(pin, name, btn) {
   // Check name availability
   const { data: existing } = await HQ_SUPABASE
     .from('players')
-    .select('id')
+    .select('id, name')
     .eq('session_id', session.id)
     .ilike('name', name)
     .limit(1);
 
+  let player;
+  
   if (existing?.length) {
-    showError('join-error', 'A player with that name has already joined. Use a different name.');
-    setLoading(btn, false);
-    return;
-  }
+    if (localStorage.getItem('hq_player_id') === existing[0].id) {
+      // Allow reconnecting as themselves
+      player = existing[0];
+    } else {
+      showError('join-error', 'A player with that name has already joined. Use a different name.');
+      setLoading(btn, false);
+      return;
+    }
+  } else {
+    // Insert player
+    const { data: newPlayer, error: pErr } = await HQ_SUPABASE
+      .from('players')
+      .insert({ session_id: session.id, name })
+      .select()
+      .single();
 
-  // Insert player
-  const { data: player, error: pErr } = await HQ_SUPABASE
-    .from('players')
-    .insert({ session_id: session.id, name })
-    .select()
-    .single();
-
-  if (pErr) {
-    showError('join-error', pErr.message.includes('unique') ? 'That name is already taken.' : pErr.message);
-    setLoading(btn, false);
-    return;
+    if (pErr) {
+      showError('join-error', pErr.message.includes('unique') ? 'That name is already taken.' : pErr.message);
+      setLoading(btn, false);
+      return;
+    }
+    player = newPlayer;
   }
 
   // Store in localStorage for reconnect
@@ -1316,28 +1324,63 @@ function studentShowReveal(payload) {
   const resultsEl = document.getElementById('sq-result');
   const playerId = State.playerSelf?.id || localStorage.getItem('hq_player_id');
   let myRank = '?';
+  let myScore = 0;
   
   if (payload.leaders && playerId) {
-    const idx = payload.leaders.findIndex(l => l.id === playerId);
-    if (idx !== -1) myRank = idx + 1;
+    const p = payload.leaders.find(l => l.id === playerId);
+    if (p) {
+      myRank = p.rank || (payload.leaders.findIndex(l => l.id === playerId) + 1);
+      myScore = p.score;
+    }
   }
   
   if (resultsEl && State._lastAnswerResult) {
     const data = State._lastAnswerResult;
     resultsEl.classList.remove('hidden');
+    resultsEl.className = 'sq-result';
+    
     if (data.correct) {
-      resultsEl.className = 'sq-result correct';
-      let msg = `Correct! +${data.points_awarded} pts`;
-      
       const elapsed = (Date.now() - new Date(State.session.question_started_at).getTime()) / 1000;
-      if (elapsed < 3) msg += ' ⚡ Lightning fast!';
-      else if (elapsed < 8) msg += ' 🔥 Great speed!';
+      let encouragement = 'You got it right! 🎉';
+      if (myRank <= 3) encouragement = 'You are on fire! 🔥';
+      else if (elapsed < 3) encouragement = 'Lightning fast! ⚡';
+      else if (elapsed < 8) encouragement = 'Great speed! 🚀';
+      else encouragement = 'Moving up! 💪';
       
-      resultsEl.innerHTML = `<span class="result-icon">✓</span><span>${msg}</span><div style="font-size: 1.1rem; margin-top: 8px; opacity: 0.9;">Current Rank: #${myRank}</div>`;
+      resultsEl.innerHTML = `
+        <div class="feedback-card">
+           <div class="feedback-icon correct-icon">✓</div>
+           <div class="feedback-title">Correct! +${data.points_awarded}</div>
+           <div class="feedback-encouragement">${encouragement}</div>
+           <div class="feedback-stats">
+              <div class="stat-box">
+                 <div class="stat-label">Rank</div>
+                 <div class="stat-value">#${myRank}</div>
+              </div>
+              <div class="stat-box">
+                 <div class="stat-label">Total Score</div>
+                 <div class="stat-value">${myScore}</div>
+              </div>
+           </div>
+        </div>`;
       AudioEngine.playCorrect();
     } else {
-      resultsEl.className = 'sq-result incorrect';
-      resultsEl.innerHTML = `<span class="result-icon">✗</span><span>Incorrect</span><div style="font-size: 1.1rem; margin-top: 8px; opacity: 0.9;">Current Rank: #${myRank}</div>`;
+      resultsEl.innerHTML = `
+        <div class="feedback-card">
+           <div class="feedback-icon incorrect-icon">✗</div>
+           <div class="feedback-title">Incorrect</div>
+           <div class="feedback-encouragement">Keep going! Don't give up! 💪</div>
+           <div class="feedback-stats">
+              <div class="stat-box">
+                 <div class="stat-label">Rank</div>
+                 <div class="stat-value">#${myRank}</div>
+              </div>
+              <div class="stat-box">
+                 <div class="stat-label">Total Score</div>
+                 <div class="stat-value">${myScore}</div>
+              </div>
+           </div>
+        </div>`;
       AudioEngine.playIncorrect();
     }
   }
