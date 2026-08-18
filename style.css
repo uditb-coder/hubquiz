@@ -1,5 +1,5 @@
-/* ============================================================
-   style.css — HubQuiz Design System
+﻿/* ============================================================
+   style.css â€” HubQuiz Design System
    ComedKares branding: dark navy + yellow, white/light-grey UI
    ============================================================ */
 
@@ -7,7 +7,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap');
 
 /* ============================================================
-   CSS Variables — Design Tokens
+   CSS Variables â€” Design Tokens
    ============================================================ */
 :root {
   /* Brand */
@@ -1372,7 +1372,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 }
 
 #view-student-lobby::before {
-  content: '▲ ■ ● ♦';
+  content: 'â–² â–  â— â™¦';
   position: absolute;
   font-size: 6rem;
   color: rgba(255,255,255,0.05);
@@ -1460,7 +1460,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   opacity:       0.6;
 }
 
-/* Answer blocks — full screen grid */
+/* Answer blocks â€” full screen grid */
 #sq-answer-blocks {
   display:               grid;
   grid-template-columns: 1fr 1fr;
@@ -1510,7 +1510,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 .student-answer-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 .student-answer-btn.selected { opacity: 1 !important; ring: 4px solid var(--white); }
 .student-answer-btn.selected::after {
-  content:  '✓';
+  content:  'âœ“';
   position: absolute;
   top:      8px;
   right:    10px;
@@ -1700,7 +1700,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 .student-answer-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 .student-answer-btn.selected { opacity: 1 !important; ring: 4px solid var(--white); }
 .student-answer-btn.selected::after {
-  content:  '✓';
+  content:  'âœ“';
   position: absolute;
   top:      8px;
   right:    10px;
@@ -2216,5 +2216,4 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 .hc-meta { font-size: 0.9rem; color: var(--grey-500); margin: 0; }
 .hc-stats { text-align: right; }
 .hc-score { font-size: 1.5rem; font-weight: 800; color: var(--yellow); margin: 0; }
-. f l a s h - o v e r l a y   {   p o s i t i o n :   f i x e d ;   i n s e t :   0 ;   z - i n d e x :   9 9 9 9 ;   p o i n t e r - e v e n t s :   n o n e ;   o p a c i t y :   0 ;   }   . f l a s h - c o r r e c t   {   a n i m a t i o n :   f l a s h S c r e e n C o r r e c t   1 . 5 s   e a s e - o u t   f o r w a r d s ;   }   . f l a s h - i n c o r r e c t   {   a n i m a t i o n :   f l a s h S c r e e n I n c o r r e c t   1 . 5 s   e a s e - o u t   f o r w a r d s ;   }   @ k e y f r a m e s   f l a s h S c r e e n C o r r e c t   {   0 %   {   b a c k g r o u n d :   # 2 E C C 7 1 ;   o p a c i t y :   1 ;   }   1 0 0 %   {   b a c k g r o u n d :   # 2 E C C 7 1 ;   o p a c i t y :   0 ;   }   }   @ k e y f r a m e s   f l a s h S c r e e n I n c o r r e c t   {   0 %   {   b a c k g r o u n d :   # E 7 4 C 3 C ;   o p a c i t y :   0 . 8 ;   }   1 0 0 %   {   b a c k g r o u n d :   # E 7 4 C 3 C ;   o p a c i t y :   0 ;   }   }  
- 
+.flash-overlay { position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0; } .flash-correct { animation: flashScreenCorrect 1.5s ease-out forwards; } .flash-incorrect { animation: flashScreenIncorrect 1.5s ease-out forwards; } @keyframes flashScreenCorrect { 0% { background: #2ECC71; opacity: 1; } 100% { background: #2ECC71; opacity: 0; } } @keyframes flashScreenIncorrect { 0% { background: #E74C3C; opacity: 0.8; } 100% { background: #E74C3C; opacity: 0; } }

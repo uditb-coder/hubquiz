@@ -1,5 +1,5 @@
 // ============================================================
-// app.js — HubQuiz Main Application
+// app.js â€” HubQuiz Main Application
 // Router + Auth + Host Game Logic + Student Game Logic
 // ============================================================
 
@@ -8,10 +8,10 @@
 // ---- Constants ----
 const QUESTION_TIME = 30; // seconds (global, fixed)
 const ANSWER_COLORS = {
-  a: { bg: '#0d9488', label: 'A', symbol: '▲' },
-  b: { bg: '#F59E0B', label: 'B', symbol: '♦' },
-  c: { bg: '#1E293B', label: 'C', symbol: '●' },
-  d: { bg: '#f43f5e', label: 'D', symbol: '■' },
+  a: { bg: '#0d9488', label: 'A', symbol: 'â–²' },
+  b: { bg: '#F59E0B', label: 'B', symbol: 'â™¦' },
+  c: { bg: '#1E293B', label: 'C', symbol: 'â—' },
+  d: { bg: '#f43f5e', label: 'D', symbol: 'â– ' },
 };
 
 // ---- App State ----
@@ -360,7 +360,7 @@ async function loadQuizList() {
   if (!quizzes.length) {
     container.innerHTML = `
       <div class="empty-state">
-        <div class="empty-icon">📝</div>
+        <div class="empty-icon">ðŸ“</div>
         <p>No quizzes yet. Create your first quiz!</p>
       </div>`;
     return;
@@ -376,10 +376,10 @@ async function loadQuizList() {
         </div>
         <div class="quiz-card-actions">
           <button class="btn btn-primary btn-start" data-id="${q.id}" title="Start Session">
-            ▶ Start
+            â–¶ Start
           </button>
-          <button class="btn btn-icon btn-edit" data-id="${q.id}" title="Edit Quiz">✏️</button>
-          <button class="btn btn-icon btn-delete" data-id="${q.id}" title="Delete Quiz">🗑️</button>
+          <button class="btn btn-icon btn-edit" data-id="${q.id}" title="Edit Quiz">âœï¸</button>
+          <button class="btn btn-icon btn-delete" data-id="${q.id}" title="Delete Quiz">ðŸ—‘ï¸</button>
         </div>
       </div>`;
   }).join('');
@@ -446,7 +446,7 @@ function addQuestionRow(q = null) {
         <option value="mcq" ${q?.question_type !== 'open_ended' ? 'selected' : ''}>Multiple Choice</option>
         <option value="open_ended" ${q?.question_type === 'open_ended' ? 'selected' : ''}>Open Ended</option>
       </select>
-      <button type="button" class="btn btn-icon q-remove" title="Remove question">🗑</button>
+      <button type="button" class="btn btn-icon q-remove" title="Remove question">ðŸ—‘</button>
     </div>
     <textarea class="q-text input-field" placeholder="Question text..." required>${escHtml(q?.question_text || '')}</textarea>
     <div class="q-options" style="${q?.question_type === 'open_ended' ? 'display:none;' : ''}">
@@ -557,7 +557,7 @@ async function saveQuiz(quizId) {
           .eq('quiz_id', quizId)
           .not('id', 'in', `(${existingIds.map(id => `'${id}'`).join(',')})`);
       } else {
-        // No existing questions to preserve — delete all and re-insert
+        // No existing questions to preserve â€” delete all and re-insert
         await HQ_SUPABASE.from('questions').delete().eq('quiz_id', quizId);
       }
     }
@@ -666,8 +666,8 @@ function showHostLobby() {
   if (copyBtn) {
     copyBtn.onclick = () => {
       navigator.clipboard.writeText(pin).then(() => {
-        copyBtn.textContent = '✓ Copied!';
-        setTimeout(() => copyBtn.textContent = '📋 Copy PIN', 1500);
+        copyBtn.textContent = 'âœ“ Copied!';
+        setTimeout(() => copyBtn.textContent = 'ðŸ“‹ Copy PIN', 1500);
       });
     };
   }
@@ -763,7 +763,7 @@ function subscribeHostChannel() {
 
   // Broadcast events FROM host TO students (and self)
   ch.on('broadcast', { event: 'game:event' }, (payload) => {
-    // Host receives its own broadcast — ignore if we're the sender
+    // Host receives its own broadcast â€” ignore if we're the sender
   });
 
   ch.subscribe();
@@ -1049,7 +1049,7 @@ async function hostShowReveal(questionId) {
       <div class="reveal-bar-row ${isCorrect ? 'correct-answer' : ''}">
         <div class="reveal-bar-label answer-${opt}">
           ${ANSWER_COLORS[opt].symbol} ${opt.toUpperCase()}
-          ${isCorrect ? '<span class="correct-tick">✓</span>' : ''}
+          ${isCorrect ? '<span class="correct-tick">âœ“</span>' : ''}
         </div>
         <div class="reveal-bar-track">
           <div class="reveal-bar-fill answer-${opt}" style="width:0%" data-target-width="${pct}%"></div>
@@ -1074,7 +1074,7 @@ async function hostShowReveal(questionId) {
   const nextBtn = document.getElementById('hr-next-btn');
   if (nextBtn) {
     const isLast = index >= State.questions.length - 1;
-    nextBtn.textContent = isLast ? '🏆 See Final Results' : '⏭ Next Question';
+    nextBtn.textContent = isLast ? 'ðŸ† See Final Results' : 'â­ Next Question';
     nextBtn.onclick = async () => {
       if (isLast) {
         hostShowFinalLeaderboard();
@@ -1122,7 +1122,7 @@ async function hostShowFinalLeaderboard() {
   podium.innerHTML = podiumOrder.map((p, i) => {
     if (!p) return '<div class="podium-slot empty"></div>';
     const rank   = i === 0 ? 2 : i === 1 ? 1 : 3;
-    const medals = ['🥇','🥈','🥉'];
+    const medals = ['ðŸ¥‡','ðŸ¥ˆ','ðŸ¥‰'];
     const heights = ['130px','170px','100px'];
     return `
       <div class="podium-slot rank-${rank}" style="--podium-h:${heights[i]}">
@@ -1208,7 +1208,10 @@ function showStudentJoin() {
   });
 
   // Mentor login link
-  document.getElementById('mentor-login-link')?.addEventListener('click', () => navigate('/login'));
+  document.getElementById('mentor-login-link')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    navigate('/login');
+  });
 }
 
 async function joinSession(pin, name, btn) {
@@ -1480,7 +1483,7 @@ function showStudentAnswerLocked(btn) {
   const lockEl = document.getElementById('sq-locked-msg');
   if (lockEl) {
     lockEl.classList.remove('hidden');
-    lockEl.textContent = '✓ Answer locked in!';
+    lockEl.textContent = 'âœ“ Answer locked in!';
   }
 }
 
@@ -1506,7 +1509,7 @@ async function submitStudentOpenAnswer(questionId, text) {
   if (resultsEl) {
     resultsEl.classList.remove('hidden');
     resultsEl.className = 'sq-result correct';
-    resultsEl.innerHTML = `<span class="result-icon">✓</span><span>Answer Submitted! ⏳</span>`;
+    resultsEl.innerHTML = `<span class="result-icon">âœ“</span><span>Answer Submitted! â³</span>`;
     AudioEngine.playCorrect();
   }
   if (lockEl) lockEl.classList.add('hidden');
@@ -1537,7 +1540,7 @@ async function submitStudentAnswer(questionId, chosenOption) {
     
     resultsEl.classList.remove('hidden');
     resultsEl.className = 'sq-result correct';
-    resultsEl.innerHTML = `<span class="result-icon">✓</span><span>Answer Submitted! ⏳</span>`;
+    resultsEl.innerHTML = `<span class="result-icon">âœ“</span><span>Answer Submitted! â³</span>`;
     AudioEngine.playCorrect();
   }
   if (lockEl) lockEl.classList.add('hidden');
@@ -1569,15 +1572,15 @@ function studentShowReveal(payload) {
       if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
       triggerFlash('correct');
       const elapsed = (Date.now() - new Date(State.session.question_started_at).getTime()) / 1000;
-      let encouragement = 'You got it right! 🎉';
-      if (myRank <= 3) encouragement = 'You are on fire! 🔥';
-      else if (elapsed < 3) encouragement = 'Lightning fast! ⚡';
-      else if (elapsed < 8) encouragement = 'Great speed! 🚀';
-      else encouragement = 'Moving up! 💪';
+      let encouragement = 'You got it right! ðŸŽ‰';
+      if (myRank <= 3) encouragement = 'You are on fire! ðŸ”¥';
+      else if (elapsed < 3) encouragement = 'Lightning fast! âš¡';
+      else if (elapsed < 8) encouragement = 'Great speed! ðŸš€';
+      else encouragement = 'Moving up! ðŸ’ª';
       
       resultsEl.innerHTML = `
         <div class="feedback-card">
-           <div class="feedback-icon correct-icon">✓</div>
+           <div class="feedback-icon correct-icon">âœ“</div>
            <div class="feedback-title">Correct! +${data.points_awarded}</div>
            <div class="feedback-encouragement">${encouragement}</div>
            <div class="feedback-stats">
@@ -1597,9 +1600,9 @@ function studentShowReveal(payload) {
       triggerFlash('incorrect');
       resultsEl.innerHTML = `
         <div class="feedback-card">
-           <div class="feedback-icon incorrect-icon">❌</div>
+           <div class="feedback-icon incorrect-icon">âŒ</div>
            <div class="feedback-title">Incorrect</div>
-           <div class="feedback-encouragement">Keep going! Don't give up! 💪</div>
+           <div class="feedback-encouragement">Keep going! Don't give up! ðŸ’ª</div>
            <div class="feedback-stats">
               <div class="stat-box">
                  <div class="stat-label">Rank</div>
@@ -1653,10 +1656,10 @@ async function studentShowFinalScreen() {
   if (scoreEl) scoreEl.textContent = myScore;
   if (totalEl) totalEl.textContent = `of ${totalPlayers} players`;
 
-  let medal = '⭐';
-  if (myRank == 1) medal = '🥇';
-  else if (myRank == 2) medal = '🥈';
-  else if (myRank == 3) medal = '🥉';
+  let medal = 'â­';
+  if (myRank == 1) medal = 'ðŸ¥‡';
+  else if (myRank == 2) medal = 'ðŸ¥ˆ';
+  else if (myRank == 3) medal = 'ðŸ¥‰';
   if (medalEl) medalEl.textContent = medal;
 
   // Clear stored session
@@ -1704,13 +1707,13 @@ function renderView(viewName) {
 function setupMuteToggle(btnId) {
   const btn = document.getElementById(btnId);
   if (!btn) return;
-  btn.textContent = AudioEngine.isMuted() ? '🔇' : '🔊';
+  btn.textContent = AudioEngine.isMuted() ? 'ðŸ”‡' : 'ðŸ”Š';
   btn.onclick = () => {
     const newMute = !AudioEngine.isMuted();
     AudioEngine.setMute(newMute);
     State.muted = newMute;
     localStorage.setItem('hq_muted', newMute);
-    btn.textContent = newMute ? '🔇' : '🔊';
+    btn.textContent = newMute ? 'ðŸ”‡' : 'ðŸ”Š';
   };
 }
 
@@ -1729,151 +1732,4 @@ function showError(elId, msg, type = 'error') {
   el.style.display = 'block';
 }
 
-function clearError(elId) {
-  const el = document.getElementById(elId);
-  if (!el) return;
-  el.textContent   = '';
-  el.style.display = 'none';
-}
-
-function escHtml(str) {
-  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function formatPin(pin) {
-  const p = String(pin).padStart(6, '0');
-  return p.slice(0, 3) + ' ' + p.slice(3);
-}
-
-// ============================================================
-// ---- SESSION HISTORY ----
-// ============================================================
-
-async function loadSessionHistory() {
-  const container = document.getElementById('history-list');
-  if (!container) return;
-  container.innerHTML = '<div class="loading-spinner">Loading history...</div>';
-
-  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-
-  const { data, error } = await HQ_SUPABASE.from('game_sessions')
-    .select('*, quiz:quizzes(title), players(id)')
-    .eq('host_id', State.user.id)
-    .gte('created_at', twentyFourHoursAgo)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    container.innerHTML = '<div class="error">Failed to load history.</div>';
-    return;
-  }
-
-  if (!data || data.length === 0) {
-    container.innerHTML = '<div class="empty-state" style="margin-top: 16px;">No games played in the past 24 hours.</div>';
-    return;
-  }
-
-  container.innerHTML = '';
-  data.forEach(s => {
-    const d = new Date(s.created_at);
-    const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    const pCount = s.players?.length || 0;
-    
-    const card = document.createElement('div');
-    card.className = 'history-card';
-    card.innerHTML = `
-      <div>
-        <h3 class="hc-title">${escHtml(s.quiz?.title || 'Unknown Quiz')}</h3>
-        <p class="hc-meta">Played on ${dateStr} &bull; ${pCount} Participant${pCount !== 1 ? 's' : ''}</p>
-      </div>
-      <div class="hc-stats">
-        <p class="hc-meta" style="font-weight: 600;">PIN: ${s.pin}</p>
-        <span class="${s.status === 'finished' ? 'status-badge' : 'status-badge warning'}">${s.status.toUpperCase()}</span>
-      </div>
-    `;
-    card.onclick = () => showSessionHistoryDetails(s.id);
-    container.appendChild(card);
-  });
-}
-
-async function showSessionHistoryDetails(sessionId) {
-  renderView('session-history');
-  
-  // Set basic placeholders
-  document.getElementById('sh-title').textContent = 'Loading...';
-  document.getElementById('sh-date').textContent = '';
-  document.getElementById('sh-pin').textContent = '';
-  const thead = document.getElementById('sh-thead-tr');
-  const tbody = document.getElementById('sh-tbody');
-  thead.innerHTML = '';
-  tbody.innerHTML = '<tr><td colspan="100" style="text-align: center; padding: 40px;">Loading data...</td></tr>';
-
-  // Back button
-  document.getElementById('sh-back-btn').onclick = () => {
-    renderView('dashboard');
-  };
-
-  // Fetch session + quiz + questions
-  const { data: session } = await HQ_SUPABASE.from('game_sessions')
-    .select('*, quiz:quizzes(*, questions(*))')
-    .eq('id', sessionId)
-    .single();
-
-  if (!session) {
-    tbody.innerHTML = '<tr><td colspan="100" style="text-align: center; padding: 40px;">Session not found.</td></tr>';
-    return;
-  }
-
-  const d = new Date(session.created_at);
-  document.getElementById('sh-title').textContent = session.quiz.title;
-  document.getElementById('sh-date').textContent = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-  document.getElementById('sh-pin').textContent = session.pin;
-
-  // Fetch players and their answers
-  const { data: players } = await HQ_SUPABASE.from('players')
-    .select('*, answers(*)')
-    .eq('session_id', sessionId)
-    .order('score', { ascending: false });
-
-  const questions = session.quiz.questions.sort((a,b) => a.order_num - b.order_num);
-
-  // Render headers
-  let thHtml = '<th>Rank</th><th>Player Name</th><th>Total Score</th>';
-  questions.forEach((q, idx) => {
-    thHtml += `<th>Q${idx + 1}</th>`;
-  });
-  thead.innerHTML = thHtml;
-
-  // Render rows
-  if (!players || players.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="${3 + questions.length}" style="text-align: center; padding: 40px;">No participants found.</td></tr>`;
-    return;
-  }
-
-  let tbHtml = '';
-  players.forEach((p, rankIndex) => {
-    const rank = rankIndex + 1;
-    tbHtml += `<tr>
-      <td style="font-weight: 700; color: var(--navy);">#${rank}</td>
-      <td style="font-weight: 600;">${escHtml(p.name)}</td>
-      <td style="font-weight: 800; color: var(--yellow);">${p.score}</td>
-    `;
-
-    questions.forEach(q => {
-      const ans = p.answers?.find(a => a.question_id === q.id);
-      if (!ans) {
-        tbHtml += `<td class="ans-none">-</td>`;
-      } else {
-        const isCorrect = ans.chosen_option === q.correct_option;
-        const pts = ans.points_awarded;
-        const cssClass = isCorrect ? 'ans-correct' : 'ans-wrong';
-        const icon = isCorrect ? '✓' : '✗';
-        tbHtml += `<td class="${cssClass}" title="Answered: ${ans.chosen_option.toUpperCase()} (${pts} pts)">${icon} ${ans.chosen_option.toUpperCase()}</td>`;
-      }
-    });
-    
-    tbHtml += '</tr>';
-  });
-  tbody.innerHTML = tbHtml;
-}
-f u n c t i o n   t r i g g e r F l a s h ( t y p e )   {   c o n s t   f   =   d o c u m e n t . c r e a t e E l e m e n t ( ' d i v ' ) ;   f . c l a s s N a m e   =   ' f l a s h - o v e r l a y   f l a s h - '   +   t y p e ;   d o c u m e n t . b o d y . a p p e n d C h i l d ( f ) ;   s e t T i m e o u t ( ( )   = >   f . r e m o v e ( ) ,   1 5 0 0 ) ;   }  
- 
+function triggerFlash(type) { const f = document.createElement('div'); f.className = 'flash-overlay flash-' + type; document.body.appendChild(f); setTimeout(() => f.remove(), 1500); }
