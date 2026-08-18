@@ -94,51 +94,30 @@ const AudioEngine = (() => {
   }
 
   // ---- Countdown tension music ----
+  let timerAudio = null;
   let isCountdownPlaying = false;
-  let countdownTimerId = null;
 
   function startCountdownMusic(secondsLeft) {
     if (muted || isCountdownPlaying) return;
     isCountdownPlaying = true;
-    const ac = getCtx();
-    countdownNodes = [];
-
-    function scheduleTick() {
-      if (!isCountdownPlaying || muted) return;
-      const t = ac.currentTime + 0.05;
-      
-      // Digital LED clock tick (sharp, short blip)
-      const osc = ac.createOscillator();
-      const gain = ac.createGain();
-      
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(1500, t);
-      osc.frequency.exponentialRampToValueAtTime(800, t + 0.03);
-      
-      gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.08, t + 0.005);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
-
-      osc.connect(gain);
-      gain.connect(ac.destination);
-      osc.start(t);
-      osc.stop(t + 0.05);
-      
-      countdownNodes.push(osc);
-      
-      // Schedule next tick in exactly 1 second
-      countdownTimerId = setTimeout(scheduleTick, 1000);
+    
+    if (!timerAudio) {
+      timerAudio = new Audio('/assets/timer.mp3');
+      // The audio is 30s long; if questions are exactly 30s, we don't strictly need loop,
+      // but loop helps if a question takes longer or there's slight lag.
+      timerAudio.loop = true;
     }
-
-    scheduleTick();
+    
+    timerAudio.currentTime = 0;
+    timerAudio.play().catch(e => console.warn('Countdown audio autoplay blocked:', e));
   }
 
   function stopCountdownMusic() {
     isCountdownPlaying = false;
-    clearTimeout(countdownTimerId);
-    if (!countdownNodes) return;
-    countdownNodes.forEach(n => { try { n.stop(); } catch(e) {} });
-    countdownNodes = null;
+    if (timerAudio) {
+      timerAudio.pause();
+      timerAudio.currentTime = 0;
+    }
   }
 
   // ---- Single sound effects ----
