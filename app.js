@@ -929,7 +929,7 @@ async function joinSession(pin, name, btn) {
     .from('game_sessions')
     .select('*')
     .eq('pin', cleanPin)
-    .in('status', ['lobby'])
+    .in('status', ['lobby', 'active', 'question_active'])
     .limit(1);
 
   if (sErr || !sessions?.length) {
@@ -976,6 +976,28 @@ async function joinSession(pin, name, btn) {
   State.session    = session;
 
   setLoading(btn, false);
+  
+  if (session.status === 'question_active') {
+    // Manually jump to current question
+    const { data: q } = await HQ_SUPABASE.from('questions')
+      .select('id')
+      .eq('quiz_id', session.quiz_id)
+      .order('order_num', { ascending: true })
+      .range(session.current_question_index, session.current_question_index)
+      .single();
+    
+    if (q) {
+      subscribeStudentChannel(session.id); // Listen for next events
+      studentShowQuestion({
+        question_index: session.current_question_index,
+        question_started_at: session.question_started_at,
+        question_id: q.id,
+        show_text: session.show_questions_on_phones
+      });
+      return;
+    }
+  }
+
   showStudentLobby(session, player);
 }
 
@@ -1162,10 +1184,15 @@ async function submitStudentOpenAnswer(questionId, text) {
   const lockEl = document.getElementById('sq-locked-msg');
   const resultsEl = document.getElementById('sq-result');
 
+  let msg = 'Answer Submitted!';
+  const elapsed = (Date.now() - new Date(State.session.question_started_at).getTime()) / 1000;
+  if (elapsed < 3) msg = 'Lightning fast! ⚡';
+  else if (elapsed < 8) msg = 'Nice speed! 🔥';
+
   if (resultsEl) {
     resultsEl.classList.remove('hidden');
     resultsEl.className = 'sq-result correct';
-    resultsEl.innerHTML = `<span class="result-icon">✓</span><span>Answer Submitted!</span>`;
+    resultsEl.innerHTML = `<span class="result-icon">✓</span><span>${msg}</span>`;
     AudioEngine.playCorrect();
   }
   if (lockEl) lockEl.classList.add('hidden');
@@ -1194,7 +1221,13 @@ async function submitStudentAnswer(questionId, chosenOption) {
     resultsEl.classList.remove('hidden');
     if (data.correct) {
       resultsEl.className = 'sq-result correct';
-      resultsEl.innerHTML = `<span class="result-icon">✓</span><span>Correct! +${data.points_awarded} pts</span>`;
+      
+      let msg = `Correct! +${data.points_awarded} pts`;
+      const elapsed = (Date.now() - new Date(State.session.question_started_at).getTime()) / 1000;
+      if (elapsed < 3) msg += ' ⚡ Lightning fast!';
+      else if (elapsed < 8) msg += ' 🔥 Great speed!';
+      
+      resultsEl.innerHTML = `<span class="result-icon">✓</span><span>${msg}</span>`;
       AudioEngine.playCorrect();
     } else {
       resultsEl.className = 'sq-result incorrect';
