@@ -229,7 +229,6 @@ async function showDashboard() {
   }
 
   renderView('dashboard');
-  setupMuteToggle('host-mute');
   loadQuizList();
   loadSessionHistory();
 
