@@ -127,60 +127,31 @@ const AudioEngine = (() => {
     const ac = getCtx();
     countdownNodes = [];
 
-    // Catchy 8-bit game loop (120 BPM)
-    const freqs = {
-      'C4': 261.63, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 
-      'C5': 523.25, 'E5': 659.25, 'F5': 698.46
-    };
-    const melody = [
-      'G4', 'E4', 'C4', 'E4', 'G4', 'C5', 'E5', 'C5',
-      'A4', 'F4', 'C4', 'F4', 'A4', 'C5', 'F5', 'C5'
-    ];
-
     function scheduleTick() {
       if (!isCountdownPlaying || muted) return;
       const t = ac.currentTime + 0.05;
       
-      // Melody (16th notes)
-      for (let i = 0; i < 16; i++) {
-        if (melody[i]) {
-          const osc = ac.createOscillator();
-          const gain = ac.createGain();
-          osc.type = 'square';
-          osc.frequency.value = freqs[melody[i]];
-          
-          gain.gain.setValueAtTime(0, t + i*0.125);
-          gain.gain.linearRampToValueAtTime(0.04, t + i*0.125 + 0.01);
-          gain.gain.exponentialRampToValueAtTime(0.001, t + i*0.125 + 0.1);
+      // Digital LED clock tick (sharp, short blip)
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(1500, t);
+      osc.frequency.exponentialRampToValueAtTime(800, t + 0.03);
+      
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.08, t + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
 
-          osc.connect(gain);
-          gain.connect(ac.destination);
-          osc.start(t + i*0.125);
-          osc.stop(t + i*0.125 + 0.125);
-          countdownNodes.push(osc);
-        }
-      }
-
-      // Bassline (off-beat 8th notes)
-      for (let i = 0; i < 8; i++) {
-        const time = t + i * 0.25 + 0.125;
-        const osc = ac.createOscillator();
-        const gain = ac.createGain();
-        osc.type = 'triangle';
-        osc.frequency.value = (i < 4) ? 130.81 : 174.61; // C3 then F3
-        
-        gain.gain.setValueAtTime(0, time);
-        gain.gain.linearRampToValueAtTime(0.12, time + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.01, time + 0.15);
-        
-        osc.connect(gain);
-        gain.connect(ac.destination);
-        osc.start(time);
-        osc.stop(time + 0.2);
-        countdownNodes.push(osc);
-      }
-
-      countdownTimerId = setTimeout(scheduleTick, 2000);
+      osc.connect(gain);
+      gain.connect(ac.destination);
+      osc.start(t);
+      osc.stop(t + 0.05);
+      
+      countdownNodes.push(osc);
+      
+      // Schedule next tick in exactly 1 second
+      countdownTimerId = setTimeout(scheduleTick, 1000);
     }
 
     scheduleTick();
