@@ -2073,13 +2073,11 @@ body.gameplay img[src*="logo.jpg"] {
   color:        var(--game-white) !important;
 }
 
-/* Question text — large, white, confident */
+/* Question text - large, white, confident, scaling down for long questions */
 #view-host-question #hq-question-text {
   color:       var(--game-white) !important;
   text-shadow: 0 2px 16px rgba(0,0,0,0.4);
-  max-height:  35vh;
-  overflow-y:  auto;
-  scrollbar-width: thin;
+  font-size:   clamp(1.2rem, 3.5vw, 3rem) !important; /* Scale down smoothly so it doesn't push options out */
 }
 
 /* Student Feedback Text Visibility */
