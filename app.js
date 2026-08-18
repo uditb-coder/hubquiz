@@ -491,7 +491,21 @@ async function editQuiz(quizId) {
 }
 
 async function deleteQuiz(quizId) {
-  if (!confirm('Delete this quiz? This cannot be undone.')) return;
+  const wantsToDelete = await new Promise((resolve) => {
+    const overlay = document.getElementById('delete-modal-overlay');
+    overlay.classList.remove('hidden');
+    document.getElementById('delete-confirm-btn').onclick = () => {
+      overlay.classList.add('hidden');
+      resolve(true);
+    };
+    document.getElementById('delete-cancel-btn').onclick = () => {
+      overlay.classList.add('hidden');
+      resolve(false);
+    };
+  });
+
+  if (!wantsToDelete) return;
+
   const { error } = await HQ_SUPABASE.from('quizzes').delete().eq('id', quizId);
   if (error) { alert('Error deleting quiz: ' + error.message); return; }
   loadQuizList();
