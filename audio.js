@@ -119,6 +119,7 @@ const AudioEngine = (() => {
 
   // ---- Countdown tension music ----
   let isCountdownPlaying = false;
+  let countdownTimerId = null;
 
   function startCountdownMusic(secondsLeft) {
     if (muted || isCountdownPlaying) return;
@@ -126,28 +127,47 @@ const AudioEngine = (() => {
     const ac = getCtx();
     countdownNodes = [];
 
-    // Gentle ticking for the final 10 seconds
-    for (let i = 0; i < 10; i++) {
-      const osc = ac.createOscillator();
-      const gain = ac.createGain();
-      osc.type = 'sine';
+    function scheduleTick() {
+      if (!isCountdownPlaying || muted) return;
+      const t = ac.currentTime + 0.05;
       
-      const t = ac.currentTime + i;
-      osc.frequency.setValueAtTime(800, t);
-      gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.linearRampToValueAtTime(0.1, t + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
-      
-      osc.connect(gain);
-      gain.connect(ac.destination);
-      osc.start(t);
-      osc.stop(t + 0.15);
-      countdownNodes.push(osc);
+      // Tick (high woodblock sound)
+      const osc1 = ac.createOscillator();
+      const gain1 = ac.createGain();
+      osc1.type = 'square';
+      osc1.frequency.setValueAtTime(800, t);
+      gain1.gain.setValueAtTime(0.0001, t);
+      gain1.gain.linearRampToValueAtTime(0.08, t + 0.01);
+      gain1.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
+      osc1.connect(gain1);
+      gain1.connect(ac.destination);
+      osc1.start(t);
+      osc1.stop(t + 0.15);
+      countdownNodes.push(osc1);
+
+      // Tock (lower sound half a second later)
+      const osc2 = ac.createOscillator();
+      const gain2 = ac.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(400, t + 0.5);
+      gain2.gain.setValueAtTime(0.0001, t + 0.5);
+      gain2.gain.linearRampToValueAtTime(0.06, t + 0.51);
+      gain2.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
+      osc2.connect(gain2);
+      gain2.connect(ac.destination);
+      osc2.start(t + 0.5);
+      osc2.stop(t + 0.65);
+      countdownNodes.push(osc2);
+
+      countdownTimerId = setTimeout(scheduleTick, 1000);
     }
+
+    scheduleTick();
   }
 
   function stopCountdownMusic() {
     isCountdownPlaying = false;
+    clearTimeout(countdownTimerId);
     if (!countdownNodes) return;
     countdownNodes.forEach(n => { try { n.stop(); } catch(e) {} });
     countdownNodes = null;

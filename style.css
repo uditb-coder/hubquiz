@@ -1914,3 +1914,32 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 #view-host-results .lb-full-row { background: #ffffff; border: 1px solid var(--grey-200); color: var(--navy); }
 #view-host-results .lb-full-row .lb-name,
 #view-host-results .lb-full-row .lb-score { color: var(--navy) !important; }
+
+/* Game Feel UI Updates */
+.qr-enlarged {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+  width: 80vmin !important;
+  height: 80vmin !important;
+  z-index: 99999 !important;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,0.85), 0 24px 48px rgba(0,0,0,0.5) !important;
+  border-radius: 24px !important;
+}
+
+@keyframes pulse-soft {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+#lobby-pin {
+  animation: pulse-soft 2s infinite ease-in-out;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+#view-host-lobby, #view-host-question, #view-student-question {
+  background: radial-gradient(circle at top right, rgba(230,240,255,1) 0%, rgba(248,249,250,1) 100%);
+}
+

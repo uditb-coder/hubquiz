@@ -167,6 +167,10 @@ function showLogin() {
 async function showDashboard() {
   if (!State.user) { navigate('/login'); return; }
 
+  // Stop any lingering audio
+  AudioEngine.stopLobbyMusic();
+  AudioEngine.stopCountdownMusic();
+
   // Check for active session recovery
   const { data: activeSessions } = await HQ_SUPABASE.from('game_sessions')
     .select('*, quiz:quizzes(*, questions(*))')
@@ -505,7 +509,11 @@ function showHostLobby() {
     });
   });
 
-  // Start quiz button
+  // QR Enlarge handler
+  document.getElementById('lobby-qr-img')?.addEventListener('click', (e) => {
+    e.target.classList.toggle('qr-enlarged');
+  });
+
   document.getElementById('start-quiz-btn')?.addEventListener('click', async () => {
     if (State.players.length === 0) {
       if (!confirm('No players have joined yet. Start anyway?')) return;
