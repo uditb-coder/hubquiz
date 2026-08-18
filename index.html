@@ -286,17 +286,22 @@
 
     <p id="hr-question-text">Question text</p>
 
-    <div class="hr-main">
-      <!-- Answer distribution bars -->
-      <div class="hr-bars-section">
-        <div class="hr-bars-title">Answer Distribution</div>
-        <div id="hr-answer-bars"><!-- Rendered by JS --></div>
-      </div>
+    <div class="hr-main" style="display:flex; gap: 24px; flex-wrap: wrap;">
+      <!-- Answer grid (new) -->
+      <div id="hr-answer-blocks" class="hq-answer-blocks" style="flex:1; min-width: 300px;"></div>
 
-      <!-- Running leaderboard -->
-      <div class="hr-lb-section">
-        <div class="hr-lb-title">Top Players</div>
-        <div id="hr-leaderboard"><!-- Rendered by JS --></div>
+      <div style="flex:1; display:flex; flex-direction:column; gap:24px; min-width: 300px;">
+        <!-- Answer distribution bars -->
+        <div class="hr-bars-section">
+          <div class="hr-bars-title">Answer Distribution</div>
+          <div id="hr-answer-bars"><!-- Rendered by JS --></div>
+        </div>
+  
+        <!-- Running leaderboard -->
+        <div class="hr-lb-section">
+          <div class="hr-lb-title">Top Players</div>
+          <div id="hr-leaderboard"><!-- Rendered by JS --></div>
+        </div>
       </div>
     </div>
 

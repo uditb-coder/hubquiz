@@ -8,10 +8,10 @@
 // ---- Constants ----
 const QUESTION_TIME = 30; // seconds (global, fixed)
 const ANSWER_COLORS = {
-  a: { bg: '#E74C3C', label: 'A', symbol: '▲' },
-  b: { bg: '#3498DB', label: 'B', symbol: '◆' },
-  c: { bg: '#F39C12', label: 'C', symbol: '●' },
-  d: { bg: '#2ECC71', label: 'D', symbol: '■' },
+  a: { bg: '#0d9488', label: 'A', symbol: '▲' },
+  b: { bg: '#F59E0B', label: 'B', symbol: '♦' },
+  c: { bg: '#1E293B', label: 'C', symbol: '●' },
+  d: { bg: '#f43f5e', label: 'D', symbol: '■' },
 };
 
 // ---- App State ----
@@ -917,8 +917,9 @@ async function subscribeAnswerCount(questionId) {
 
 function startHostTimer(seconds, startedAt) {
   clearTimer();
-  const ring    = document.getElementById('timer-ring-progress');
-  const numEl   = document.getElementById('timer-number');
+  const ring = document.getElementById('timer-ring-progress');
+  const ringWrap = document.querySelector('.timer-ring-wrap');
+  const numEl = document.getElementById('timer-number');
   const totalLen = ring ? parseFloat(ring.getAttribute('stroke-dasharray')) : 283;
 
   // Start the 30-sec music right when the timer starts
@@ -937,6 +938,11 @@ function startHostTimer(seconds, startedAt) {
       if (remaining > 20) ring.setAttribute('stroke', '#2ECC71');
       else if (remaining > 10) ring.setAttribute('stroke', '#F39C12');
       else ring.setAttribute('stroke', '#E74C3C');
+    }
+
+    if (ringWrap) {
+      if (remaining <= 3 && remaining > 0) ringWrap.classList.add('timer-shake');
+      else ringWrap.classList.remove('timer-shake');
     }
 
     if (remaining <= 0) {
@@ -991,8 +997,10 @@ async function hostShowReveal(questionId) {
   document.getElementById('hr-question-text').textContent = q.question_text;
 
   const barsEl = document.getElementById('hr-answer-bars');
+  const blocksEl = document.getElementById('hr-answer-blocks');
   
   if (q.question_type === 'open_ended') {
+    if (blocksEl) blocksEl.innerHTML = '';
     // Fetch text answers directly
     const { data: textAnswers } = await HQ_SUPABASE.from('answers')
       .select('chosen_text, players!inner(name, session_id)')
@@ -1017,23 +1025,44 @@ async function hostShowReveal(questionId) {
       p_question_id: questionId,
     });
     
+    if (blocksEl) {
+      blocksEl.innerHTML = ['a','b','c','d']
+        .filter(opt => q['option_'+opt] && q['option_'+opt].trim() !== '')
+        .map(opt => {
+          const isCorrect = opt === q.correct_option;
+          const revealClass = isCorrect ? 'reveal-correct' : 'reveal-incorrect';
+          return `
+          <div class="host-answer-block answer-${opt} ${revealClass}">
+            <span class="answer-symbol">${ANSWER_COLORS[opt].symbol}</span>
+            <span class="answer-opt-label">${opt.toUpperCase()}</span>
+            <span class="answer-opt-text">${escHtml(q['option_'+opt])}</span>
+          </div>`;
+        }).join('');
+    }
+
     const total = counts?.total_players || 1;
     barsEl.innerHTML = ['a','b','c','d'].map(opt => {
       const count = counts?.[opt] ?? 0;
       const pct   = Math.round((count / total) * 100);
       const isCorrect = opt === q.correct_option;
       return `
-        <div class="reveal-bar-row ${isCorrect ? 'correct-answer' : ''}">
-          <div class="reveal-bar-label answer-${opt}">
-            ${ANSWER_COLORS[opt].symbol} ${opt.toUpperCase()}
-            ${isCorrect ? '<span class="correct-tick">✓</span>' : ''}
-          </div>
-          <div class="reveal-bar-track">
-            <div class="reveal-bar-fill answer-${opt}" style="width:${pct}%"></div>
-          </div>
-          <span class="reveal-bar-count">${count}</span>
-        </div>`;
+      <div class="reveal-bar-row ${isCorrect ? 'correct-answer' : ''}">
+        <div class="reveal-bar-label answer-${opt}">
+          ${ANSWER_COLORS[opt].symbol} ${opt.toUpperCase()}
+          ${isCorrect ? '<span class="correct-tick">✓</span>' : ''}
+        </div>
+        <div class="reveal-bar-track">
+          <div class="reveal-bar-fill answer-${opt}" style="width:0%" data-target-width="${pct}%"></div>
+        </div>
+        <span class="reveal-bar-count">${count}</span>
+      </div>`;
     }).join('');
+    
+    setTimeout(() => {
+      document.querySelectorAll('.reveal-bar-fill').forEach(bar => {
+        bar.style.width = bar.getAttribute('data-target-width');
+      });
+    }, 50);
   }
 
   // Render mini leaderboard
