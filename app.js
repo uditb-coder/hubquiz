@@ -1144,6 +1144,15 @@ function showStudentLobby(session, player) {
   setupMuteToggle('sl-mute');
   document.getElementById('sl-player-name').textContent = player.name;
 
+  const statusEl = document.querySelector('#view-student-lobby .sl-status');
+  if (statusEl) {
+    if (session.status !== 'lobby') {
+      statusEl.innerHTML = `Game in progress! Waiting for the next question<span class="sl-waiting-dots" aria-hidden="true"></span>`;
+    } else {
+      statusEl.innerHTML = `You're in! Waiting for the host to start<span class="sl-waiting-dots" aria-hidden="true"></span>`;
+    }
+  }
+
   // Subscribe to game events
   subscribeStudentChannel(session.id);
 }
