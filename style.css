@@ -1,5 +1,5 @@
-﻿/* ============================================================
-   style.css â€” HubQuiz Design System
+/* ============================================================
+   style.css — HubQuiz Design System
    ComedKares branding: dark navy + yellow, white/light-grey UI
    ============================================================ */
 
@@ -7,7 +7,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap');
 
 /* ============================================================
-   CSS Variables â€” Design Tokens
+   CSS Variables — Design Tokens
    ============================================================ */
 :root {
   /* Brand */
@@ -1372,7 +1372,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 }
 
 #view-student-lobby::before {
-  content: 'â–² â–  â— â™¦';
+  content: '▲ ■ ● ♦';
   position: absolute;
   font-size: 6rem;
   color: rgba(255,255,255,0.05);
@@ -1460,7 +1460,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   opacity:       0.6;
 }
 
-/* Answer blocks â€” full screen grid */
+/* Answer blocks — full screen grid */
 #sq-answer-blocks {
   display:               grid;
   grid-template-columns: 1fr 1fr;
@@ -1510,7 +1510,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 .student-answer-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 .student-answer-btn.selected { opacity: 1 !important; ring: 4px solid var(--white); }
 .student-answer-btn.selected::after {
-  content:  'âœ“';
+  content:  '✓';
   position: absolute;
   top:      8px;
   right:    10px;
@@ -1700,7 +1700,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 .student-answer-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 .student-answer-btn.selected { opacity: 1 !important; ring: 4px solid var(--white); }
 .student-answer-btn.selected::after {
-  content:  'âœ“';
+  content:  '✓';
   position: absolute;
   top:      8px;
   right:    10px;
@@ -2216,4 +2216,3 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 .hc-meta { font-size: 0.9rem; color: var(--grey-500); margin: 0; }
 .hc-stats { text-align: right; }
 .hc-score { font-size: 1.5rem; font-weight: 800; color: var(--yellow); margin: 0; }
-.flash-overlay { position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0; } .flash-correct { animation: flashScreenCorrect 1.5s ease-out forwards; } .flash-incorrect { animation: flashScreenIncorrect 1.5s ease-out forwards; } @keyframes flashScreenCorrect { 0% { background: #2ECC71; opacity: 1; } 100% { background: #2ECC71; opacity: 0; } } @keyframes flashScreenIncorrect { 0% { background: #E74C3C; opacity: 0.8; } 100% { background: #E74C3C; opacity: 0; } }
