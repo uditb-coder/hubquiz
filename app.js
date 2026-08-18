@@ -693,6 +693,19 @@ function showHostLobby() {
     };
   }
 
+  const cancelBtn = document.getElementById('lobby-end-btn');
+  if (cancelBtn) {
+    cancelBtn.onclick = async () => {
+      if (confirm('Are you sure you want to cancel this quiz?')) {
+        AudioEngine.stopLobbyMusic();
+        await HQ_SUPABASE.from('game_sessions').update({ status: 'finished' }).eq('id', State.session.id);
+        await broadcastGameEvent('game:finished');
+        State.session.status = 'finished';
+        navigate('/host');
+      }
+    };
+  }
+
   // Load existing players
   loadPlayers();
 
