@@ -256,6 +256,7 @@ async function loadQuizList() {
   const { data: quizzes, error } = await HQ_SUPABASE
     .from('quizzes')
     .select('*, questions(count)')
+    .eq('created_by', State.user.id)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -506,8 +507,16 @@ async function deleteQuiz(quizId) {
 
   if (!wantsToDelete) return;
 
-  const { error } = await HQ_SUPABASE.from('quizzes').delete().eq('id', quizId);
-  if (error) { alert('Error deleting quiz: ' + error.message); return; }
+  const { data, error } = await HQ_SUPABASE.from('quizzes').delete().eq('id', quizId).select();
+  if (error) { 
+    alert('Error deleting quiz: ' + error.message); 
+    return; 
+  }
+  if (!data || data.length === 0) {
+    alert('Could not delete quiz. You may not have permission, or it was already deleted.');
+    return;
+  }
+  
   loadQuizList();
 }
 
