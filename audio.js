@@ -127,39 +127,60 @@ const AudioEngine = (() => {
     const ac = getCtx();
     countdownNodes = [];
 
+    // Catchy 8-bit game loop (120 BPM)
+    const freqs = {
+      'C4': 261.63, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 
+      'C5': 523.25, 'E5': 659.25, 'F5': 698.46
+    };
+    const melody = [
+      'G4', 'E4', 'C4', 'E4', 'G4', 'C5', 'E5', 'C5',
+      'A4', 'F4', 'C4', 'F4', 'A4', 'C5', 'F5', 'C5'
+    ];
+
     function scheduleTick() {
       if (!isCountdownPlaying || muted) return;
       const t = ac.currentTime + 0.05;
       
-      // Soft Marimba Tick
-      const osc1 = ac.createOscillator();
-      const gain1 = ac.createGain();
-      osc1.type = 'sine';
-      osc1.frequency.setValueAtTime(659.25, t); // E5
-      gain1.gain.setValueAtTime(0.0001, t);
-      gain1.gain.exponentialRampToValueAtTime(0.12, t + 0.01);
-      gain1.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
-      osc1.connect(gain1);
-      gain1.connect(ac.destination);
-      osc1.start(t);
-      osc1.stop(t + 0.25);
-      countdownNodes.push(osc1);
+      // Melody (16th notes)
+      for (let i = 0; i < 16; i++) {
+        if (melody[i]) {
+          const osc = ac.createOscillator();
+          const gain = ac.createGain();
+          osc.type = 'square';
+          osc.frequency.value = freqs[melody[i]];
+          
+          gain.gain.setValueAtTime(0, t + i*0.125);
+          gain.gain.linearRampToValueAtTime(0.04, t + i*0.125 + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + i*0.125 + 0.1);
 
-      // Soft Marimba Tock
-      const osc2 = ac.createOscillator();
-      const gain2 = ac.createGain();
-      osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(523.25, t + 0.5); // C5
-      gain2.gain.setValueAtTime(0.0001, t + 0.5);
-      gain2.gain.exponentialRampToValueAtTime(0.08, t + 0.51);
-      gain2.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
-      osc2.connect(gain2);
-      gain2.connect(ac.destination);
-      osc2.start(t + 0.5);
-      osc2.stop(t + 0.75);
-      countdownNodes.push(osc2);
+          osc.connect(gain);
+          gain.connect(ac.destination);
+          osc.start(t + i*0.125);
+          osc.stop(t + i*0.125 + 0.125);
+          countdownNodes.push(osc);
+        }
+      }
 
-      countdownTimerId = setTimeout(scheduleTick, 1000);
+      // Bassline (off-beat 8th notes)
+      for (let i = 0; i < 8; i++) {
+        const time = t + i * 0.25 + 0.125;
+        const osc = ac.createOscillator();
+        const gain = ac.createGain();
+        osc.type = 'triangle';
+        osc.frequency.value = (i < 4) ? 130.81 : 174.61; // C3 then F3
+        
+        gain.gain.setValueAtTime(0, time);
+        gain.gain.linearRampToValueAtTime(0.12, time + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.01, time + 0.15);
+        
+        osc.connect(gain);
+        gain.connect(ac.destination);
+        osc.start(time);
+        osc.stop(time + 0.2);
+        countdownNodes.push(osc);
+      }
+
+      countdownTimerId = setTimeout(scheduleTick, 2000);
     }
 
     scheduleTick();
