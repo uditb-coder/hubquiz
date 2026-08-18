@@ -177,13 +177,15 @@ function showLogin() {
 async function showDashboard() {
   if (!State.user) { navigate('/login'); return; }
 
+  renderView('dashboard'); // Render dashboard first so modals overlay it, not the login view.
+  
   // Stop any lingering audio
   AudioEngine.stopLobbyMusic();
   AudioEngine.stopCountdownMusic();
 
   // Check for active session recovery
   const { data: activeSessions } = await HQ_SUPABASE.from('game_sessions')
-    .select('*, quiz:quizzes(*, questions(*))')
+    .select('*, quiz:quizzes(*, questions(*)), players(*)')
     .eq('host_id', State.user.id)
     .in('status', ['lobby', 'active', 'question_active', 'question_review'])
     .order('created_at', { ascending: false })
@@ -210,12 +212,16 @@ async function showDashboard() {
       State.session = s;
       State.quiz = s.quiz;
       State.questions = s.quiz.questions.sort((a,b) => a.order_num - b.order_num);
+      State.players = s.players || [];
       
       if (s.status === 'lobby') {
         showHostLobby(s.quiz.id, s.pin);
+        subscribeHostLobby(); // re-subscribe
       } else if (s.status === 'question_review') {
+        subscribeHostChannel(); // re-subscribe
         hostShowReveal(s.questions[s.current_question_index]?.id);
       } else {
+        subscribeHostChannel(); // re-subscribe
         hostShowQuestion(s.current_question_index);
       }
       return;
@@ -228,7 +234,6 @@ async function showDashboard() {
     }
   }
 
-  renderView('dashboard');
   loadQuizList();
   loadSessionHistory();
 
