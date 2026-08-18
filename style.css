@@ -2077,6 +2077,23 @@ body.gameplay img[src*="logo.jpg"] {
 #view-host-question #hq-question-text {
   color:       var(--game-white) !important;
   text-shadow: 0 2px 16px rgba(0,0,0,0.4);
+  max-height:  35vh;
+  overflow-y:  auto;
+  scrollbar-width: thin;
+}
+
+/* Student Feedback Text Visibility */
+.gameplay .feedback-card {
+  color: var(--game-white) !important;
+}
+.gameplay .feedback-title {
+  color: var(--game-gold) !important;
+}
+.gameplay .stat-label {
+  color: var(--game-white-dim) !important;
+}
+.gameplay .stat-value {
+  color: var(--game-white) !important;
 }
 
 /* Timer ring — gold accent */
