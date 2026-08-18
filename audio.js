@@ -118,33 +118,36 @@ const AudioEngine = (() => {
   }
 
   // ---- Countdown tension music ----
+  let isCountdownPlaying = false;
 
   function startCountdownMusic(secondsLeft) {
-    if (muted) return;
-    stopCountdownMusic();
+    if (muted || isCountdownPlaying) return;
+    isCountdownPlaying = true;
     const ac = getCtx();
     countdownNodes = [];
 
-    // Rising tension: low pulse that speeds up
-    const baseFreq = 80;
-    for (let i = 0; i < Math.min(secondsLeft, 10); i++) {
+    // Gentle ticking for the final 10 seconds
+    for (let i = 0; i < 10; i++) {
       const osc = ac.createOscillator();
       const gain = ac.createGain();
-      osc.type = 'sawtooth';
-      const t = ac.currentTime + i * 0.5;
-      osc.frequency.setValueAtTime(baseFreq + i * 4, t);
+      osc.type = 'sine';
+      
+      const t = ac.currentTime + i;
+      osc.frequency.setValueAtTime(800, t);
       gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.linearRampToValueAtTime(0.08, t + 0.05);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.4);
+      gain.gain.linearRampToValueAtTime(0.1, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
+      
       osc.connect(gain);
       gain.connect(ac.destination);
       osc.start(t);
-      osc.stop(t + 0.45);
+      osc.stop(t + 0.15);
       countdownNodes.push(osc);
     }
   }
 
   function stopCountdownMusic() {
+    isCountdownPlaying = false;
     if (!countdownNodes) return;
     countdownNodes.forEach(n => { try { n.stop(); } catch(e) {} });
     countdownNodes = null;
