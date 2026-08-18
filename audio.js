@@ -131,32 +131,32 @@ const AudioEngine = (() => {
       if (!isCountdownPlaying || muted) return;
       const t = ac.currentTime + 0.05;
       
-      // Tick (high woodblock sound)
+      // Soft Marimba Tick
       const osc1 = ac.createOscillator();
       const gain1 = ac.createGain();
-      osc1.type = 'square';
-      osc1.frequency.setValueAtTime(800, t);
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(659.25, t); // E5
       gain1.gain.setValueAtTime(0.0001, t);
-      gain1.gain.linearRampToValueAtTime(0.08, t + 0.01);
-      gain1.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
+      gain1.gain.exponentialRampToValueAtTime(0.12, t + 0.01);
+      gain1.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
       osc1.connect(gain1);
       gain1.connect(ac.destination);
       osc1.start(t);
-      osc1.stop(t + 0.15);
+      osc1.stop(t + 0.25);
       countdownNodes.push(osc1);
 
-      // Tock (lower sound half a second later)
+      // Soft Marimba Tock
       const osc2 = ac.createOscillator();
       const gain2 = ac.createGain();
       osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(400, t + 0.5);
+      osc2.frequency.setValueAtTime(523.25, t + 0.5); // C5
       gain2.gain.setValueAtTime(0.0001, t + 0.5);
-      gain2.gain.linearRampToValueAtTime(0.06, t + 0.51);
-      gain2.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
+      gain2.gain.exponentialRampToValueAtTime(0.08, t + 0.51);
+      gain2.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
       osc2.connect(gain2);
       gain2.connect(ac.destination);
       osc2.start(t + 0.5);
-      osc2.stop(t + 0.65);
+      osc2.stop(t + 0.75);
       countdownNodes.push(osc2);
 
       countdownTimerId = setTimeout(scheduleTick, 1000);
