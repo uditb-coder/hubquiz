@@ -576,15 +576,20 @@ async function broadcastGameEvent(event, data = {}) {
 async function hostStartQuiz() {
   AudioEngine.stopLobbyMusic();
 
+  const showQsCb = document.getElementById('show-questions-checkbox');
+  const showQs = showQsCb ? showQsCb.checked : false;
+
   // Update session status
   const { error } = await HQ_SUPABASE.from('game_sessions').update({
     status: 'active',
     current_question_index: 0,
+    show_questions_on_phones: showQs
   }).eq('id', State.session.id);
   if (error) { alert(error.message); return; }
 
   State.session.current_question_index = 0;
   State.session.status = 'active';
+  State.session.show_questions_on_phones = showQs;
 
   hostShowQuestion(0);
 }
@@ -610,6 +615,7 @@ async function hostShowQuestion(index) {
     question_index: index,
     question_started_at: now,
     question_id: q.id,
+    show_text: State.session.show_questions_on_phones,
   });
 
   renderView('host-question');
@@ -1045,6 +1051,16 @@ async function studentShowQuestion(payload) {
   setupMuteToggle('sq-mute');
 
   document.getElementById('sq-q-num').textContent = `Q${question_index + 1}`;
+
+  const textContainer = document.getElementById('sq-question-text');
+  if (textContainer) {
+    if (payload.show_text) {
+      textContainer.textContent = q.question_text;
+      textContainer.classList.remove('hidden');
+    } else {
+      textContainer.classList.add('hidden');
+    }
+  }
 
   // Render tappable color blocks or text area
   const blocksEl = document.getElementById('sq-answer-blocks');
