@@ -108,6 +108,13 @@
     <div id="quiz-list">
       <div class="loading-spinner">Loading...</div>
     </div>
+    
+    <div class="dash-section-header" style="margin-top: 48px;">
+      <h1 class="dash-section-title">Recent Games (Past 24 Hours)</h1>
+    </div>
+    <div id="history-list">
+      <div class="empty-state" style="margin-top: 16px;">No games played recently.</div>
+    </div>
   </main>
 
   <!-- Quiz Create/Edit Modal -->
@@ -136,6 +143,34 @@
     </div>
   </div>
 </section>
+
+  <!-- ============================================================
+       VIEW: SESSION HISTORY DETAIL
+       ============================================================ -->
+  <section id="view-session-history" class="view hidden">
+    <div style="padding: 32px; width: 100%; height: 100vh; display: flex; flex-direction: column;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+        <div>
+          <button id="sh-back-btn" class="btn btn-secondary" style="margin-bottom: 16px;">&larr; Back to Dashboard</button>
+          <h1 id="sh-title" style="font-size: 2rem; margin: 0; color: var(--navy);">Quiz Title</h1>
+          <p id="sh-subtitle" style="color: var(--grey-500); margin: 4px 0 0 0;">Played on <span id="sh-date">...</span> &bull; PIN: <span id="sh-pin">...</span></p>
+        </div>
+      </div>
+      
+      <div style="flex: 1; overflow: auto; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <table class="history-table" id="sh-table">
+          <thead>
+            <tr id="sh-thead-tr">
+              <!-- Dynamically populated -->
+            </tr>
+          </thead>
+          <tbody id="sh-tbody">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
 
 <!-- ============================================================
      VIEW: HOST LOBBY

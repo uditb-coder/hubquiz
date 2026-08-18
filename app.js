@@ -231,6 +231,7 @@ async function showDashboard() {
   renderView('dashboard');
   setupMuteToggle('host-mute');
   loadQuizList();
+  loadSessionHistory();
 
   document.getElementById('logout-btn')?.addEventListener('click', async () => {
     await HQ_SUPABASE.auth.signOut();
@@ -1565,4 +1566,135 @@ function escHtml(str) {
 function formatPin(pin) {
   const p = String(pin).padStart(6, '0');
   return p.slice(0, 3) + ' ' + p.slice(3);
+}
+
+// ============================================================
+// ---- SESSION HISTORY ----
+// ============================================================
+
+async function loadSessionHistory() {
+  const container = document.getElementById('history-list');
+  if (!container) return;
+  container.innerHTML = '<div class="loading-spinner">Loading history...</div>';
+
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+  const { data, error } = await HQ_SUPABASE.from('game_sessions')
+    .select('*, quiz:quizzes(title), players(id)')
+    .eq('host_id', State.user.id)
+    .gte('created_at', twentyFourHoursAgo)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    container.innerHTML = '<div class="error">Failed to load history.</div>';
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    container.innerHTML = '<div class="empty-state" style="margin-top: 16px;">No games played in the past 24 hours.</div>';
+    return;
+  }
+
+  container.innerHTML = '';
+  data.forEach(s => {
+    const d = new Date(s.created_at);
+    const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    const pCount = s.players?.length || 0;
+    
+    const card = document.createElement('div');
+    card.className = 'history-card';
+    card.innerHTML = `
+      <div>
+        <h3 class="hc-title">${escHtml(s.quiz?.title || 'Unknown Quiz')}</h3>
+        <p class="hc-meta">Played on ${dateStr} &bull; ${pCount} Participant${pCount !== 1 ? 's' : ''}</p>
+      </div>
+      <div class="hc-stats">
+        <p class="hc-meta" style="font-weight: 600;">PIN: ${s.pin}</p>
+        <span class="${s.status === 'finished' ? 'status-badge' : 'status-badge warning'}">${s.status.toUpperCase()}</span>
+      </div>
+    `;
+    card.onclick = () => showSessionHistoryDetails(s.id);
+    container.appendChild(card);
+  });
+}
+
+async function showSessionHistoryDetails(sessionId) {
+  renderView('session-history');
+  
+  // Set basic placeholders
+  document.getElementById('sh-title').textContent = 'Loading...';
+  document.getElementById('sh-date').textContent = '';
+  document.getElementById('sh-pin').textContent = '';
+  const thead = document.getElementById('sh-thead-tr');
+  const tbody = document.getElementById('sh-tbody');
+  thead.innerHTML = '';
+  tbody.innerHTML = '<tr><td colspan="100" style="text-align: center; padding: 40px;">Loading data...</td></tr>';
+
+  // Back button
+  document.getElementById('sh-back-btn').onclick = () => {
+    renderView('dashboard');
+  };
+
+  // Fetch session + quiz + questions
+  const { data: session } = await HQ_SUPABASE.from('game_sessions')
+    .select('*, quiz:quizzes(*, questions(*))')
+    .eq('id', sessionId)
+    .single();
+
+  if (!session) {
+    tbody.innerHTML = '<tr><td colspan="100" style="text-align: center; padding: 40px;">Session not found.</td></tr>';
+    return;
+  }
+
+  const d = new Date(session.created_at);
+  document.getElementById('sh-title').textContent = session.quiz.title;
+  document.getElementById('sh-date').textContent = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  document.getElementById('sh-pin').textContent = session.pin;
+
+  // Fetch players and their answers
+  const { data: players } = await HQ_SUPABASE.from('players')
+    .select('*, answers(*)')
+    .eq('session_id', sessionId)
+    .order('score', { ascending: false });
+
+  const questions = session.quiz.questions.sort((a,b) => a.order_num - b.order_num);
+
+  // Render headers
+  let thHtml = '<th>Rank</th><th>Player Name</th><th>Total Score</th>';
+  questions.forEach((q, idx) => {
+    thHtml += `<th>Q${idx + 1}</th>`;
+  });
+  thead.innerHTML = thHtml;
+
+  // Render rows
+  if (!players || players.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="${3 + questions.length}" style="text-align: center; padding: 40px;">No participants found.</td></tr>`;
+    return;
+  }
+
+  let tbHtml = '';
+  players.forEach((p, rankIndex) => {
+    const rank = rankIndex + 1;
+    tbHtml += `<tr>
+      <td style="font-weight: 700; color: var(--navy);">#${rank}</td>
+      <td style="font-weight: 600;">${escHtml(p.name)}</td>
+      <td style="font-weight: 800; color: var(--yellow);">${p.score}</td>
+    `;
+
+    questions.forEach(q => {
+      const ans = p.answers?.find(a => a.question_id === q.id);
+      if (!ans) {
+        tbHtml += `<td class="ans-none">-</td>`;
+      } else {
+        const isCorrect = ans.chosen_option === q.correct_option;
+        const pts = ans.points_awarded;
+        const cssClass = isCorrect ? 'ans-correct' : 'ans-wrong';
+        const icon = isCorrect ? '✓' : '✗';
+        tbHtml += `<td class="${cssClass}" title="Answered: ${ans.chosen_option.toUpperCase()} (${pts} pts)">${icon} ${ans.chosen_option.toUpperCase()}</td>`;
+      }
+    });
+    
+    tbHtml += '</tr>';
+  });
+  tbody.innerHTML = tbHtml;
 }
