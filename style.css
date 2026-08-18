@@ -1871,209 +1871,497 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   .student-answer-btn { min-height: 100px; }
 }
 
-/* Game Show Dynamic Styles for Host Views */
+/* ============================================================
+   GAMEPLAY THEME — Deep Navy & Gold Game Show
+   Applies to all live gameplay screens:
+   host-lobby, host-question, host-reveal, host-leaderboard,
+   student-lobby, student-question, student-final
+   ============================================================ */
 
-/* Animated Lobby Background */
-@keyframes lobbyBgFlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+/* --- Gameplay Color Tokens --- */
+:root {
+  --game-bg:        #0B1D3A;
+  --game-bg-end:    #132A4E;
+  --game-surface:   #1B2A4A;
+  --game-surface-2: #20345C;
+  --game-gold:      #D4AF37;
+  --game-gold-soft: #F0C740;
+  --game-gold-glow: rgba(212,175,55,0.35);
+  --game-border:    rgba(212,175,55,0.25);
+  --game-white:     rgba(255,255,255,0.92);
+  --game-white-dim: rgba(255,255,255,0.45);
+
+  /* Answer colors — warm, rich, distinct */
+  --answer-a: #C9A227;   /* warm gold */
+  --answer-b: #1C6E91;   /* deep teal-blue */
+  --answer-c: #C2622A;   /* coral/amber */
+  --answer-d: #2E7D5E;   /* muted emerald */
+}
+
+/* --- Keyframes --- */
+@keyframes gameGradientFlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
-#view-host-lobby, #view-host-question, #view-student-question,
-#view-host-reveal, #view-host-leaderboard {
-  background: linear-gradient(120deg, #e0f2fe, #fef3c7, #ccfbf1, #ffe4e6, #e0f2fe) !important;
-  background-size: 300% 300% !important;
-  animation: lobbyBgFlow 20s ease infinite !important;
-  color: var(--navy) !important;
-  position: relative;
-  overflow: hidden;
+@keyframes bounceInGame {
+  0%   { transform: scale(0.4) translateY(20px); opacity: 0; }
+  65%  { transform: scale(1.08) translateY(-4px); opacity: 1; }
+  80%  { transform: scale(0.96); }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 
-#view-host-lobby::before, #view-host-question::before, #view-host-leaderboard::before {
-  content: '▲ ■ ● ♦';
-  position: absolute;
-  font-size: 15vw;
-  color: rgba(13, 148, 136, 0.04);
-  top: 10%;
-  left: 5%;
-  letter-spacing: 25vw;
-  line-height: 40vh;
-  word-wrap: break-word;
-  width: 150%;
-  animation: ambientFloat 30s infinite ease-in-out;
-  pointer-events: none;
-  z-index: 0;
-  display: block !important;
+@keyframes slideUpStagger {
+  0%   { transform: translateY(28px); opacity: 0; }
+  100% { transform: translateY(0);    opacity: 1; }
 }
 
-#view-host-lobby .hq-container, #view-host-question .hq-container, #view-host-leaderboard .hq-container {
-  position: relative;
-  z-index: 1;
+@keyframes goldGlow {
+  0%,100% { box-shadow: 0 0 16px 2px var(--game-gold-glow); }
+  50%      { box-shadow: 0 0 32px 8px var(--game-gold-glow); }
 }
 
-#view-host-lobby .lobby-quiz-title { color: var(--navy) !important; }
-#view-host-lobby .lobby-quiz-meta { color: var(--grey-500) !important; }
-#view-host-lobby .pin-section,
-#view-host-lobby .lobby-players-section {
-  background: #ffffff !important;
-  border-color: var(--grey-200) !important;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05) !important;
-}
-#view-host-lobby .pin-label { color: var(--grey-500) !important; }
-#view-host-lobby .pin-url { color: var(--grey-700) !important; }
-
-/* Giant PIN */
-#view-host-lobby #lobby-pin { 
-  font-family: var(--font-head);
-  font-size: clamp(3.5rem, 10vw, 6rem) !important;
-  font-weight: 900 !important;
-  color: var(--navy) !important;
-  background: #fff;
-  padding: 10px 40px;
-  border-radius: 40px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  letter-spacing: 12px;
-  text-shadow: none !important;
-  white-space: nowrap;
-  display: inline-block;
-  margin: 10px 0;
-  animation: pulse-soft 2s infinite ease-in-out;
+@keyframes goldPulse {
+  0%,100% { transform: scale(1); box-shadow: 0 0 10px 2px var(--game-gold-glow); }
+  50%     { transform: scale(1.04); box-shadow: 0 0 24px 8px var(--game-gold-glow); }
 }
 
-/* Player Bubble Animations */
+@keyframes riseUp {
+  from { transform: translateY(48px); opacity: 0; }
+}
+
 @keyframes popIn {
-  0% { transform: scale(0); opacity: 0; }
-  60% { transform: scale(1.1); opacity: 1; }
+  0%   { transform: scale(0); opacity: 0; }
+  65%  { transform: scale(1.12); opacity: 1; }
   100% { transform: scale(1); opacity: 1; }
 }
 
-#view-host-lobby .player-chip {
-  background: #ffffff !important;
-  color: var(--navy) !important;
-  border: 2px solid #e2e8f0 !important;
-  border-radius: 24px !important;
-  padding: 8px 16px !important;
-  font-weight: 700 !important;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
-  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
-}
-
-/* Pulsing dot indicator for Live Counter */
-@keyframes pulseDot {
-  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-}
-
-#view-host-lobby .player-count-badge {
-  background: var(--yellow) !important;
-  color: var(--navy) !important;
-  position: relative;
-  border-radius: 20px;
-  animation: pulseDot 2s infinite;
-}
-
-#view-host-lobby .lobby-players-title { color: var(--navy) !important; }
-#view-host-lobby .waiting-text { color: var(--grey-500) !important; }
-
-/* Common Views */
-/* Host Reveal */
-
-/* Host Question View */
-#view-host-question .hq-top-bar { color: var(--navy); }
-#view-host-question .hq-answered-badge { background: #ffffff; border: 1px solid var(--grey-300); color: var(--navy); }
-#view-host-question #hq-question-text { color: var(--navy); }
-#view-host-question .timer-ring-wrap { background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-#view-host-question #timer-number { color: var(--navy); }
-#view-host-question .hq-progress { color: var(--grey-600) !important; }
-
-/* Question View Answer Blocks Animation */
-@keyframes slideUpFade {
-  0% { transform: translateY(30px); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
-}
-
-.hq-answer-blocks .host-answer-block {
-  opacity: 0;
-  animation: slideUpFade 0.5s forwards;
-}
-
-.hq-answer-blocks .host-answer-block:nth-child(1) { animation-delay: 0.1s; }
-.hq-answer-blocks .host-answer-block:nth-child(2) { animation-delay: 0.2s; }
-.hq-answer-blocks .host-answer-block:nth-child(3) { animation-delay: 0.3s; }
-.hq-answer-blocks .host-answer-block:nth-child(4) { animation-delay: 0.4s; }
-
-/* Answer Reveal Animations */
-@keyframes glowCorrect {
-  0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
-  50% { box-shadow: 0 0 20px 10px rgba(46, 204, 113, 0.2); }
-  100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
-}
-
-.reveal-correct {
-  transform: scale(1.05);
-  z-index: 10;
-  border: 4px solid #2ECC71 !important;
-  animation: glowCorrect 1.5s infinite;
-}
-
-.reveal-incorrect {
-  opacity: 0.6;
-  transform: scale(0.95);
-}
-
-.reveal-bar-fill {
-  transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-/* Host Reveal View */
-#view-host-reveal .hr-progress { color: var(--grey-600) !important; }
-#view-host-reveal #hr-question-text { color: var(--navy) !important; }
-#view-host-reveal .hr-bars-title, #view-host-reveal .hr-lb-title { color: var(--grey-600) !important; }
-#view-host-reveal .lb-row { background: #ffffff; border: 1px solid var(--grey-200); }
-#view-host-reveal .lb-row .lb-name, 
-#view-host-reveal .lb-row .lb-score { color: var(--navy) !important; }
-#view-host-reveal .reveal-bar-label { color: var(--navy) !important; }
-#view-host-reveal .reveal-bar-track { background: var(--grey-200) !important; }
-#view-host-reveal .reveal-bar-count { color: var(--navy) !important; }
-
-/* Host Leaderboard View */
-#view-host-leaderboard .hl-list-title,
-#view-host-leaderboard .results-subtitle,
-#view-host-leaderboard .hl-subtitle { color: var(--grey-600) !important; }
-#view-host-leaderboard .hl-title { color: var(--navy) !important; }
-#view-host-leaderboard .lb-full-row { background: #ffffff; border: 1px solid var(--grey-200); color: var(--navy); }
-#view-host-leaderboard .lb-full-row .lb-name,
-#view-host-leaderboard .lb-full-row .lb-score { color: var(--navy) !important; }
-
-/* Podium Light Overrides */
-#view-host-leaderboard .podium-name { color: var(--navy) !important; }
-#view-host-leaderboard .podium-score { color: var(--grey-600) !important; }
-#view-host-leaderboard #hl-end-btn { color: var(--navy) !important; border-color: var(--grey-300) !important; }
-
 @keyframes pulse-soft {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-  100% { transform: scale(1); }
+  0%,100% { transform: scale(1); }
+  50%     { transform: scale(1.02); }
 }
 
 @keyframes timerShake {
   0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+  25%      { transform: translateX(-4px); }
+  75%      { transform: translateX(4px); }
 }
 
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+}
+
+@keyframes glowCorrect {
+  0%,100% { box-shadow: 0 0 0 0 rgba(46,204,113,0.5), 0 0 0 0 var(--game-gold-glow); }
+  50%     { box-shadow: 0 0 24px 8px rgba(46,204,113,0.3), 0 0 40px 12px var(--game-gold-glow); }
+}
+
+/* ============================================================
+   HOST LOBBY — Dark game-show lobby
+   ============================================================ */
+#view-host-lobby {
+  background: linear-gradient(150deg, var(--game-bg) 0%, var(--game-bg-end) 100%) !important;
+  background-image: none;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle dot texture overlay */
+#view-host-lobby::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+.lobby-content { position: relative; z-index: 1; }
+
+#view-host-lobby .lobby-hubquiz-logo { opacity: 1; }
+#view-host-lobby .lobby-quiz-title { color: var(--game-white) !important; }
+#view-host-lobby .lobby-quiz-meta  { color: var(--game-white-dim) !important; }
+
+/* PIN section */
+#view-host-lobby .pin-section {
+  background:    rgba(255,255,255,0.05) !important;
+  border:        1px solid var(--game-border) !important;
+  box-shadow:    0 0 40px rgba(0,0,0,0.3), 0 0 0 0 var(--game-gold-glow) !important;
+  backdrop-filter: blur(16px);
+}
+#view-host-lobby .pin-label { color: var(--game-white-dim) !important; }
+#view-host-lobby .pin-url   { color: var(--game-white-dim) !important; }
+#view-host-lobby .pin-url strong { color: var(--game-gold) !important; }
+
+/* Giant PIN — gold, glowing */
+#view-host-lobby #lobby-pin {
+  font-size:     clamp(3.5rem, 10vw, 6rem) !important;
+  font-weight:   900 !important;
+  color:         var(--game-gold) !important;
+  background:    transparent !important;
+  letter-spacing: 14px !important;
+  text-shadow:   0 0 40px var(--game-gold-glow), 0 4px 24px rgba(0,0,0,0.5) !important;
+  box-shadow:    none !important;
+  padding:       0 !important;
+  border-radius: 0 !important;
+  white-space:   nowrap;
+  display:       inline-block;
+  margin:        12px 0;
+  animation:     goldPulse 2.5s ease-in-out infinite;
+}
+
+/* Players section */
+#view-host-lobby .lobby-players-section {
+  background:  rgba(255,255,255,0.04) !important;
+  border:      1px solid var(--game-border) !important;
+  box-shadow:  none !important;
+}
+#view-host-lobby .lobby-players-title { color: var(--game-white) !important; }
+#view-host-lobby .waiting-text        { color: var(--game-white-dim) !important; }
+
+/* Player chips — bounce in */
+#view-host-lobby .player-chip {
+  background:    var(--game-surface-2) !important;
+  color:         var(--game-white) !important;
+  border:        1px solid var(--game-border) !important;
+  animation:     popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+}
+
+/* Live counter badge */
+#view-host-lobby .player-count-badge {
+  background:    var(--game-gold) !important;
+  color:         #0B1D3A !important;
+  animation:     goldGlow 2s infinite;
+}
+
+/* Start / Cancel buttons */
+#view-host-lobby #start-quiz-btn {
+  background:  var(--game-gold) !important;
+  color:       #0B1D3A !important;
+  font-weight: 800 !important;
+  box-shadow:  0 4px 24px var(--game-gold-glow) !important;
+}
+#view-host-lobby #start-quiz-btn:hover {
+  background:  var(--game-gold-soft) !important;
+  transform:   scale(1.03) !important;
+  box-shadow:  0 8px 32px var(--game-gold-glow) !important;
+}
+#view-host-lobby label { color: var(--game-white) !important; }
+#view-host-lobby #copy-pin-btn { color: var(--game-white) !important; border-color: var(--game-border) !important; background: transparent !important; }
+
+/* ============================================================
+   HOST QUESTION — Dark question screen
+   ============================================================ */
+#view-host-question {
+  background: linear-gradient(150deg, var(--game-bg) 0%, var(--game-bg-end) 100%) !important;
+}
+
+#view-host-question .hq-top-bar       { color: var(--game-white-dim); }
+#view-host-question .hq-progress      { color: var(--game-white-dim) !important; }
+#view-host-question .hq-answered-badge {
+  background:   rgba(255,255,255,0.08) !important;
+  border:       1px solid var(--game-border) !important;
+  color:        var(--game-white) !important;
+}
+
+/* Question text — large, white, confident */
+#view-host-question #hq-question-text {
+  color:       var(--game-white) !important;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.4);
+}
+
+/* Timer ring — gold accent */
+#view-host-question .timer-ring-wrap {
+  background:  transparent !important;
+  box-shadow:  none !important;
+}
+#view-host-question #timer-number { color: var(--game-white) !important; }
+
+/* Override timer ring track color for dark mode */
+#view-host-question .timer-ring-bg { stroke: rgba(255,255,255,0.1) !important; }
+
+/* Answer blocks — 2×2 grid on host */
+#view-host-question #hq-answer-blocks {
+  display:               grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap:                   12px !important;
+  max-width:             1100px !important;
+}
+
+/* Host answer block look — raised, dark, colorful */
+.host-answer-block {
+  box-shadow:    0 8px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15) !important;
+  border:        1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 20px !important;
+  min-height:    140px !important;
+}
+.host-answer-block:hover { transform: scale(1.02); box-shadow: 0 12px 32px rgba(0,0,0,0.5) !important; }
+
+.host-answer-block.answer-a { background: var(--answer-a) !important; }
+.host-answer-block.answer-b { background: var(--answer-b) !important; }
+.host-answer-block.answer-c { background: var(--answer-c) !important; }
+.host-answer-block.answer-d { background: var(--answer-d) !important; }
+
+/* Staggered slide-up bounce entrance for answer blocks */
+.hq-answer-blocks .host-answer-block {
+  opacity: 0;
+  animation: slideUpStagger 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+.hq-answer-blocks .host-answer-block:nth-child(1) { animation-delay: 0.05s; }
+.hq-answer-blocks .host-answer-block:nth-child(2) { animation-delay: 0.13s; }
+.hq-answer-blocks .host-answer-block:nth-child(3) { animation-delay: 0.21s; }
+.hq-answer-blocks .host-answer-block:nth-child(4) { animation-delay: 0.29s; }
+
+/* Skip/End buttons */
+#view-host-question #hq-skip-btn {
+  background:  var(--game-gold) !important;
+  color:       #0B1D3A !important;
+  font-weight: 800 !important;
+  box-shadow:  0 4px 16px var(--game-gold-glow) !important;
+}
+#view-host-question #hq-skip-btn:hover { transform: scale(1.04) !important; }
+
+/* ============================================================
+   HOST REVEAL — Dark reveal screen
+   ============================================================ */
+#view-host-reveal {
+  background: linear-gradient(150deg, var(--game-bg) 0%, var(--game-bg-end) 100%) !important;
+}
+
+#view-host-reveal .hr-progress    { color: var(--game-white-dim) !important; }
+#view-host-reveal #hr-question-text { color: var(--game-white) !important; }
+#view-host-reveal .hr-bars-title  { color: var(--game-white-dim) !important; }
+#view-host-reveal .hr-lb-title    { color: var(--game-white-dim) !important; }
+#view-host-reveal .reveal-bar-label { color: var(--game-white) !important; }
+#view-host-reveal .reveal-bar-count { color: var(--game-white) !important; }
+#view-host-reveal .reveal-bar-track { background: rgba(255,255,255,0.08) !important; }
+
+/* Leaderboard rows on reveal screen */
+#view-host-reveal .lb-row {
+  background:  rgba(255,255,255,0.05) !important;
+  border:      1px solid rgba(255,255,255,0.07) !important;
+}
+#view-host-reveal .lb-row .lb-name  { color: var(--game-white) !important; }
+#view-host-reveal .lb-row .lb-score { color: var(--game-gold) !important; }
+#view-host-reveal .lb-rank          { color: var(--game-gold) !important; }
+
+/* Next / End buttons */
+#view-host-reveal #hr-next-btn {
+  background:  var(--game-gold) !important;
+  color:       #0B1D3A !important;
+  font-weight: 800 !important;
+  box-shadow:  0 4px 20px var(--game-gold-glow) !important;
+}
+#view-host-reveal #hr-next-btn:hover { transform: scale(1.04) !important; }
+
+/* Correct block — glows gold+green and scales up */
+.reveal-correct {
+  transform: scale(1.06) !important;
+  z-index: 10;
+  border: 3px solid rgba(46,204,113,0.7) !important;
+  box-shadow: 0 0 0 4px rgba(46,204,113,0.15) !important;
+  animation: glowCorrect 2s ease-in-out infinite;
+}
+
+/* Incorrect blocks — fade, retain color */
+.reveal-incorrect {
+  opacity: 0.35;
+  transform: scale(0.93);
+  filter: saturate(0.5);
+  transition: all 0.5s ease;
+}
+
+.reveal-bar-fill {
+  transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  opacity: 1 !important;
+}
+.reveal-bar-fill.answer-a { background: var(--answer-a) !important; }
+.reveal-bar-fill.answer-b { background: var(--answer-b) !important; }
+.reveal-bar-fill.answer-c { background: var(--answer-c) !important; }
+.reveal-bar-fill.answer-d { background: var(--answer-d) !important; }
+
+/* ============================================================
+   HOST LEADERBOARD — Dark podium with gold framing
+   ============================================================ */
+#view-host-leaderboard {
+  background: linear-gradient(150deg, var(--game-bg) 0%, var(--game-bg-end) 100%) !important;
+}
+
+#view-host-leaderboard .hl-title {
+  color:       var(--game-gold) !important;
+  text-shadow: 0 0 32px var(--game-gold-glow);
+}
+#view-host-leaderboard .hl-subtitle   { color: var(--game-white-dim) !important; }
+#view-host-leaderboard .hl-list-title { color: var(--game-white-dim) !important; }
+
+/* Podium player names / scores */
+#view-host-leaderboard .podium-name  { color: var(--game-white) !important; }
+#view-host-leaderboard .podium-score { color: var(--game-gold) !important; }
+
+/* Full leaderboard rows */
+#view-host-leaderboard .lb-full-row {
+  background:  rgba(255,255,255,0.04) !important;
+  border:      1px solid rgba(255,255,255,0.07) !important;
+  color:       var(--game-white) !important;
+  animation:   slideUpStagger 0.4s ease both;
+}
+#view-host-leaderboard .lb-full-row .lb-name  { color: var(--game-white) !important; }
+#view-host-leaderboard .lb-full-row .lb-score { color: var(--game-gold) !important; }
+#view-host-leaderboard .lb-full-row .lb-rank  { color: var(--game-gold) !important; }
+#view-host-leaderboard .lb-full-row.top-1 {
+  background:  rgba(212,175,55,0.12) !important;
+  border-color: rgba(212,175,55,0.3) !important;
+  box-shadow:  0 0 20px rgba(212,175,55,0.08) !important;
+}
+#view-host-leaderboard .lb-full-row.top-2 { background: rgba(192,192,192,0.08) !important; border-color: rgba(192,192,192,0.15) !important; }
+#view-host-leaderboard .lb-full-row.top-3 { background: rgba(205,127,50,0.08) !important; border-color: rgba(205,127,50,0.15) !important; }
+
+/* Back to dashboard button */
+#view-host-leaderboard #hl-end-btn {
+  color:        var(--game-white-dim) !important;
+  border-color: rgba(255,255,255,0.2) !important;
+  background:   transparent !important;
+}
+
+/* Podium suspense reveal: 3rd → 2nd → 1st */
+.podium-slot:nth-child(1) { animation-delay: 0.8s; }   /* 1st place — last */
+.podium-slot:nth-child(2) { animation-delay: 0.15s; }  /* 3rd place — first */
+.podium-slot:nth-child(3) { animation-delay: 0.45s; }  /* 2nd place — middle */
+
+/* Gold glow around 1st place podium base */
+.rank-1 .podium-base {
+  background: linear-gradient(180deg, var(--game-gold-soft) 0%, var(--game-gold) 100%);
+  box-shadow: 0 -4px 24px var(--game-gold-glow), 0 8px 24px rgba(0,0,0,0.4);
+}
+
+/* ============================================================
+   STUDENT LOBBY — "You're in!" waiting screen
+   ============================================================ */
+#view-student-lobby {
+  background: linear-gradient(150deg, var(--game-bg) 0%, var(--game-bg-end) 100%) !important;
+  animation: none !important;
+}
+
+#view-student-lobby::before {
+  content: '▲ ■ ● ♦';
+  position: absolute;
+  font-size: 8rem;
+  color: rgba(212,175,55,0.04);
+  top: 5%;
+  left: -10%;
+  letter-spacing: 30vw;
+  line-height: 50vh;
+  word-wrap: break-word;
+  width: 200%;
+  animation: ambientFloat 25s infinite ease-in-out;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#view-student-lobby .sl-name   { color: var(--game-gold) !important; }
+#view-student-lobby .sl-status { color: var(--game-white-dim) !important; }
+
+/* Pulsing gold glow orb behind the name */
+#view-student-lobby .sl-emoji {
+  filter: drop-shadow(0 0 20px var(--game-gold-glow));
+  animation: goldPulse 2s ease-in-out infinite;
+}
+
+/* ============================================================
+   STUDENT QUESTION — Full-screen dark answer view
+   ============================================================ */
+#view-student-question {
+  background: var(--game-bg) !important;
+  animation: none !important;
+}
+
+/* Q-num label */
+#view-student-question #sq-q-num {
+  color:   var(--game-gold) !important;
+  opacity: 1 !important;
+}
+
+/* Optional question text */
+#view-student-question #sq-question-text {
+  color:       var(--game-white) !important;
+  font-weight: 700 !important;
+}
+
+/* Student answer blocks — full bleed, colors from vars */
+.student-answer-btn {
+  border-radius:  16px !important;
+  border:         1px solid rgba(255,255,255,0.1) !important;
+  box-shadow:     0 6px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15) !important;
+  transition:     transform 0.15s cubic-bezier(0.175,0.885,0.32,1.275), opacity 0.2s !important;
+}
+.student-answer-btn:active { transform: scale(0.92) !important; }
+.student-answer-btn.selected {
+  opacity: 1 !important;
+  box-shadow: 0 0 0 3px var(--game-gold), 0 8px 24px rgba(0,0,0,0.5) !important;
+}
+.student-answer-btn:disabled:not(.selected) { opacity: 0.3 !important; }
+
+.student-answer-btn.answer-a { background: var(--answer-a) !important; }
+.student-answer-btn.answer-b { background: var(--answer-b) !important; }
+.student-answer-btn.answer-c { background: var(--answer-c) !important; }
+.student-answer-btn.answer-d { background: var(--answer-d) !important; }
+
+/* Waiting reveal text */
+#view-student-question #sq-waiting-reveal {
+  color: var(--game-white-dim) !important;
+}
+#sq-locked-msg { color: var(--game-white-dim) !important; }
+
+/* Timer bar — glows gold in final seconds */
+#sq-timer-bar { border-radius: 0 3px 3px 0; }
+
+/* ============================================================
+   STUDENT FINAL SCREEN — Dark celebratory result
+   ============================================================ */
+#view-student-final {
+  background: linear-gradient(150deg, var(--game-bg) 0%, var(--game-bg-end) 100%) !important;
+}
+
+#sf-rank  { color: var(--game-gold) !important; text-shadow: 0 0 24px var(--game-gold-glow); }
+#sf-score { color: var(--game-white) !important; }
+#sf-total, .sf-game-over, .sf-score-label { color: var(--game-white-dim) !important; }
+
+#view-student-final #sf-play-again {
+  background:  var(--game-gold) !important;
+  color:       #0B1D3A !important;
+  font-weight: 800 !important;
+  box-shadow:  0 4px 20px var(--game-gold-glow) !important;
+}
+
+/* ============================================================
+   CROSS-SCREEN — Mute button on dark backgrounds
+   ============================================================ */
+#lobby-mute, #hq-mute, #hr-mute, #hl-mute, #sl-mute {
+  background:   rgba(255,255,255,0.08) !important;
+  border-color: rgba(255,255,255,0.12) !important;
+  color:        var(--game-white) !important;
+}
+
+/* ============================================================
+   TIMER — Color transitions and final-second pulse
+   ============================================================ */
 .timer-shake {
-  animation: timerShake 0.4s infinite;
-  box-shadow: 0 0 15px rgba(231, 76, 60, 0.5) !important;
+  animation: timerShake 0.35s infinite, goldGlow 0.5s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(231,76,60,0.5) !important;
 }
 
-/* Smooth view transitions */
-.view {
-  animation: slideUpFade 0.3s ease-out;
+/* ============================================================
+   QR Code — dark border to show on dark backgrounds
+   ============================================================ */
+#lobby-qr-img {
+  border-color: var(--game-gold) !important;
+  box-shadow: 0 0 0 2px var(--game-gold-glow) !important;
 }
 
+/* ============================================================
+   QR ENLARGEMENT OVERLAY
+   ============================================================ */
 .qr-enlarged {
   position: fixed !important;
   top: 50% !important;
@@ -2086,94 +2374,34 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   border-radius: 24px !important;
 }
 
-/* Rich Feedback Card */
-.feedback-card {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  background: white;
-  padding: 12px 16px;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-  text-align: left;
-  width: 95vw;
-  max-width: 500px;
-  margin: 0 auto;
+/* ============================================================
+   SMOOTH VIEW TRANSITIONS
+   ============================================================ */
+.view { animation: slideUpStagger 0.25s ease-out; }
+
+/* ============================================================
+   FLASH OVERLAYS — Correct / Incorrect
+   ============================================================ */
+.flash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+}
+.flash-correct   { animation: flashScreenCorrect 1.2s ease-out forwards; }
+.flash-incorrect { animation: flashScreenIncorrect 1.2s ease-out forwards; }
+
+@keyframes flashScreenCorrect {
+  0%   { background: rgba(46,204,113,0.7); opacity: 1; }
+  100% { background: rgba(46,204,113,0); opacity: 0; }
+}
+@keyframes flashScreenIncorrect {
+  0%   { background: rgba(194,98,42,0.6); opacity: 1; }
+  100% { background: rgba(194,98,42,0); opacity: 0; }
 }
 
-.feedback-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  color: white;
-  flex-shrink: 0;
-}
 
-.feedback-icon.correct-icon { background: var(--success); }
-.feedback-icon.incorrect-icon { background: var(--danger); }
-
-.feedback-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.feedback-title {
-  font-family: var(--font-head);
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: var(--navy);
-  margin: 0;
-}
-
-.feedback-encouragement {
-  font-size: 0.8rem;
-  color: var(--grey-500);
-  margin: 2px 0 0 0;
-}
-
-.feedback-stats {
-  display: flex;
-  gap: 8px;
-}
-
-.stat-box {
-  background: var(--grey-50);
-  border: 1px solid var(--grey-200);
-  border-radius: 8px;
-  padding: 4px 8px;
-  min-width: unset;
-  text-align: right;
-}
-
-.stat-label {
-  font-size: 0.6rem;
-  font-weight: 700;
-  color: var(--grey-500);
-  text-transform: uppercase;
-  margin-bottom: 2px;
-}
-
-.stat-value {
-  font-family: var(--font-head);
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--navy);
-}
-
-.sq-result {
-  background: transparent !important;
-  padding: 0;
-  box-shadow: none;
-  width: 100%;
-  justify-content: center;
-}
 /* ============================================================
    SESSION HISTORY TABLE
    ============================================================ */

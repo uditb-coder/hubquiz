@@ -1582,7 +1582,7 @@ function studentShowReveal(payload) {
         <div class="feedback-card">
            <div class="feedback-icon correct-icon">✓</div>
            <div class="feedback-content">
-             <div class="feedback-title">Correct! +${data.points_awarded}</div>
+             <div class="feedback-title">Correct! +<span id="pts-countup">0</span></div>
              <div class="feedback-encouragement">${encouragement}</div>
            </div>
            <div class="feedback-stats">
@@ -1596,6 +1596,23 @@ function studentShowReveal(payload) {
               </div>
            </div>
         </div>`;
+      
+      // Animate points count up
+      const ptsEl = document.getElementById('pts-countup');
+      if (ptsEl && data.points_awarded > 0) {
+        let startTime = null;
+        const duration = 600; // ms
+        const target = data.points_awarded;
+        function step(timestamp) {
+          if (!startTime) startTime = timestamp;
+          const progress = Math.min((timestamp - startTime) / duration, 1);
+          ptsEl.textContent = Math.floor(progress * target);
+          if (progress < 1) window.requestAnimationFrame(step);
+          else ptsEl.textContent = target;
+        }
+        window.requestAnimationFrame(step);
+      }
+
       AudioEngine.playCorrect();
     } else {
       if (navigator.vibrate) navigator.vibrate(50);
@@ -1699,6 +1716,17 @@ function showDisconnected() {
 function renderView(viewName) {
   document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
   const view = document.getElementById(`view-${viewName}`);
+  
+  const gameplayViews = [
+    'host-lobby', 'host-question', 'host-reveal', 'host-leaderboard',
+    'student-lobby', 'student-question', 'student-final'
+  ];
+  if (gameplayViews.includes(viewName)) {
+    document.body.classList.add('gameplay');
+  } else {
+    document.body.classList.remove('gameplay');
+  }
+
   if (view) {
     view.classList.remove('hidden');
     // Scroll to top
