@@ -880,12 +880,18 @@ let _answerCountCh = null;
 let _answerCount = 0;
 
 async function subscribeAnswerCount(questionId) {
-  // Fetch existing count in case of page reload mid-question
-  const { count } = await HQ_SUPABASE.from('answers')
-    .select('*', { count: 'exact', head: true })
-    .eq('question_id', questionId);
-    
-  _answerCount = count || 0;
+  // Reset local answer count
+  _answerCount = 0;
+  
+  if (State.players.length > 0) {
+    // Fetch existing count in case of page reload mid-question, filtered by our players
+    const { count } = await HQ_SUPABASE.from('answers')
+      .select('*', { count: 'exact', head: true })
+      .eq('question_id', questionId)
+      .in('player_id', State.players.map(p => p.id));
+      
+    _answerCount = count || 0;
+  }
   
   const el = document.getElementById('hq-answered-count');
   if (el) el.textContent = _answerCount;
@@ -898,18 +904,21 @@ async function subscribeAnswerCount(questionId) {
 
   if (_answerCountCh) { HQ_SUPABASE.removeChannel(_answerCountCh); _answerCountCh = null; }
 
-  _answerCountCh = HQ_SUPABASE.channel(`answers:${questionId}`)
+  _answerCountCh = HQ_SUPABASE.channel(`answers:${questionId}:${State.session.id}`)
     .on('postgres_changes', {
       event: 'INSERT',
       schema: 'public',
       table: 'answers',
       filter: `question_id=eq.${questionId}`,
-    }, () => {
-      _answerCount++;
-      if (el) el.textContent = _answerCount;
-      if (_answerCount >= State.players.length && State.players.length > 0) {
-        clearTimer();
-        hostShowReveal(questionId);
+    }, (payload) => {
+      // Only count if the answer came from a player in OUR session
+      if (State.players.some(p => p.id === payload.new.player_id)) {
+        _answerCount++;
+        if (el) el.textContent = _answerCount;
+        if (_answerCount >= State.players.length && State.players.length > 0) {
+          clearTimer();
+          hostShowReveal(questionId);
+        }
       }
     })
     .subscribe();
@@ -1454,6 +1463,9 @@ async function studentShowQuestion(payload) {
       });
     });
   }
+  
+  // Start the visual timer bar on the student screen
+  startStudentTimer(QUESTION_TIME, payload.question_started_at);
 }
 
 function startStudentTimer(seconds, startedAt) {
