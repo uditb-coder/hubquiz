@@ -504,25 +504,33 @@ function showHostLobby() {
   document.getElementById('lobby-q-count').textContent = `${State.questions.length} question${State.questions.length !== 1 ? 's' : ''}`;
 
   // Copy PIN button
-  document.getElementById('copy-pin-btn')?.addEventListener('click', () => {
-    navigator.clipboard.writeText(pin).then(() => {
-      const btn = document.getElementById('copy-pin-btn');
-      btn.textContent = '✓ Copied!';
-      setTimeout(() => btn.textContent = '📋 Copy PIN', 1500);
-    });
-  });
+  const copyBtn = document.getElementById('copy-pin-btn');
+  if (copyBtn) {
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(pin).then(() => {
+        copyBtn.textContent = '✓ Copied!';
+        setTimeout(() => copyBtn.textContent = '📋 Copy PIN', 1500);
+      });
+    };
+  }
 
   // QR Enlarge handler
-  document.getElementById('lobby-qr-img')?.addEventListener('click', (e) => {
-    e.target.classList.toggle('qr-enlarged');
-  });
+  const qrImg = document.getElementById('lobby-qr-img');
+  if (qrImg) {
+    qrImg.onclick = (e) => {
+      e.target.classList.toggle('qr-enlarged');
+    };
+  }
 
-  document.getElementById('start-quiz-btn')?.addEventListener('click', async () => {
-    if (State.players.length === 0) {
-      if (!confirm('No players have joined yet. Start anyway?')) return;
-    }
-    await hostStartQuiz();
-  });
+  const startBtn = document.getElementById('start-quiz-btn');
+  if (startBtn) {
+    startBtn.onclick = async () => {
+      if (State.players.length === 0) {
+        if (!confirm('No players have joined yet. Start anyway?')) return;
+      }
+      await hostStartQuiz();
+    };
+  }
 
   // Load existing players
   loadPlayers();
