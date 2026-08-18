@@ -802,6 +802,9 @@ function startHostTimer(seconds, startedAt) {
   const numEl   = document.getElementById('timer-number');
   const totalLen = ring ? parseFloat(ring.getAttribute('stroke-dasharray')) : 283;
 
+  // Start the 30-sec music right when the timer starts
+  AudioEngine.startCountdownMusic();
+
   function tick() {
     const elapsed = (Date.now() - new Date(startedAt).getTime()) / 1000;
     const remaining = Math.max(0, seconds - elapsed);
@@ -811,18 +814,10 @@ function startHostTimer(seconds, startedAt) {
     if (ring) {
       const progress = remaining / seconds;
       ring.setAttribute('stroke-dashoffset', totalLen * (1 - progress));
-      // Color shift: green → yellow → red
+      // Color shift: green -> yellow -> red
       if (remaining > 20) ring.setAttribute('stroke', '#2ECC71');
       else if (remaining > 10) ring.setAttribute('stroke', '#F39C12');
       else ring.setAttribute('stroke', '#E74C3C');
-    }
-
-    if (remaining <= 10 && remaining > 0) {
-      AudioEngine.startCountdownMusic(remaining);
-    }
-
-    if (numRemaining <= remaining + 0.5) {
-      AudioEngine.playTick();
     }
 
     if (remaining <= 0) {
@@ -836,7 +831,7 @@ function startHostTimer(seconds, startedAt) {
     State.timerInterval = requestAnimationFrame(tick);
   }
 
-  State.timerInterval = requestAnimationFrame(tick);
+  tick();
 }
 
 function clearTimer() {
