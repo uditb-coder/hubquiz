@@ -191,7 +191,22 @@ async function showDashboard() {
 
   if (activeSessions && activeSessions.length > 0) {
     const s = activeSessions[0];
-    if (confirm('You have an active game session running. Do you want to resume it?')) {
+    
+    // Custom modal promise
+    const wantsToResume = await new Promise((resolve) => {
+      const overlay = document.getElementById('resume-modal-overlay');
+      overlay.classList.remove('hidden');
+      document.getElementById('resume-yes-btn').onclick = () => {
+        overlay.classList.add('hidden');
+        resolve(true);
+      };
+      document.getElementById('resume-no-btn').onclick = () => {
+        overlay.classList.add('hidden');
+        resolve(false);
+      };
+    });
+
+    if (wantsToResume) {
       State.session = s;
       State.quiz = s.quiz;
       State.questions = s.quiz.questions.sort((a,b) => a.order_num - b.order_num);
@@ -205,8 +220,11 @@ async function showDashboard() {
       }
       return;
     } else {
-      // Mark as finished so it doesn't pop up again
-      await HQ_SUPABASE.from('game_sessions').update({ status: 'finished' }).eq('id', s.id);
+      // Mark ALL active sessions as finished so they don't pop up again
+      await HQ_SUPABASE.from('game_sessions')
+        .update({ status: 'finished' })
+        .eq('host_id', State.user.id)
+        .in('status', ['lobby', 'active', 'question_active', 'question_review']);
     }
   }
 

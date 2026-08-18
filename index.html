@@ -436,7 +436,19 @@
 <script src="supabase.js"></script>
 <script src="audio.js"></script>
 <script src="confetti.js"></script>
-<script src="app.js"></script>
+  <!-- Resume Session Modal -->
+  <div id="resume-modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-box" style="max-width: 400px; text-align: center;">
+      <h2 class="modal-title">Active Game Found</h2>
+      <p style="color: var(--grey-500); margin-bottom: 24px;">You have an active game session running. Do you want to resume it?</p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button id="resume-no-btn" class="btn btn-secondary" style="flex: 1;">No, end old games</button>
+        <button id="resume-yes-btn" class="btn btn-primary" style="flex: 1;">Resume</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="app.js"></script>
 
 <!-- History API polyfill for static hosting (Netlify/Vercel handle this via _redirects) -->
 <script>
