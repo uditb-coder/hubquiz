@@ -1880,15 +1880,36 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   100% { background-position: 0% 50%; }
 }
 
-#view-host-lobby, #view-host-question, #view-student-question {
-  background: linear-gradient(120deg, #f8fafc, #e2e8f0, #e0f2fe, #f8fafc) !important;
+#view-host-lobby, #view-host-question, #view-student-question,
+#view-host-reveal, #view-host-leaderboard {
+  background: linear-gradient(120deg, #e0f2fe, #fef3c7, #ccfbf1, #ffe4e6, #e0f2fe) !important;
   background-size: 300% 300% !important;
-  animation: lobbyBgFlow 15s ease infinite !important;
+  animation: lobbyBgFlow 20s ease infinite !important;
   color: var(--navy) !important;
+  position: relative;
+  overflow: hidden;
 }
 
-#view-host-lobby::before, #view-host-question::before {
-  display: none !important;
+#view-host-lobby::before, #view-host-question::before, #view-host-leaderboard::before {
+  content: '▲ ■ ● ♦';
+  position: absolute;
+  font-size: 15vw;
+  color: rgba(13, 148, 136, 0.04);
+  top: 10%;
+  left: 5%;
+  letter-spacing: 25vw;
+  line-height: 40vh;
+  word-wrap: break-word;
+  width: 150%;
+  animation: ambientFloat 30s infinite ease-in-out;
+  pointer-events: none;
+  z-index: 0;
+  display: block !important;
+}
+
+#view-host-lobby .hq-container, #view-host-question .hq-container, #view-host-leaderboard .hq-container {
+  position: relative;
+  z-index: 1;
 }
 
 #view-host-lobby .lobby-quiz-title { color: var(--navy) !important; }
@@ -1905,7 +1926,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 /* Giant PIN */
 #view-host-lobby #lobby-pin { 
   font-family: var(--font-head);
-  font-size: 6rem !important;
+  font-size: clamp(3.5rem, 10vw, 6rem) !important;
   font-weight: 900 !important;
   color: var(--navy) !important;
   background: #fff;
@@ -1914,6 +1935,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   box-shadow: 0 10px 25px rgba(0,0,0,0.1);
   letter-spacing: 12px;
   text-shadow: none !important;
+  white-space: nowrap;
   display: inline-block;
   margin: 10px 0;
   animation: pulse-soft 2s infinite ease-in-out;
@@ -1956,11 +1978,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 #view-host-lobby .waiting-text { color: var(--grey-500) !important; }
 
 /* Common Views */
-#view-host-reveal, #view-host-leaderboard {
-  background-color: #f8fafc;
-  color: var(--navy);
-  background-image: none;
-}
+/* Host Reveal */
 
 /* Host Question View */
 #view-host-question .hq-top-bar { color: var(--navy); }
