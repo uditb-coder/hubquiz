@@ -270,7 +270,7 @@ async function showDashboard() {
             { order_index: 0, question_text: 'Which of the following is an example of field exploration?', option_a: 'Reading a textbook in the library', option_b: 'Visiting a village or NGO to observe user challenges', option_c: 'Watching a tutorial video online', option_d: 'Writing code in the lab', correct_option: 'b' },
             { order_index: 1, question_text: 'Why is stakeholder interaction crucial during the Empathy stage?', option_a: 'To understand the real needs and pain points of the users', option_b: 'To convince them to buy the product', option_c: 'To ask them for funding', option_d: 'To show off the final prototype', correct_option: 'a' },
             { order_index: 2, question_text: 'Where must all field interaction and observations be recorded?', option_a: 'On a personal blog', option_b: 'In a digital word document', option_c: 'In the handwritten activity book prescribed by the University', option_d: 'They do not need to be recorded', correct_option: 'c' },
-            { order_index: 3, question_text: 'Empathy in design thinking means:', option_a: 'Feeling sorry for the users', option_b: 'Putting yourself in the user\\'s shoes to deeply understand their experience', option_c: 'Designing what you personally think is best', option_d: 'Ignoring user feedback', correct_option: 'b' }
+            { order_index: 3, question_text: 'Empathy in design thinking means:', option_a: 'Feeling sorry for the users', option_b: "Putting yourself in the user's shoes to deeply understand their experience", option_c: 'Designing what you personally think is best', option_d: 'Ignoring user feedback', correct_option: 'b' }
           ]
         },
         {
@@ -296,7 +296,7 @@ async function showDashboard() {
           questions: [
             { order_index: 0, question_text: 'What is a "low-fidelity" prototype?', option_a: 'A fully functional, expensive product ready for market', option_b: 'A quick, simple, and cheap representation of the idea (e.g., using cardboard or paper)', option_c: 'A prototype that does not work at all', option_d: 'A prototype built with low-quality materials that breaks easily', correct_option: 'b' },
             { order_index: 1, question_text: 'Which of the following tools might be used in the Atal Idea Lab for fabrication?', option_a: 'Only Microsoft Word', option_b: 'Arduino, electronics kits, and 3D printers', option_c: 'Only handwritten activity books', option_d: 'Microscopes and test tubes', correct_option: 'b' },
-            { order_index: 2, question_text: 'What is the purpose of User Testing in Week 14?', option_a: 'To test the students\\' knowledge', option_b: 'To collect feedback from users to iterate and improve the design', option_c: 'To grade the prototype', option_d: 'To sell the prototype', correct_option: 'b' },
+            { order_index: 2, question_text: 'What is the purpose of User Testing in Week 14?', option_a: "To test the students' knowledge", option_b: 'To collect feedback from users to iterate and improve the design', option_c: 'To grade the prototype', option_d: 'To sell the prototype', correct_option: 'b' },
             { order_index: 3, question_text: 'What document is drafted alongside the iterations in Week 14?', option_a: 'A social venture plan / business model for impact', option_b: 'The final exam question paper', option_c: 'A personal diary', option_d: 'A legal patent application', correct_option: 'a' }
           ]
         },
