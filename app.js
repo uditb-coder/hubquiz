@@ -1277,6 +1277,7 @@ async function submitStudentAnswer(questionId, chosenOption) {
   const lockEl = document.getElementById('sq-locked-msg');
   const resultsEl = document.getElementById('sq-result');
 
+  if (resultsEl) {
     // Save for reveal
     State._lastAnswerResult = data;
     
