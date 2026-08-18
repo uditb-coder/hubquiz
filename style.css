@@ -28,10 +28,10 @@
   --grey-900:    #1A202C;
 
   /* Answer block colors */
-  --answer-a:    #E74C3C;
-  --answer-b:    #3498DB;
-  --answer-c:    #F39C12;
-  --answer-d:    #2ECC71;
+  --answer-a:    #0d9488;
+  --answer-b:    #F59E0B;
+  --answer-c:    #1E293B;
+  --answer-d:    #f43f5e;
 
   /* Semantic */
   --success:     #2ECC71;
@@ -113,6 +113,10 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   background:  var(--yellow-dark);
   transform:   translateY(-1px);
   box-shadow:  0 6px 20px rgba(255,214,0,0.4);
+}
+.btn-primary:active:not(:disabled), .btn:active:not(:disabled) {
+  transform: scale(0.96) !important;
+  transition: transform 0.1s ease;
 }
 
 .btn-navy {
@@ -1348,6 +1352,12 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 /* ============================================================
    VIEW: STUDENT LOBBY (WAITING)
    ============================================================ */
+@keyframes ambientFloat {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0.1; }
+  50% { transform: translateY(-20px) rotate(180deg); opacity: 0.3; }
+  100% { transform: translateY(0) rotate(360deg); opacity: 0.1; }
+}
+
 #view-student-lobby {
   min-height:      100vh;
   background:      linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
@@ -1357,6 +1367,23 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   justify-content: center;
   padding:         40px 24px;
   text-align:      center;
+  position:        relative;
+  overflow:        hidden;
+}
+
+#view-student-lobby::before {
+  content: '▲ ■ ● ♦';
+  position: absolute;
+  font-size: 6rem;
+  color: rgba(255,255,255,0.05);
+  top: 10%;
+  left: 10%;
+  letter-spacing: 40vw;
+  line-height: 40vh;
+  word-wrap: break-word;
+  width: 200%;
+  animation: ambientFloat 20s infinite ease-in-out;
+  pointer-events: none;
 }
 
 .sl-emoji { font-size: 4rem; margin-bottom: 20px; animation: pulse 1.5s ease-in-out infinite; }
@@ -1650,13 +1677,8 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 
 @media (max-width: 400px) {
   #lobby-pin { font-size: 2.8rem; letter-spacing: 10px; }
-  justify-content: center;
-  gap:             8px;
-  min-height:      120px;
-  cursor:          pointer;
-  transition:      transform 0.15s, opacity 0.2s;
-  position:        relative;
-  overflow:        hidden;
+  #sq-answer-blocks { gap: 2px; }
+  .student-answer-btn { min-height: 100px; }
 }
 
 .student-answer-btn::before {
@@ -2001,7 +2023,9 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 
 /* Host Leaderboard View */
 #view-host-leaderboard .hl-list-title,
-#view-host-leaderboard .results-subtitle { color: var(--grey-600) !important; }
+#view-host-leaderboard .results-subtitle,
+#view-host-leaderboard .hl-subtitle { color: var(--grey-600) !important; }
+#view-host-leaderboard .hl-title { color: var(--navy) !important; }
 #view-host-leaderboard .lb-full-row { background: #ffffff; border: 1px solid var(--grey-200); color: var(--navy); }
 #view-host-leaderboard .lb-full-row .lb-name,
 #view-host-leaderboard .lb-full-row .lb-score { color: var(--navy) !important; }
@@ -2009,6 +2033,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 /* Podium Light Overrides */
 #view-host-leaderboard .podium-name { color: var(--navy) !important; }
 #view-host-leaderboard .podium-score { color: var(--grey-600) !important; }
+#view-host-leaderboard #hl-end-btn { color: var(--navy) !important; border-color: var(--grey-300) !important; }
 
 @keyframes pulse-soft {
   0% { transform: scale(1); }
@@ -2191,3 +2216,5 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 .hc-meta { font-size: 0.9rem; color: var(--grey-500); margin: 0; }
 .hc-stats { text-align: right; }
 .hc-score { font-size: 1.5rem; font-weight: 800; color: var(--yellow); margin: 0; }
+. f l a s h - o v e r l a y   {   p o s i t i o n :   f i x e d ;   i n s e t :   0 ;   z - i n d e x :   9 9 9 9 ;   p o i n t e r - e v e n t s :   n o n e ;   o p a c i t y :   0 ;   }   . f l a s h - c o r r e c t   {   a n i m a t i o n :   f l a s h S c r e e n C o r r e c t   1 . 5 s   e a s e - o u t   f o r w a r d s ;   }   . f l a s h - i n c o r r e c t   {   a n i m a t i o n :   f l a s h S c r e e n I n c o r r e c t   1 . 5 s   e a s e - o u t   f o r w a r d s ;   }   @ k e y f r a m e s   f l a s h S c r e e n C o r r e c t   {   0 %   {   b a c k g r o u n d :   # 2 E C C 7 1 ;   o p a c i t y :   1 ;   }   1 0 0 %   {   b a c k g r o u n d :   # 2 E C C 7 1 ;   o p a c i t y :   0 ;   }   }   @ k e y f r a m e s   f l a s h S c r e e n I n c o r r e c t   {   0 %   {   b a c k g r o u n d :   # E 7 4 C 3 C ;   o p a c i t y :   0 . 8 ;   }   1 0 0 %   {   b a c k g r o u n d :   # E 7 4 C 3 C ;   o p a c i t y :   0 ;   }   }  
+ 

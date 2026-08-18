@@ -1435,6 +1435,9 @@ async function studentShowQuestion(payload) {
     blocksEl.querySelectorAll('.student-answer-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         if (btn.disabled) return;
+        
+        if (navigator.vibrate) navigator.vibrate(30);
+
         // Lock all buttons
         blocksEl.querySelectorAll('.student-answer-btn').forEach(b => b.disabled = true);
         btn.classList.add('selected');
@@ -1563,6 +1566,8 @@ function studentShowReveal(payload) {
     resultsEl.className = 'sq-result';
     
     if (data.correct) {
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+      triggerFlash('correct');
       const elapsed = (Date.now() - new Date(State.session.question_started_at).getTime()) / 1000;
       let encouragement = 'You got it right! 🎉';
       if (myRank <= 3) encouragement = 'You are on fire! 🔥';
@@ -1588,9 +1593,11 @@ function studentShowReveal(payload) {
         </div>`;
       AudioEngine.playCorrect();
     } else {
+      if (navigator.vibrate) navigator.vibrate(50);
+      triggerFlash('incorrect');
       resultsEl.innerHTML = `
         <div class="feedback-card">
-           <div class="feedback-icon incorrect-icon">✗</div>
+           <div class="feedback-icon incorrect-icon">❌</div>
            <div class="feedback-title">Incorrect</div>
            <div class="feedback-encouragement">Keep going! Don't give up! 💪</div>
            <div class="feedback-stats">
@@ -1868,3 +1875,5 @@ async function showSessionHistoryDetails(sessionId) {
   });
   tbody.innerHTML = tbHtml;
 }
+f u n c t i o n   t r i g g e r F l a s h ( t y p e )   {   c o n s t   f   =   d o c u m e n t . c r e a t e E l e m e n t ( ' d i v ' ) ;   f . c l a s s N a m e   =   ' f l a s h - o v e r l a y   f l a s h - '   +   t y p e ;   d o c u m e n t . b o d y . a p p e n d C h i l d ( f ) ;   s e t T i m e o u t ( ( )   = >   f . r e m o v e ( ) ,   1 5 0 0 ) ;   }  
+ 
