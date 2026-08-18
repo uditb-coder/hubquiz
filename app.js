@@ -398,6 +398,14 @@ async function saveQuiz(quizId) {
   try {
     let finalQuizId = quizId;
 
+    if (!State.user) {
+      const { data: authData } = await HQ_SUPABASE.auth.getSession();
+      State.user = authData?.session?.user;
+      if (!State.user) {
+        throw new Error("You must be logged in to save a quiz. Please refresh the page.");
+      }
+    }
+
     if (quizId) {
       // Update existing
       const { error } = await HQ_SUPABASE.from('quizzes').update({ title }).eq('id', quizId);
@@ -406,6 +414,7 @@ async function saveQuiz(quizId) {
       // Create new
       const { data, error } = await HQ_SUPABASE.from('quizzes').insert({ title, created_by: State.user.id }).select().single();
       if (error) throw error;
+      if (!data) throw new Error("Could not retrieve the newly created quiz data from the server.");
       finalQuizId = data.id;
     }
 
