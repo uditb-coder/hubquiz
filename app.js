@@ -69,6 +69,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     State.user = session?.user ?? null;
   });
 
+  // Global listener to close enlarged QR code when clicking outside
+  document.addEventListener('click', (e) => {
+    const qrImg = document.getElementById('lobby-qr-img');
+    if (qrImg && qrImg.classList.contains('qr-enlarged')) {
+      if (e.target !== qrImg) {
+        qrImg.classList.remove('qr-enlarged');
+      }
+    }
+  });
+
   route();
 });
 
