@@ -773,8 +773,23 @@ async function hostShowQuestion(index) {
 let _answerCountCh = null;
 let _answerCount = 0;
 
-function subscribeAnswerCount(questionId) {
-  _answerCount = 0;
+async function subscribeAnswerCount(questionId) {
+  // Fetch existing count in case of page reload mid-question
+  const { count } = await HQ_SUPABASE.from('answers')
+    .select('*', { count: 'exact', head: true })
+    .eq('question_id', questionId);
+    
+  _answerCount = count || 0;
+  
+  const el = document.getElementById('hq-answered-count');
+  if (el) el.textContent = _answerCount;
+
+  if (_answerCount >= State.players.length && State.players.length > 0) {
+    clearTimer();
+    hostShowReveal(questionId);
+    return;
+  }
+
   if (_answerCountCh) { HQ_SUPABASE.removeChannel(_answerCountCh); _answerCountCh = null; }
 
   _answerCountCh = HQ_SUPABASE.channel(`answers:${questionId}`)
@@ -785,10 +800,8 @@ function subscribeAnswerCount(questionId) {
       filter: `question_id=eq.${questionId}`,
     }, () => {
       _answerCount++;
-      const el = document.getElementById('hq-answered-count');
       if (el) el.textContent = _answerCount;
       if (_answerCount >= State.players.length && State.players.length > 0) {
-        // All answered — auto-advance
         clearTimer();
         hostShowReveal(questionId);
       }
