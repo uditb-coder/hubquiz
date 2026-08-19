@@ -64,7 +64,8 @@ body {
   font-size:   16px;
   line-height: 1.6;
   color:       var(--grey-900);
-  background:  var(--grey-50);
+  background:  url('assets/bg.svg') no-repeat center center fixed;
+  background-size: cover;
   min-height:  100vh;
   overflow-x:  hidden;
 }
