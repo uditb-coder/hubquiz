@@ -1907,46 +1907,9 @@ body.gameplay img[src*="logo.jpg"] {
   border-radius: 4px;
 }
 
-/* Global Video Background Styling */
-#gameplay-video-bg, #gameplay-video-overlay {
-  display: none; /* Hidden by default on non-gameplay screens */
-}
-
-/* When in gameplay mode, show the video background */
-body.gameplay #gameplay-video-bg {
-  display: block;
-  position: fixed; /* Keep it fixed behind everything */
-  top: 50%;
-  left: 50%;
-  min-width: 100vw;
-  min-height: 100vh;
-  width: auto;
-  height: auto;
-  z-index: 0;
-  transform: translateX(-50%) translateY(-50%);
-  object-fit: cover;
-}
-
-body.gameplay #gameplay-video-overlay {
-  display: block;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(11, 29, 58, 0.4); /* Navy tint for UI readability */
-  z-index: 1;
-}
-
-/* Ensure body doesn't have a background covering the video */
+/* Ensure body doesn't have a background covering the SVG */
 body.gameplay {
   background: transparent !important;
-}
-
-/* Set views to be above the video layer */
-body.gameplay .view {
-  position: relative;
-  z-index: 2;
 }
 
 @keyframes bounceInGame {
