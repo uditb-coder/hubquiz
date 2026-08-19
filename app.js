@@ -653,7 +653,7 @@ async function startSession(quizId) {
 
 function showHostLobby() {
   renderView('host-lobby');
-  setupMuteToggle('lobby-mute');
+  
 
   // Display PIN
   const pin = State.session.pin;
@@ -828,7 +828,7 @@ async function hostShowQuestion(index) {
   });
 
   renderView('host-question');
-  setupMuteToggle('hq-mute');
+  
 
   document.getElementById('hq-q-num').textContent = `Q${index + 1} of ${State.questions.length}`;
   document.getElementById('hq-question-text').textContent = q.question_text;
@@ -999,7 +999,7 @@ async function hostShowReveal(questionId) {
   });
 
   renderView('host-reveal');
-  setupMuteToggle('hr-mute');
+  
   AudioEngine.playDrumroll();
 
   document.getElementById('hr-q-num').textContent = `Q${index + 1} of ${State.questions.length}`;
@@ -1115,7 +1115,7 @@ async function hostShowFinalLeaderboard() {
   });
 
   renderView('host-leaderboard');
-  setupMuteToggle('hl-mute');
+  
   AudioEngine.playFanfare();
 
   setTimeout(() => Confetti.burst(200), 300);
@@ -1324,7 +1324,7 @@ async function joinSession(pin, name, btn) {
 
 function showStudentLobby(session, player) {
   renderView('student-lobby');
-  setupMuteToggle('sl-mute');
+  
   document.getElementById('sl-player-name').textContent = player.name;
 
   const statusEl = document.querySelector('#view-student-lobby .sl-status');
@@ -1396,7 +1396,7 @@ async function studentShowQuestion(payload) {
   State.session.question_started_at    = question_started_at;
 
   renderView('student-question');
-  setupMuteToggle('sq-mute');
+  
 
   document.getElementById('sq-q-num').textContent = `Q${question_index + 1}`;
 
@@ -1748,18 +1748,7 @@ function renderView(viewName) {
   }
 }
 
-function setupMuteToggle(btnId) {
-  const btn = document.getElementById(btnId);
-  if (!btn) return;
-  btn.textContent = AudioEngine.isMuted() ? '🔇' : '🔊';
-  btn.onclick = () => {
-    const newMute = !AudioEngine.isMuted();
-    AudioEngine.setMute(newMute);
-    State.muted = newMute;
-    localStorage.setItem('hq_muted', newMute);
-    btn.textContent = newMute ? '🔇' : '🔊';
-  };
-}
+
 
 function setLoading(btn, loading) {
   if (!btn) return;
