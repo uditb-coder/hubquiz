@@ -211,12 +211,11 @@ async function showDashboard() {
     if (wantsToResume) {
       State.session = s;
       State.quiz = s.quiz;
-      State.questions = s.quiz.questions.sort((a,b) => a.order_num - b.order_num);
+      State.questions = s.quiz.questions.sort((a,b) => a.order_index - b.order_index);
       State.players = s.players || [];
       
       if (s.status === 'lobby') {
-        showHostLobby(s.quiz.id, s.pin);
-        subscribeHostLobby(); // re-subscribe
+        showHostLobby();
       } else if (s.status === 'question_review') {
         subscribeHostChannel(); // re-subscribe
         hostShowReveal(s.questions[s.current_question_index]?.id);
@@ -761,6 +760,20 @@ function subscribeHostChannel() {
     renderPlayerList();
   });
 
+  // Listen for session status changes (e.g. if another host ends the game)
+  ch.on('postgres_changes', {
+    event: 'UPDATE',
+    schema: 'public',
+    table: 'game_sessions',
+    filter: `id=eq.${State.session.id}`
+  }, (payload) => {
+    if (payload.new.status === 'finished' && State.session.status !== 'finished') {
+      State.session.status = 'finished';
+      alert('The session was ended by another host.');
+      navigate('/host');
+    }
+  });
+
   // Broadcast events FROM host TO students (and self)
   ch.on('broadcast', { event: 'game:event' }, (payload) => {
     // Host receives its own broadcast — ignore if we're the sender
@@ -830,7 +843,7 @@ async function hostShowQuestion(index) {
   renderView('host-question');
   
 
-  document.getElementById('hq-q-num').textContent = `Q${index + 1} of ${State.questions.length}`;
+  document.getElementById('hq-q-num').textContent = `Q${index + 1} of ${State.questions.length} • PIN: ${formatPin(State.session.pin)}`;
   document.getElementById('hq-question-text').textContent = q.question_text;
   document.getElementById('hq-answered-count').textContent = '0';
   document.getElementById('hq-total-count').textContent = State.players.length;
@@ -1002,7 +1015,7 @@ async function hostShowReveal(questionId) {
   
   AudioEngine.playDrumroll();
 
-  document.getElementById('hr-q-num').textContent = `Q${index + 1} of ${State.questions.length}`;
+  document.getElementById('hr-q-num').textContent = `Q${index + 1} of ${State.questions.length} • PIN: ${formatPin(State.session.pin)}`;
   document.getElementById('hr-question-text').textContent = q.question_text;
 
   const barsEl = document.getElementById('hr-answer-bars');
@@ -1115,6 +1128,7 @@ async function hostShowFinalLeaderboard() {
   });
 
   renderView('host-leaderboard');
+  document.querySelector('.hl-subtitle').textContent = `Final Leaderboard • PIN: ${formatPin(State.session.pin)}`;
   
   AudioEngine.playFanfare();
 
