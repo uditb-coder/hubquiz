@@ -1907,9 +1907,10 @@ body.gameplay img[src*="logo.jpg"] {
   border-radius: 4px;
 }
 
-/* Ensure body doesn't have a background covering the SVG */
+/* Darken the SVG background for gameplay screens so white text is readable */
 body.gameplay {
-  background: transparent !important;
+  background: linear-gradient(rgba(11, 29, 58, 0.90), rgba(11, 29, 58, 0.90)), url('assets/bg.svg') no-repeat center center fixed !important;
+  background-size: cover !important;
 }
 
 @keyframes bounceInGame {
