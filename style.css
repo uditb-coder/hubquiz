@@ -2059,50 +2059,54 @@ body.gameplay {
 #view-host-lobby #copy-pin-btn { color: var(--game-white) !important; border-color: var(--game-border) !important; background: transparent !important; }
 
 /* ============================================================
-   HOST QUESTION — Dark question screen
+   HOST QUESTION - Light SVG background
    ============================================================ */
 #view-host-question {
-  background: transparent !important;
+  background: url('assets/bg.svg') no-repeat center center fixed !important;
+  background-size: cover !important;
 }
 
-#view-host-question .hq-top-bar       { color: var(--game-white-dim); }
-#view-host-question .hq-progress      { color: var(--game-white-dim) !important; }
+#view-host-question .hq-top-bar       { color: var(--grey-600); }
+#view-host-question .hq-progress      { color: var(--grey-600) !important; }
 #view-host-question .hq-answered-badge {
-  background:   rgba(255,255,255,0.08) !important;
-  border:       1px solid var(--game-border) !important;
-  color:        var(--game-white) !important;
+  background:   rgba(255,255,255,0.8) !important;
+  border:       1px solid var(--grey-200) !important;
+  color:        var(--grey-800) !important;
+  box-shadow:   0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* Question text - large, white, confident, scaling down for long questions */
+/* Question text - large, dark, confident */
 #view-host-question #hq-question-text {
-  color:       var(--game-white) !important;
-  text-shadow: 0 2px 16px rgba(0,0,0,0.4);
-  font-size:   clamp(1.2rem, 3.5vw, 3rem) !important; /* Scale down smoothly so it doesn't push options out */
+  color:       var(--grey-900) !important;
+  text-shadow: none;
+  font-size:   clamp(1.2rem, 3.5vw, 3rem) !important;
 }
 
 /* Student Feedback Text Visibility */
 .gameplay .feedback-card {
-  color: var(--game-white) !important;
+  color: var(--grey-800) !important;
+  background: white !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 .gameplay .feedback-title {
-  color: var(--game-gold) !important;
+  color: var(--navy) !important;
 }
 .gameplay .stat-label {
-  color: var(--game-white-dim) !important;
+  color: var(--grey-500) !important;
 }
 .gameplay .stat-value {
-  color: var(--game-white) !important;
+  color: var(--grey-900) !important;
 }
 
-/* Timer ring — gold accent */
+/* Timer ring */
 #view-host-question .timer-ring-wrap {
   background:  transparent !important;
   box-shadow:  none !important;
 }
-#view-host-question #timer-number { color: var(--game-white) !important; }
+#view-host-question #timer-number { color: var(--grey-900) !important; }
 
-/* Override timer ring track color for dark mode */
-#view-host-question .timer-ring-bg { stroke: rgba(255,255,255,0.1) !important; }
+/* Override timer ring track color for light mode */
+#view-host-question .timer-ring-bg { stroke: rgba(0,0,0,0.1) !important; }
 
 /* Answer blocks — 2×2 grid on host */
 #view-host-question #hq-answer-blocks {
@@ -2292,36 +2296,37 @@ body.gameplay {
 }
 
 /* ============================================================
-   STUDENT QUESTION — Full-screen dark answer view
+   STUDENT QUESTION - Full-screen dark answer view
    ============================================================ */
 #view-student-question {
-  background: var(--game-bg) !important;
+  background: url('assets/bg.svg') no-repeat center center fixed !important;
+  background-size: cover !important;
   animation: none !important;
 }
 
 /* Q-num label */
 #view-student-question #sq-q-num {
-  color:   var(--game-gold) !important;
+  color:   var(--navy) !important;
   opacity: 1 !important;
 }
 
 /* Optional question text */
 #view-student-question #sq-question-text {
-  color:       var(--game-white) !important;
+  color:       var(--grey-900) !important;
   font-weight: 700 !important;
 }
 
-/* Student answer blocks — full bleed, colors from vars */
+/* Student answer blocks - full bleed, colors from vars */
 .student-answer-btn {
   border-radius:  16px !important;
-  border:         1px solid rgba(255,255,255,0.1) !important;
-  box-shadow:     0 6px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15) !important;
+  border:         1px solid rgba(0,0,0,0.1) !important;
+  box-shadow:     0 6px 20px rgba(0,0,0,0.15) !important;
   transition:     transform 0.15s cubic-bezier(0.175,0.885,0.32,1.275), opacity 0.2s !important;
 }
 .student-answer-btn:active { transform: scale(0.92) !important; }
 .student-answer-btn.selected {
   opacity: 1 !important;
-  box-shadow: 0 0 0 3px var(--game-gold), 0 8px 24px rgba(0,0,0,0.5) !important;
+  box-shadow: 0 0 0 3px var(--navy), 0 8px 24px rgba(0,0,0,0.2) !important;
 }
 .student-answer-btn:disabled:not(.selected) { opacity: 0.3 !important; }
 
@@ -2332,9 +2337,9 @@ body.gameplay {
 
 /* Waiting reveal text */
 #view-student-question #sq-waiting-reveal {
-  color: var(--game-white-dim) !important;
+  color: var(--grey-600) !important;
 }
-#sq-locked-msg { color: var(--game-white-dim) !important; }
+#sq-locked-msg { color: var(--grey-600) !important; }
 
 /* Timer bar — glows gold in final seconds */
 #sq-timer-bar { border-radius: 0 3px 3px 0; }
