@@ -372,7 +372,7 @@ async function loadQuizList() {
       <div class="quiz-card" data-id="${q.id}">
         <div class="quiz-card-body">
           <h3 class="quiz-title">${escHtml(q.title)}</h3>
-          <span class="quiz-meta">${qCount} question${qCount !== 1 ? 's' : ''}</span>
+          <span class="quiz-meta">${qCount} question${qCount !== 1 ? 's' : ''} &bull; Created by ${State.user?.user_metadata?.display_name || 'You'}</span>
         </div>
         <div class="quiz-card-actions">
           <button class="btn btn-primary btn-start" data-id="${q.id}" title="Start Session">
@@ -659,7 +659,7 @@ function showHostLobby() {
   const pin = State.session.pin;
   document.getElementById('lobby-pin').textContent = formatPin(pin);
   document.getElementById('lobby-quiz-title').textContent = State.quiz.title;
-  document.getElementById('lobby-q-count').textContent = `${State.questions.length} question${State.questions.length !== 1 ? 's' : ''}`;
+  document.getElementById('lobby-q-count').textContent = `${State.questions.length} question${State.questions.length !== 1 ? 's' : ''} • Hosted by ${State.user?.user_metadata?.display_name || 'You'}`;
 
   // Copy PIN button
   const copyBtn = document.getElementById('copy-pin-btn');
