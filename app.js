@@ -617,6 +617,35 @@ async function deleteQuiz(quizId) {
 // ============================================================
 
 async function startSession(quizId) {
+  const ADMIN_ID = '3a161b9f-96a0-4440-b2d5-1db1881d4e88';
+  const isUdit = State.user.id === ADMIN_ID;
+
+  if (!isUdit) {
+    // Block other mentors if Udit is running a game
+    const { data: adminSessions } = await HQ_SUPABASE.from('game_sessions')
+      .select('id')
+      .eq('host_id', ADMIN_ID)
+      .in('status', ['lobby', 'active', 'question_active', 'question_review'])
+      .limit(1);
+
+    if (adminSessions && adminSessions.length > 0) {
+      alert("Udit is currently conducting a Mega-Quiz. Other sessions are temporarily paused and cannot be started right now.");
+      return;
+    }
+  } else {
+    // If Udit starts a game, force-end ALL other active sessions on the server
+    const { data: otherSessions } = await HQ_SUPABASE.from('game_sessions')
+      .select('id')
+      .neq('host_id', ADMIN_ID)
+      .in('status', ['lobby', 'active', 'question_active', 'question_review']);
+
+    if (otherSessions && otherSessions.length > 0) {
+      await HQ_SUPABASE.from('game_sessions')
+        .update({ status: 'finished' })
+        .in('id', otherSessions.map(s => s.id));
+    }
+  }
+
   // Generate a unique PIN server-side
   const { data: pinData, error: pinError } = await HQ_SUPABASE.rpc('generate_session_pin');
   if (pinError) { alert('Could not generate PIN: ' + pinError.message); return; }
@@ -1282,6 +1311,18 @@ async function joinSession(pin, name, btn) {
       return;
     }
   } else {
+    // Check total player limit (Max 200) for new players
+    const { count: playerCount } = await HQ_SUPABASE
+      .from('players')
+      .select('*', { count: 'exact', head: true })
+      .eq('session_id', session.id);
+      
+    if (playerCount >= 200) {
+      showError('join-error', 'This game has reached the maximum capacity of 200 players.');
+      setLoading(btn, false);
+      return;
+    }
+
     // Insert player
     const { data: newPlayer, error: pErr } = await HQ_SUPABASE
       .from('players')
