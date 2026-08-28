@@ -64,7 +64,7 @@ body {
   font-size:   16px;
   line-height: 1.6;
   color:       var(--grey-900);
-  background:  url('assets/bg.svg') no-repeat center center fixed;
+  background: #FFFFFF;
   background-size: cover;
   min-height:  100vh;
   overflow-x:  hidden;
@@ -785,13 +785,13 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 }
 
 .player-chip {
-  background:    rgba(255,255,255,0.1);
-  border:        1px solid rgba(255,255,255,0.15);
+  background: var(--grey-100);
+  border: 1px solid var(--grey-200);
   border-radius: 20px;
   padding:       6px 14px;
   font-size:     0.875rem;
   font-weight:   500;
-  color:         var(--white);
+  color: var(--navy);
   animation:     popIn 0.3s ease;
 }
 @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -807,7 +807,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
    ============================================================ */
 #view-host-question {
   min-height:      100vh;
-  background:      linear-gradient(160deg, var(--navy) 0%, #162038 100%);
+  background:      #FFFFFF;
   display:         flex;
   flex-direction:  column;
   padding:         24px;
@@ -1134,7 +1134,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   flex:        1;
   font-size:   0.9rem;
   font-weight: 500;
-  color:       var(--white);
+  color: var(--navy);
 }
 
 .lb-score {
@@ -1420,7 +1420,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
    ============================================================ */
 #view-student-question {
   min-height:      100vh;
-  background:      var(--navy);
+  background:      #FFFFFF;
   display:         flex;
   flex-direction:  column;
   padding:         0;
@@ -1571,7 +1571,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
    ============================================================ */
 #view-student-final {
   min-height:      100vh;
-  background:      linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+  background:      #FFFFFF;
   display:         flex;
   flex-direction:  column;
   align-items:     center;
@@ -1761,7 +1761,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
    ============================================================ */
 #view-student-final {
   min-height:      100vh;
-  background:      linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+  background:      #FFFFFF;
   display:         flex;
   flex-direction:  column;
   align-items:     center;
@@ -1908,10 +1908,7 @@ body.gameplay img[src*="logo.jpg"] {
 }
 
 /* Darken the SVG background for gameplay screens so white text is readable */
-body.gameplay {
-  background: linear-gradient(rgba(11, 29, 58, 0.90), rgba(11, 29, 58, 0.90)), url('assets/bg.svg') no-repeat center center fixed !important;
-  background-size: cover !important;
-}
+
 
 @keyframes bounceInGame {
   0%   { transform: scale(0.4) translateY(20px); opacity: 0; }
@@ -2030,9 +2027,9 @@ body.gameplay {
 
 /* Player chips — bounce in */
 #view-host-lobby .player-chip {
-  background:    var(--game-surface-2) !important;
-  color:         var(--game-white) !important;
-  border:        1px solid var(--game-border) !important;
+  background: var(--grey-100) !important;
+  color: var(--navy) !important;
+  border: 1px solid var(--grey-200) !important;
   animation:     popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
 }
 
@@ -2062,7 +2059,7 @@ body.gameplay {
    HOST QUESTION - Light SVG background
    ============================================================ */
 #view-host-question {
-  background: url('assets/bg.svg') no-repeat center center fixed !important;
+  background: #FFFFFF;
   background-size: cover !important;
 }
 
@@ -2299,7 +2296,7 @@ body.gameplay {
    STUDENT QUESTION - Full-screen dark answer view
    ============================================================ */
 #view-student-question {
-  background: url('assets/bg.svg') no-repeat center center fixed !important;
+  background: #FFFFFF;
   background-size: cover !important;
   animation: none !important;
 }
