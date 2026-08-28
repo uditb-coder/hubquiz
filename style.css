@@ -1992,10 +1992,10 @@ body.gameplay img[src*="logo.jpg"] {
 #view-host-lobby #lobby-pin {
   font-size:     clamp(3.5rem, 10vw, 6rem) !important;
   font-weight:   900 !important;
-  color:         var(--game-gold) !important;
+  color:         var(--navy) !important;
   background:    transparent !important;
   letter-spacing: 14px !important;
-  text-shadow:   0 0 40px var(--game-gold-glow), 0 4px 24px rgba(0,0,0,0.5) !important;
+  text-shadow:   none !important;
   box-shadow:    none !important;
   padding:       0 !important;
   border-radius: 0 !important;
