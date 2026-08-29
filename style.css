@@ -1511,12 +1511,12 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   font-weight: 800;
 }
 
-.sa-symbol { font-size: 2rem; opacity: 0.6; color: var(--navy); }
+.sa-symbol { font-size: 2rem; opacity: 0.6; color: #FFFFFF; }
 .sa-label {
   font-family:   var(--font-head);
   font-size:     1.5rem;
   font-weight:   900;
-  color: var(--navy);
+  color:         #FFFFFF;
 }
 
 /* Locked message + result */
@@ -1700,12 +1700,12 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   font-weight: 800;
 }
 
-.sa-symbol { font-size: 2rem; opacity: 0.6; color: var(--navy); }
+.sa-symbol { font-size: 2rem; opacity: 0.6; color: #FFFFFF; }
 .sa-label  {
   font-family:   var(--font-head);
   font-size:     1.5rem;
   font-weight:   900;
-  color:         var(--navy);
+  color:         #FFFFFF;
 }
 
 /* Locked message + result */
@@ -1881,11 +1881,11 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   --game-white:     rgba(255,255,255,0.92);
   --game-white-dim: rgba(255,255,255,0.45);
 
-  /* Answer colors — warm, rich, distinct */
-  --answer-a: #C9A227;   /* warm gold */
-  --answer-b: #1C6E91;   /* deep teal-blue */
-  --answer-c: #C2622A;   /* coral/amber */
-  --answer-d: #2E7D5E;   /* muted emerald */
+  /* Answer colors — vibrant, rich, distinct */
+  --answer-a: #E8A317;   /* vibrant gold */
+  --answer-b: #1B85B8;   /* vibrant blue */
+  --answer-c: #D65A24;   /* vibrant orange */
+  --answer-d: #289960;   /* vibrant green */
 }
 
 /* Ensure the ComedKares logo is visible on the dark background */
@@ -2115,6 +2115,24 @@ body.gameplay img[src*="logo.jpg"] {
 .host-answer-block.answer-b { background: var(--answer-b) !important; }
 .host-answer-block.answer-c { background: var(--answer-c) !important; }
 .host-answer-block.answer-d { background: var(--answer-d) !important; }
+
+.host-answer-block .answer-opt-text {
+  font-size: 1.6rem !important;
+  color: #FFFFFF !important;
+  font-weight: 500 !important;
+  line-height: 1.3 !important;
+  flex: 1;
+}
+
+.host-answer-block .answer-opt-label {
+  font-size: 2.5rem !important;
+  color: #FFFFFF !important;
+  margin-right: 12px !important;
+}
+
+.host-answer-block .answer-symbol {
+  color: rgba(255,255,255,0.7) !important;
+}
 
 /* Staggered slide-up bounce entrance for answer blocks */
 .hq-answer-blocks .host-answer-block {
