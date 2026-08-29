@@ -2162,10 +2162,10 @@ body.gameplay img[src*="logo.jpg"] {
   background: transparent !important;
 }
 
-#view-host-reveal .hr-progress    { color: var(--game-white-dim) !important; }
+#view-host-reveal .hr-progress    { color: var(--grey-500) !important; font-weight: 500; }
 #view-host-reveal #hr-question-text { color: var(--navy); }
-#view-host-reveal .hr-bars-title  { color: var(--game-white-dim) !important; }
-#view-host-reveal .hr-lb-title    { color: var(--game-white-dim) !important; }
+#view-host-reveal .hr-bars-title  { color: var(--grey-600) !important; font-weight: 500; }
+#view-host-reveal .hr-lb-title    { color: var(--grey-600) !important; font-weight: 500; }
 #view-host-reveal .reveal-bar-label { color: var(--navy); }
 #view-host-reveal .reveal-bar-count { color: var(--navy) !important; }
 #view-host-reveal .reveal-bar-track { background: rgba(255,255,255,0.08) !important; }
@@ -2225,8 +2225,8 @@ body.gameplay img[src*="logo.jpg"] {
   color:       var(--game-gold) !important;
   text-shadow: 0 0 32px var(--game-gold-glow);
 }
-#view-host-leaderboard .hl-subtitle   { color: var(--game-white-dim) !important; }
-#view-host-leaderboard .hl-list-title { color: var(--game-white-dim) !important; }
+#view-host-leaderboard .hl-subtitle   { color: var(--grey-600) !important; font-weight: 500; }
+#view-host-leaderboard .hl-list-title { color: var(--grey-600) !important; font-weight: 500; }
 
 /* Podium player names / scores */
 #view-host-leaderboard .podium-name { color: var(--navy); }
@@ -2234,27 +2234,28 @@ body.gameplay img[src*="logo.jpg"] {
 
 /* Full leaderboard rows */
 #view-host-leaderboard .lb-full-row {
-  background:  rgba(255,255,255,0.04) !important;
-  border:      1px solid rgba(255,255,255,0.07) !important;
+  background:  #F9FAFB !important;
+  border:      1px solid #E5E7EB !important;
   color: var(--navy) !important;
   animation:   slideUpStagger 0.4s ease both;
 }
 #view-host-leaderboard .lb-full-row .lb-name { color: var(--navy); }
 #view-host-leaderboard .lb-full-row .lb-score { color: var(--game-gold) !important; }
-#view-host-leaderboard .lb-full-row .lb-rank  { color: var(--game-gold) !important; }
+#view-host-leaderboard .lb-full-row .lb-rank  { color: var(--navy) !important; opacity: 0.5; }
 #view-host-leaderboard .lb-full-row.top-1 {
-  background:  rgba(212,175,55,0.12) !important;
+  background:  rgba(212,175,55,0.05) !important;
   border-color: rgba(212,175,55,0.3) !important;
   box-shadow:  0 0 20px rgba(212,175,55,0.08) !important;
 }
-#view-host-leaderboard .lb-full-row.top-2 { background: rgba(192,192,192,0.08) !important; border-color: rgba(192,192,192,0.15) !important; }
-#view-host-leaderboard .lb-full-row.top-3 { background: rgba(205,127,50,0.08) !important; border-color: rgba(205,127,50,0.15) !important; }
+#view-host-leaderboard .lb-full-row.top-2 { background: #F3F4F6 !important; border-color: #D1D5DB !important; }
+#view-host-leaderboard .lb-full-row.top-3 { background: rgba(205,127,50,0.05) !important; border-color: rgba(205,127,50,0.3) !important; }
 
 /* Back to dashboard button */
 #view-host-leaderboard #hl-end-btn {
-  color:        var(--game-white-dim) !important;
-  border-color: rgba(255,255,255,0.2) !important;
-  background:   transparent !important;
+  color:        var(--navy) !important;
+  border-color: var(--grey-300) !important;
+  background:   #FFFFFF !important;
+  box-shadow:   0 2px 4px rgba(0,0,0,0.05) !important;
 }
 
 /* Podium suspense reveal: 3rd → 2nd → 1st */
