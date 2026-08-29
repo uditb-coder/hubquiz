@@ -179,6 +179,13 @@ async function showDashboard() {
 
   renderView('dashboard'); // Render dashboard first so modals overlay it, not the login view.
   
+  const ADMIN_ID = '3a161b9f-96a0-4440-b2d5-1db1881d4e88';
+  if (State.user.id === ADMIN_ID) {
+    document.getElementById('template-fdp-btn').style.display = 'inline-flex';
+  } else {
+    document.getElementById('template-fdp-btn').style.display = 'none';
+  }
+
   // Stop any lingering audio
   AudioEngine.stopLobbyMusic();
   AudioEngine.stopCountdownMusic();
@@ -333,6 +340,89 @@ async function showDashboard() {
       alert('Success! All 6 VTU curriculum quizzes have been imported into your account.');
     } catch (err) {
       alert('Error importing template: ' + err.message);
+    } finally {
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById('template-fdp-btn')?.addEventListener('click', async (e) => {
+    const btn = e.target;
+    const originalText = btn.textContent;
+    btn.textContent = 'Importing...';
+    btn.disabled = true;
+
+    try {
+      const fdpCurriculum = [
+        {
+          title: '"Before We Begin..." - Icebreaker Warm-Up',
+          questions: [
+            { order_index: 0, question_text: 'In one word - how do you feel about facilitating the IDT Lab this semester?', option_a: 'Excited', option_b: 'Nervous', option_c: 'Confused', option_d: 'Ready', correct_option: null },
+            { order_index: 1, question_text: 'How many times have YOUR students left the campus to observe a real-world problem before designing a solution?', option_a: 'Never - we haven\'t started yet', option_b: 'Once or twice in a project', option_c: 'It happens regularly in our college', option_d: 'What do you mean "observe"?', correct_option: null },
+            { order_index: 2, question_text: 'If a student came to you and said "Sir/Ma\'am, I want to build an app to solve traffic in Bengaluru" - what would YOUR first instinct be?', option_a: 'Help them start coding immediately', option_b: 'Ask them to research what apps already exist', option_c: 'Ask them who they\'ve spoken to who actually experiences traffic problems', option_d: 'Tell them it\'s too ambitious and simplify the problem', correct_option: null },
+            { order_index: 3, question_text: 'On a scale of 1 to 4, how confident are you that your students will complete all 5 stages of Design Thinking by Week 16?', option_a: 'Very confident - we have a solid plan', option_b: 'Somewhat confident - there are a few unknowns', option_c: 'Not very confident - I need more clarity on the process', option_d: 'Not at all confident - that\'s why I\'m here today!', correct_option: null },
+            { order_index: 4, question_text: 'Which of these best describes how your 1st-year students currently behave in a lab session?', option_a: 'They wait for me to tell them exactly what to do', option_b: 'They dive in and figure things out on their own', option_c: 'They Google everything first, then ask me', option_d: 'Complete chaos - honestly unpredictable!', correct_option: null },
+            { order_index: 5, question_text: 'What is the BIGGEST challenge you expect when running the IDT Lab?', option_a: 'Getting students to take it seriously (it\'s not a "real" exam subject)', option_b: 'Managing the field visits and logistics', option_c: 'Understanding the syllabus and assessment myself', option_d: 'Getting students to stop jumping straight to solutions', correct_option: null },
+            { order_index: 6, question_text: 'Which of these tools have you personally used before today?', option_a: 'Mind Mapping', option_b: 'Empathy Map', option_c: 'How Might We (HMW) statements', option_d: 'None of the above - I\'m learning today!', correct_option: null },
+            { order_index: 7, question_text: 'If Design Thinking were a Bollywood film genre, what would it be?', option_a: 'Action - fast-paced, build fast, break things', option_b: 'Drama - deep emotions, understand people\'s pain', option_c: 'Comedy - wild ideas, nothing is too crazy', option_d: 'Thriller - you never know what the user actually needs!', correct_option: null },
+            { order_index: 8, question_text: 'Be honest - before today, had you read the 3 pre-session reading materials we sent?', option_a: 'Yes, all three - thoroughly!', option_b: 'I skimmed one of them', option_c: 'I opened one and closed it immediately', option_d: 'What reading materials?', correct_option: null }
+          ]
+        },
+        {
+          title: '"IDT Lab - Are You Ready to Facilitate?"',
+          questions: [
+            { order_index: 0, question_text: 'How many credits does the IDT Lab (1BIDTL158) carry?', option_a: '2 Credits', option_b: '3 Credits', option_c: '1 Credit', option_d: '4 Credits', correct_option: 'c' },
+            { order_index: 1, question_text: 'What is the minimum CIE score a student must achieve to be eligible to write the SEE?', option_a: '15 out of 50', option_b: '25 out of 50', option_c: '20 out of 50', option_d: '30 out of 50', correct_option: 'c' },
+            { order_index: 2, question_text: 'During which weeks of the IDT Lab do students conduct Field Visits?', option_a: 'Weeks 1 and 2', option_b: 'Weeks 4 and 5', option_c: 'Weeks 9 and 10', option_d: 'Weeks 12 and 13', correct_option: 'b' },
+            { order_index: 3, question_text: 'The "How Might We" (HMW) framework is used in which phase of Design Thinking?', option_a: 'Empathize', option_b: 'Prototype', option_c: 'Define', option_d: 'Test', correct_option: 'c' },
+            { order_index: 4, question_text: 'What does the Empathy Map capture? (Select the most complete answer)', option_a: 'What students think about technology', option_b: 'The user\'s Says, Thinks, Does, and Feels', option_c: 'The engineering specifications of a product', option_d: 'The financial cost of a proposed solution', correct_option: 'b' },
+            { order_index: 5, question_text: 'In the Design Challenge activity you just completed, you designed a feature for a product (Gloves, Glasses, Bag, or Shoes). What phase of Design Thinking were you experiencing?', option_a: 'Empathize - you were observing a user', option_b: 'Define - you were writing a problem statement', option_c: 'Ideate - you were generating creative solutions', option_d: 'Test - you were validating a prototype', correct_option: 'c' },
+            { order_index: 6, question_text: 'Which of the following is a well-framed "How Might We" statement?', option_a: 'How might we build an app to manage library timings?', option_b: 'How might we fix the parking problem?', option_c: 'How might we help commuter students feel confident and less anxious about their campus journey so they arrive on time?', option_d: 'How might we improve everything about the college experience?', correct_option: 'c' },
+            { order_index: 7, question_text: 'In the IDT Lab, the field visit is scheduled on:', option_a: 'Any weekday morning', option_b: 'The full day of the 2nd and 4th Saturdays of the month', option_c: 'One specific Friday per month', option_d: 'During regular 2-hour lab sessions in the college', correct_option: 'b' },
+            { order_index: 8, question_text: 'What must students submit as part of their SEE requirements?', option_a: 'A typed research report only', option_b: 'Only a working digital prototype', option_c: 'Handwritten Activity Book, Presentation, Physical Prototype, and Peer Feedback', option_d: 'A business plan and investor pitch deck', correct_option: 'c' },
+            { order_index: 9, question_text: 'What is the maximum team size allowed in the IDT Lab?', option_a: '3 students', option_b: '8 students', option_c: '10 students', option_d: '6 students', correct_option: 'd' }
+          ]
+        },
+        {
+          title: '"Think Like a Designer" - Generative Thinking & Full Day Wrap',
+          questions: [
+            { order_index: 0, question_text: 'In Gibson\'s library activity, what was the REAL insight revealed after applying the 5 Whys technique?', option_a: 'The library needs longer opening hours', option_b: 'Students need more computers in the library', option_c: 'Students don\'t believe physical books add value over freely available digital content', option_d: 'The library is too far from classrooms', correct_option: 'c' },
+            { order_index: 1, question_text: 'Analytical Design Thinking is best described as:', option_a: 'Starting with users and generating many possible answers', option_b: 'Starting with a given problem and converging on the single correct answer', option_c: 'Using AI tools to generate design solutions', option_d: 'Designing aesthetically beautiful products for premium users', correct_option: 'b' },
+            { order_index: 2, question_text: 'Generative Design Thinking is best described as:', option_a: 'Using mathematical formulas to solve engineering challenges', option_b: 'Copying best practices from other industries', option_c: 'Starting with people - observing needs and generating multiple possible solutions', option_d: 'Generating as many engineering specifications as possible', correct_option: 'c' },
+            { order_index: 3, question_text: 'In the 5 Whys technique, why do we keep asking "Why?" after each answer?', option_a: 'To confuse the student and challenge their thinking', option_b: 'To move beyond surface symptoms and reach the root cause of the problem', option_c: 'Because the VTU syllabus requires 5 questions per problem', option_d: 'To help students memorize the problem better', correct_option: 'b' },
+            { order_index: 4, question_text: 'Which of the following is an example of GENERATIVE thinking applied to a campus problem?', option_a: '"The attendance system is broken. Let us fix the software bug."', option_b: '"Students are absent. Let us install a biometric system."', option_c: '"Why do students skip class? Let us observe and interview them across different contexts to discover the real barriers and co-design solutions with them."', option_d: '"Attendance is low. The best engineering colleges enforce attendance strictly, so let us do the same."', correct_option: 'c' },
+            { order_index: 5, question_text: 'When a student presents their empathy findings and says, "We surveyed 50 students on WhatsApp and most said the canteen food is bad," what is the most important gap in their research?', option_a: 'They should have surveyed more students', option_b: 'They only have self-reported opinions, not observed behaviour - they never watched real users interact with the canteen', option_c: 'WhatsApp is not a reliable survey platform', option_d: 'They should have also surveyed the canteen staff', correct_option: 'b' },
+            { order_index: 6, question_text: 'After completing the Design Challenge (Smart Gloves/Glasses/Bag/Shoes), Gibson revealed that your team "used IMAGINATION, not EMPATHY." What would you do differently to truly apply the Empathy phase before this same activity?', option_a: 'Research competitors\' products online before sketching', option_b: 'Ask teammates what features they personally want in the product', option_c: 'Spend time observing and interviewing actual users of gloves/bags/shoes in real-world contexts before generating any ideas', option_d: 'Watch product review videos on YouTube for inspiration', correct_option: 'c' },
+            { order_index: 7, question_text: 'The "How Might We" statement - "How might we increase library usage at our college?" - is an example of:', option_a: 'A perfectly framed HMW question', option_b: 'A HMW that is too narrow - it assumes the goal is usage numbers', option_c: 'A HMW that is too broad - it doesn\'t target a specific user or emotional need', option_d: 'A HMW that is well-framed but needs a shorter phrasing', correct_option: 'c' },
+            { order_index: 8, question_text: 'In the IDT Lab, when should students ideally begin building their first prototype?', option_a: 'Immediately after forming their team in Week 3', option_b: 'Only after their HMW statement has been validated and they have completed the Ideation Sprint (after Week 11)', option_c: 'At the end of Week 16 for the final presentation', option_d: 'Whenever the student feels ready, there is no required sequence', correct_option: 'b' },
+            { order_index: 9, question_text: 'Based on everything you have learned today, which statement best describes YOUR role as an IDT Lab facilitator?', option_a: 'To evaluate and correct student designs based on engineering principles', option_b: 'To teach students the theory of Design Thinking through lectures each week', option_c: 'To guide students through the 5-phase process by asking questions, creating space for field visits, and celebrating iteration and failure', option_d: 'To ensure students complete all assignments on time and submit their activity books', correct_option: 'c' }
+          ]
+        }
+      ];
+
+      for (const template of fdpCurriculum) {
+        // Create quiz
+        const { data: qz, error: qzErr } = await HQ_SUPABASE.from('quizzes')
+          .insert([{ title: template.title, created_by: State.user.id }])
+          .select().single();
+        
+        if (qzErr) throw qzErr;
+
+        // Attach quiz_id to questions
+        const questions = template.questions.map(q => ({
+          ...q,
+          quiz_id: qz.id
+        }));
+
+        // Insert questions
+        const { error: qsErr } = await HQ_SUPABASE.from('questions').insert(questions);
+        if (qsErr) throw qsErr;
+      }
+
+      await loadQuizList();
+      alert('Success! FDP Quizzes have been imported into your account.');
+    } catch (err) {
+      alert('Error importing FDP Quizzes: ' + err.message);
     } finally {
       btn.textContent = originalText;
       btn.disabled = false;
@@ -1635,7 +1725,20 @@ function studentShowReveal(payload) {
     resultsEl.classList.remove('hidden');
     resultsEl.className = 'sq-result';
     
-    if (data.correct) {
+    if (payload.correct_option === null) {
+      if (navigator.vibrate) navigator.vibrate(50);
+      triggerFlash('correct');
+      
+      resultsEl.innerHTML = `
+        <div class="feedback-card" style="border-color: var(--grey-300); background: var(--grey-50);">
+           <div class="feedback-icon" style="background: var(--grey-200); color: var(--navy);">📝</div>
+           <div class="feedback-content">
+             <div class="feedback-title" style="color: var(--navy);">Response Recorded</div>
+             <div class="feedback-encouragement" style="color: var(--grey-600);">Thanks for sharing!</div>
+           </div>
+        </div>
+      `;
+    } else if (data.correct) {
       if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
       triggerFlash('correct');
       const elapsed = (Date.now() - new Date(State.session.question_started_at).getTime()) / 1000;
