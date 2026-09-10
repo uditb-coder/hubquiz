@@ -179,12 +179,7 @@ async function showDashboard() {
 
   renderView('dashboard'); // Render dashboard first so modals overlay it, not the login view.
   
-  const ADMIN_ID = '961e9563-848e-4fda-a754-891ed3732dd4';
-  if (State.user.id === ADMIN_ID) {
-    document.getElementById('template-idt-btn').style.display = 'inline-flex';
-  } else {
-    document.getElementById('template-idt-btn').style.display = 'none';
-  }
+  document.getElementById('template-idt-btn').style.display = 'inline-flex';
 
   // Stop any lingering audio
   AudioEngine.stopLobbyMusic();
