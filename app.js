@@ -639,15 +639,15 @@ async function saveQuiz(quizId) {
     // Delete old questions if editing (delete all, then re-insert/update)
     if (quizId) {
       const existingIds = qData.map(q => q.id).filter(Boolean);
-      if (existingIds.length > 0) {
-        // Delete only questions not in the current list
-        await HQ_SUPABASE.from('questions')
-          .delete()
-          .eq('quiz_id', quizId)
-          .not('id', 'in', `(${existingIds.map(id => `'${id}'`).join(',')})`);
-      } else {
-        // No existing questions to preserve — delete all and re-insert
-        await HQ_SUPABASE.from('questions').delete().eq('quiz_id', quizId);
+      
+      // Fetch current questions from DB to find which ones were removed from the UI
+      const { data: currentQs } = await HQ_SUPABASE.from('questions').select('id').eq('quiz_id', quizId);
+      const currentIds = currentQs ? currentQs.map(q => q.id) : [];
+      const idsToDelete = currentIds.filter(id => !existingIds.includes(id));
+      
+      // Delete the removed questions
+      if (idsToDelete.length > 0) {
+        await HQ_SUPABASE.from('questions').delete().in('id', idsToDelete);
       }
     }
 
