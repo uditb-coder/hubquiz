@@ -5,8 +5,8 @@
 // ============================================================
 
 // TODO: Replace these with your actual Supabase project credentials
-const SUPABASE_URL  = 'https://pxsemvrbchajuqhnetti.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4c2VtdnJiY2hhanVxaG5ldHRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5Njk2NTcsImV4cCI6MjEwMjU0NTY1N30.wBgG5qUjrRLC8Od41RrM_dIjC8VXrb9FeyvfO4dIBkE';
+const SUPABASE_URL  = 'https://immune-climb-identifies-kitty.trycloudflare.com';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
 
 // Create and export the Supabase client
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
