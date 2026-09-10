@@ -181,9 +181,9 @@ async function showDashboard() {
   
   const ADMIN_ID = '3a161b9f-96a0-4440-b2d5-1db1881d4e88';
   if (State.user.id === ADMIN_ID) {
-    document.getElementById('template-fdp-btn').style.display = 'inline-flex';
+    document.getElementById('template-idt-btn').style.display = 'inline-flex';
   } else {
-    document.getElementById('template-fdp-btn').style.display = 'none';
+    document.getElementById('template-idt-btn').style.display = 'none';
   }
 
   // Stop any lingering audio
@@ -346,61 +346,212 @@ async function showDashboard() {
     }
   });
 
-  document.getElementById('template-fdp-btn')?.addEventListener('click', async (e) => {
+  document.getElementById('template-idt-btn')?.addEventListener('click', async (e) => {
     const btn = e.target;
     const originalText = btn.textContent;
     btn.textContent = 'Importing...';
     btn.disabled = true;
 
     try {
-      const fdpCurriculum = [
-        {
-          title: '"Before We Begin..." - Icebreaker Warm-Up',
-          questions: [
-            { order_index: 0, question_text: 'In one word - how do you feel about facilitating the IDT Lab this semester?', option_a: 'Excited', option_b: 'Nervous', option_c: 'Confused', option_d: 'Ready', correct_option: null },
-            { order_index: 1, question_text: 'How many times have YOUR students left the campus to observe a real-world problem before designing a solution?', option_a: 'Never - we haven\'t started yet', option_b: 'Once or twice in a project', option_c: 'It happens regularly in our college', option_d: 'What do you mean "observe"?', correct_option: null },
-            { order_index: 2, question_text: 'If a student came to you and said "Sir/Ma\'am, I want to build an app to solve traffic in Bengaluru" - what would YOUR first instinct be?', option_a: 'Help them start coding immediately', option_b: 'Ask them to research what apps already exist', option_c: 'Ask them who they\'ve spoken to who actually experiences traffic problems', option_d: 'Tell them it\'s too ambitious and simplify the problem', correct_option: null },
-            { order_index: 3, question_text: 'On a scale of 1 to 4, how confident are you that your students will complete all 5 stages of Design Thinking by Week 16?', option_a: 'Very confident - we have a solid plan', option_b: 'Somewhat confident - there are a few unknowns', option_c: 'Not very confident - I need more clarity on the process', option_d: 'Not at all confident - that\'s why I\'m here today!', correct_option: null },
-            { order_index: 4, question_text: 'Which of these best describes how your 1st-year students currently behave in a lab session?', option_a: 'They wait for me to tell them exactly what to do', option_b: 'They dive in and figure things out on their own', option_c: 'They Google everything first, then ask me', option_d: 'Complete chaos - honestly unpredictable!', correct_option: null },
-            { order_index: 5, question_text: 'What is the BIGGEST challenge you expect when running the IDT Lab?', option_a: 'Getting students to take it seriously (it\'s not a "real" exam subject)', option_b: 'Managing the field visits and logistics', option_c: 'Understanding the syllabus and assessment myself', option_d: 'Getting students to stop jumping straight to solutions', correct_option: null },
-            { order_index: 6, question_text: 'Which of these tools have you personally used before today?', option_a: 'Mind Mapping', option_b: 'Empathy Map', option_c: 'How Might We (HMW) statements', option_d: 'None of the above - I\'m learning today!', correct_option: null },
-            { order_index: 7, question_text: 'If Design Thinking were a Bollywood film genre, what would it be?', option_a: 'Action - fast-paced, build fast, break things', option_b: 'Drama - deep emotions, understand people\'s pain', option_c: 'Comedy - wild ideas, nothing is too crazy', option_d: 'Thriller - you never know what the user actually needs!', correct_option: null },
-            { order_index: 8, question_text: 'Be honest - before today, had you read the 3 pre-session reading materials we sent?', option_a: 'Yes, all three - thoroughly!', option_b: 'I skimmed one of them', option_c: 'I opened one and closed it immediately', option_d: 'What reading materials?', correct_option: null }
-          ]
-        },
-        {
-          title: '"IDT Lab - Are You Ready to Facilitate?"',
-          questions: [
-            { order_index: 0, question_text: 'How many credits does the IDT Lab (1BIDTL158) carry?', option_a: '2 Credits', option_b: '3 Credits', option_c: '1 Credit', option_d: '4 Credits', correct_option: 'c' },
-            { order_index: 1, question_text: 'What is the minimum CIE score a student must achieve to be eligible to write the SEE?', option_a: '15 out of 50', option_b: '25 out of 50', option_c: '20 out of 50', option_d: '30 out of 50', correct_option: 'c' },
-            { order_index: 2, question_text: 'During which weeks of the IDT Lab do students conduct Field Visits?', option_a: 'Weeks 1 and 2', option_b: 'Weeks 4 and 5', option_c: 'Weeks 9 and 10', option_d: 'Weeks 12 and 13', correct_option: 'b' },
-            { order_index: 3, question_text: 'The "How Might We" (HMW) framework is used in which phase of Design Thinking?', option_a: 'Empathize', option_b: 'Prototype', option_c: 'Define', option_d: 'Test', correct_option: 'c' },
-            { order_index: 4, question_text: 'What does the Empathy Map capture? (Select the most complete answer)', option_a: 'What students think about technology', option_b: 'The user\'s Says, Thinks, Does, and Feels', option_c: 'The engineering specifications of a product', option_d: 'The financial cost of a proposed solution', correct_option: 'b' },
-            { order_index: 5, question_text: 'In the Design Challenge activity you just completed, you designed a feature for a product (Gloves, Glasses, Bag, or Shoes). What phase of Design Thinking were you experiencing?', option_a: 'Empathize - you were observing a user', option_b: 'Define - you were writing a problem statement', option_c: 'Ideate - you were generating creative solutions', option_d: 'Test - you were validating a prototype', correct_option: 'c' },
-            { order_index: 6, question_text: 'Which of the following is a well-framed "How Might We" statement?', option_a: 'How might we build an app to manage library timings?', option_b: 'How might we fix the parking problem?', option_c: 'How might we help commuter students feel confident and less anxious about their campus journey so they arrive on time?', option_d: 'How might we improve everything about the college experience?', correct_option: 'c' },
-            { order_index: 7, question_text: 'In the IDT Lab, the field visit is scheduled on:', option_a: 'Any weekday morning', option_b: 'The full day of the 2nd and 4th Saturdays of the month', option_c: 'One specific Friday per month', option_d: 'During regular 2-hour lab sessions in the college', correct_option: 'b' },
-            { order_index: 8, question_text: 'What must students submit as part of their SEE requirements?', option_a: 'A typed research report only', option_b: 'Only a working digital prototype', option_c: 'Handwritten Activity Book, Presentation, Physical Prototype, and Peer Feedback', option_d: 'A business plan and investor pitch deck', correct_option: 'c' },
-            { order_index: 9, question_text: 'What is the maximum team size allowed in the IDT Lab?', option_a: '3 students', option_b: '8 students', option_c: '10 students', option_d: '6 students', correct_option: 'd' }
-          ]
-        },
-        {
-          title: '"Think Like a Designer" - Generative Thinking & Full Day Wrap',
-          questions: [
-            { order_index: 0, question_text: 'In Gibson\'s library activity, what was the REAL insight revealed after applying the 5 Whys technique?', option_a: 'The library needs longer opening hours', option_b: 'Students need more computers in the library', option_c: 'Students don\'t believe physical books add value over freely available digital content', option_d: 'The library is too far from classrooms', correct_option: 'c' },
-            { order_index: 1, question_text: 'Analytical Design Thinking is best described as:', option_a: 'Starting with users and generating many possible answers', option_b: 'Starting with a given problem and converging on the single correct answer', option_c: 'Using AI tools to generate design solutions', option_d: 'Designing aesthetically beautiful products for premium users', correct_option: 'b' },
-            { order_index: 2, question_text: 'Generative Design Thinking is best described as:', option_a: 'Using mathematical formulas to solve engineering challenges', option_b: 'Copying best practices from other industries', option_c: 'Starting with people - observing needs and generating multiple possible solutions', option_d: 'Generating as many engineering specifications as possible', correct_option: 'c' },
-            { order_index: 3, question_text: 'In the 5 Whys technique, why do we keep asking "Why?" after each answer?', option_a: 'To confuse the student and challenge their thinking', option_b: 'To move beyond surface symptoms and reach the root cause of the problem', option_c: 'Because the VTU syllabus requires 5 questions per problem', option_d: 'To help students memorize the problem better', correct_option: 'b' },
-            { order_index: 4, question_text: 'Which of the following is an example of GENERATIVE thinking applied to a campus problem?', option_a: '"The attendance system is broken. Let us fix the software bug."', option_b: '"Students are absent. Let us install a biometric system."', option_c: '"Why do students skip class? Let us observe and interview them across different contexts to discover the real barriers and co-design solutions with them."', option_d: '"Attendance is low. The best engineering colleges enforce attendance strictly, so let us do the same."', correct_option: 'c' },
-            { order_index: 5, question_text: 'When a student presents their empathy findings and says, "We surveyed 50 students on WhatsApp and most said the canteen food is bad," what is the most important gap in their research?', option_a: 'They should have surveyed more students', option_b: 'They only have self-reported opinions, not observed behaviour - they never watched real users interact with the canteen', option_c: 'WhatsApp is not a reliable survey platform', option_d: 'They should have also surveyed the canteen staff', correct_option: 'b' },
-            { order_index: 6, question_text: 'After completing the Design Challenge (Smart Gloves/Glasses/Bag/Shoes), Gibson revealed that your team "used IMAGINATION, not EMPATHY." What would you do differently to truly apply the Empathy phase before this same activity?', option_a: 'Research competitors\' products online before sketching', option_b: 'Ask teammates what features they personally want in the product', option_c: 'Spend time observing and interviewing actual users of gloves/bags/shoes in real-world contexts before generating any ideas', option_d: 'Watch product review videos on YouTube for inspiration', correct_option: 'c' },
-            { order_index: 7, question_text: 'The "How Might We" statement - "How might we increase library usage at our college?" - is an example of:', option_a: 'A perfectly framed HMW question', option_b: 'A HMW that is too narrow - it assumes the goal is usage numbers', option_c: 'A HMW that is too broad - it doesn\'t target a specific user or emotional need', option_d: 'A HMW that is well-framed but needs a shorter phrasing', correct_option: 'c' },
-            { order_index: 8, question_text: 'In the IDT Lab, when should students ideally begin building their first prototype?', option_a: 'Immediately after forming their team in Week 3', option_b: 'Only after their HMW statement has been validated and they have completed the Ideation Sprint (after Week 11)', option_c: 'At the end of Week 16 for the final presentation', option_d: 'Whenever the student feels ready, there is no required sequence', correct_option: 'b' },
-            { order_index: 9, question_text: 'Based on everything you have learned today, which statement best describes YOUR role as an IDT Lab facilitator?', option_a: 'To evaluate and correct student designs based on engineering principles', option_b: 'To teach students the theory of Design Thinking through lectures each week', option_c: 'To guide students through the 5-phase process by asking questions, creating space for field visits, and celebrating iteration and failure', option_d: 'To ensure students complete all assignments on time and submit their activity books', correct_option: 'c' }
-          ]
-        }
-      ];
+      const idtCurriculum = [
+          {
+            title: ' Session 1: Orientation & Team Formation',
+            questions: [
+              { order_index: 0, question_text: 'What is the main objective of the IDT course?', option_a: 'To memorize textbooks', option_b: 'To instil 21st-century skills and solve real-world problems', option_c: 'To learn advanced calculus', option_d: 'To build robots for competitions', correct_option: 'b' },
+              { order_index: 1, question_text: 'What is the total weightage of the Continuous Internal Evaluation (CIE)?', option_a: '20%', option_b: '30%', option_c: '50%', option_d: '100%', correct_option: 'c' },
+              { order_index: 2, question_text: 'To qualify for the SEE, what is the minimum marks required in the CIE?', option_a: '15', option_b: '18', option_c: '20', option_d: '25', correct_option: 'c' },
+              { order_index: 3, question_text: 'Which of the following is NOT a stated Course Outcome?', option_a: 'Pitch socially relevant ideas', option_b: 'Empathize with community problems', option_c: 'Memorize all UN resolutions', option_d: 'Collaborate effectively in diverse teams', correct_option: 'c' },
+              { order_index: 4, question_text: 'What is a Prototype?', option_a: 'A final product ready for sale', option_b: 'An early version of a product to test an idea', option_c: 'A detailed research paper', option_d: 'A business model', correct_option: 'b' },
+              { order_index: 5, question_text: 'What is a "Low-Fidelity" prototype?', option_a: 'A highly polished working model', option_b: 'A simple sketch or paper model', option_c: 'A finalized app coded in Python', option_d: 'A 3D printed engine', correct_option: 'b' },
+              { order_index: 6, question_text: 'Why is it important to have a Prototype Testing Plan?', option_a: 'To ensure performance metrics are measured and failures identified', option_b: 'To delay the project deadline', option_c: 'To make the presentation look longer', option_d: 'To assign blame if it fails', correct_option: 'a' },
+              { order_index: 7, question_text: 'How many students should ideally be in one group for this course?', option_a: '1 to 2', option_b: 'Min 4 and Max 6', option_c: 'Exactly 10', option_d: 'Whole class as one group', correct_option: 'b' },
+              { order_index: 8, question_text: 'Why are IDT teams supposed to be multidisciplinary?', option_a: 'Because the university ran out of space', option_b: 'To bring diverse perspectives from different branches', option_c: 'To make scheduling meetings harder', option_d: 'Because the syllabus says so randomly', correct_option: 'b' },
+              { order_index: 9, question_text: 'Switching between video-based and text-based learning helps your brain do what?', option_a: 'Fall asleep faster', option_b: 'Improve memory by training it like a muscle', option_c: 'Forget old information', option_d: 'Ignore the facilitator', correct_option: 'b' }
+            ]
+          },
+          {
+            title: ' Session 2: Design Thinking & Social Entrepreneurship',
+            questions: [
+              { order_index: 0, question_text: 'What is the core focus of Design Thinking?', option_a: 'Making things look pretty', option_b: 'A human-centered approach to problem solving', option_c: 'Writing perfect code', option_d: 'Maximizing company profits', correct_option: 'b' },
+              { order_index: 1, question_text: 'What is the FIRST stage of the Design Thinking process?', option_a: 'Define', option_b: 'Test', option_c: 'Empathize', option_d: 'Ideate', correct_option: 'c' },
+              { order_index: 2, question_text: 'Which stage involves brainstorming multiple creative solutions?', option_a: 'Empathize', option_b: 'Prototype', option_c: 'Ideate', option_d: 'Define', correct_option: 'c' },
+              { order_index: 3, question_text: 'What is the main difference between Invention and Innovation?', option_a: 'Invention applies ideas for value; Innovation creates something new', option_b: 'Invention is creating something new; Innovation is applying ideas to create value', option_c: 'They are identical terms', option_d: 'Invention is only for science; Innovation is for art', correct_option: 'b' },
+              { order_index: 4, question_text: 'Social Entrepreneurship combines business thinking with what?', option_a: 'Social responsibility and impact', option_b: 'High prices and monopoly', option_c: 'Government control', option_d: 'Stock market trading', correct_option: 'a' },
+              { order_index: 5, question_text: 'In Design Thinking, why do we build prototypes?', option_a: 'Because it is fun', option_b: 'To quickly validate ideas before spending too much time/money', option_c: 'To trick investors', option_d: 'To finish the course early', correct_option: 'b' },
+              { order_index: 6, question_text: 'What does the "Define" stage of Design Thinking do?', option_a: 'Collects user feedback', option_b: 'Clearly states the user\'s problem based on insights', option_c: 'Builds the final model', option_d: 'Sells the product', correct_option: 'b' },
+              { order_index: 7, question_text: 'Technical solutions without empathy usually end up...', option_a: 'Being huge market successes', option_b: 'Failing in real-world conditions', option_c: 'Winning awards', option_d: 'Being cheaper to make', correct_option: 'b' },
+              { order_index: 8, question_text: 'Which of these is an example of an Innovation?', option_a: 'Discovering a new element', option_b: 'Improving a water filter to make it affordable for villages', option_c: 'Writing a sci-fi novel', option_d: 'Dreaming about flying cars', correct_option: 'b' },
+              { order_index: 9, question_text: 'During the Ideation stage, what is the best mindset?', option_a: 'Judge every idea immediately', option_b: 'Only accept ideas from the team leader', option_c: 'Go for quantity and wild ideas without judgment', option_d: 'Stop after finding one good idea', correct_option: 'c' }
+            ]
+          },
+          {
+            title: ' Session 3: Innovation Warm-Up & SDGs',
+            questions: [
+              { order_index: 0, question_text: 'What does SDG stand for?', option_a: 'Standard Design Guidelines', option_b: 'Sustainable Development Goals', option_c: 'Social Design Group', option_d: 'System Development Grid', correct_option: 'b' },
+              { order_index: 1, question_text: 'How many SDGs were established by the United Nations?', option_a: '10', option_b: '15', option_c: '17', option_d: '20', correct_option: 'c' },
+              { order_index: 2, question_text: 'In what year were the SDGs created by the UN?', option_a: '2000', option_b: '2010', option_c: '2015', option_d: '2020', correct_option: 'c' },
+              { order_index: 3, question_text: 'Which of the following is an example of an SDG?', option_a: 'Quality Education', option_b: 'Free Netflix for all', option_c: 'Faster internet speeds', option_d: 'Space exploration', correct_option: 'a' },
+              { order_index: 4, question_text: 'What is the primary purpose of a Mind Map?', option_a: 'To paint a landscape', option_b: 'To visually organize ideas and make connections', option_c: 'To write a formal essay', option_d: 'To calculate budget', correct_option: 'b' },
+              { order_index: 5, question_text: 'Why is mapping a case study important before creating solutions?', option_a: 'To make the report look thicker', option_b: 'To uncover root causes and understand the context', option_c: 'To copy someone else\'s work', option_d: 'To delay the actual work', correct_option: 'b' },
+              { order_index: 6, question_text: 'In the context of IDT, engineering projects should ideally align with...', option_a: 'The easiest topic', option_b: 'At least one SDG', option_c: 'A famous movie plot', option_d: 'The facilitator\'s personal hobby', correct_option: 'b' },
+              { order_index: 7, question_text: 'What is one of the key communication skills practiced in this session?', option_a: 'Speaking loudly over others', option_b: 'Clear articulation of ideas and active listening', option_c: 'Typing really fast', option_d: 'Avoiding eye contact', correct_option: 'b' },
+              { order_index: 8, question_text: 'Breaking down a case into smaller components helps to...', option_a: 'Make it more confusing', option_b: 'Identify hidden patterns and root causes', option_c: 'Lose the main point', option_d: 'Make the team argue', correct_option: 'b' },
+              { order_index: 9, question_text: 'Which of these is a major global challenge addressed by the SDGs?', option_a: 'Climate Change', option_b: 'Traffic jams in one city', option_c: 'Broken phone screens', option_d: 'Boredom', correct_option: 'a' }
+            ]
+          },
+          {
+            title: ' Session 4: Introduction to Empathy',
+            questions: [
+              { order_index: 0, question_text: 'What does the "H" in 5W1H stand for?', option_a: 'How', option_b: 'Who', option_c: 'When', option_d: 'Help', correct_option: 'a' },
+              { order_index: 1, question_text: 'In 5W1H, which question explores the user\'s environment and context?', option_a: 'What', option_b: 'Why', option_c: 'Where', option_d: 'When', correct_option: 'c' },
+              { order_index: 2, question_text: 'Which 5W1H question uncovers deep motivations, beliefs, and feelings?', option_a: 'Who', option_b: 'Why', option_c: 'What', option_d: 'How', correct_option: 'b' },
+              { order_index: 3, question_text: 'What is the purpose of Stakeholder Mapping?', option_a: 'To draw a map of the city', option_b: 'To visualize all people affected by the issue', option_c: 'To find the fastest route to the field visit', option_d: 'To plan the final party', correct_option: 'b' },
+              { order_index: 4, question_text: 'Who is considered a "Stakeholder"?', option_a: 'Only the person buying the product', option_b: 'Anyone who is affected by or has an interest in the problem', option_c: 'Only the government', option_d: 'The facilitator', correct_option: 'b' },
+              { order_index: 5, question_text: 'Why is a field visit advised in this session?', option_a: 'To get out of the classroom for fun', option_b: 'To gather first-hand insights and observe the problem in real life', option_c: 'To take nice photos for Instagram', option_d: 'To buy snacks', correct_option: 'b' },
+              { order_index: 6, question_text: 'When defining the "WHO", what is the best approach?', option_a: 'Treat them as a broad, faceless category (e.g., "all humans")', option_b: 'Treat them as a specific person with real feelings and challenges', option_c: 'Ignore their age and background', option_d: 'Assume they are exactly like you', correct_option: 'b' },
+              { order_index: 7, question_text: '"What tools do they currently use to solve the problem?" falls under which 5W1H category?', option_a: 'What', option_b: 'Why', option_c: 'When', option_d: 'Where', correct_option: 'a' },
+              { order_index: 8, question_text: 'Empathy in Design Thinking means...', option_a: 'Feeling sorry for the user', option_b: 'Putting yourself in the user\'s shoes to deeply understand their experience', option_c: 'Giving them money', option_d: 'Designing what you personally like', correct_option: 'b' },
+              { order_index: 9, question_text: '"How do they describe the ideal solution?" helps you understand...', option_a: 'The user\'s budget', option_b: 'The user\'s expectations and desired experience', option_c: 'The exact code to write', option_d: 'The history of the problem', correct_option: 'b' }
+            ]
+          },
+          {
+            title: ' Session 5: Interview Techniques with Stakeholder',
+            questions: [
+              { order_index: 0, question_text: 'What is an "Open-Ended" question?', option_a: 'A question that can only be answered with Yes or No', option_b: 'A question that encourages detailed stories and explanations', option_c: 'A question that has no correct answer in math', option_d: 'A question that ends the interview', correct_option: 'b' },
+              { order_index: 1, question_text: 'Which of the following is a good open-ended question?', option_a: 'Do you like this app?', option_b: 'Is this difficult for you?', option_c: 'Can you walk me through how you currently handle this problem?', option_d: 'Are you happy today?', correct_option: 'c' },
+              { order_index: 2, question_text: 'What is "Active Listening" during an interview?', option_a: 'Listening while texting on your phone', option_b: 'Fully focusing, understanding, responding, and remembering what is being said', option_c: 'Interrupting the user to share your own story', option_d: 'Only listening for the answer you want to hear', correct_option: 'b' },
+              { order_index: 3, question_text: 'A Power-Interest Matrix helps you categorize stakeholders based on...', option_a: 'Their physical strength and hobbies', option_b: 'Their level of influence (power) and their level of concern (interest)', option_c: 'Their wealth and age', option_d: 'Their grades and attendance', correct_option: 'b' },
+              { order_index: 4, question_text: 'If a stakeholder has HIGH power and HIGH interest, how should you manage them?', option_a: 'Ignore them completely', option_b: 'Keep them satisfied with minimal contact', option_c: 'Manage them closely and keep them fully engaged', option_d: 'Only send them an email at the end', correct_option: 'c' },
+              { order_index: 5, question_text: 'During a stakeholder interview, why use "neutral prompts"?', option_a: 'To avoid leading the interviewee to a specific answer', option_b: 'To make the interview boring', option_c: 'To confuse the user', option_d: 'To show off your vocabulary', correct_option: 'a' },
+              { order_index: 6, question_text: 'Which tool visually maps out what a user Says, Thinks, Does, and Feels?', option_a: 'Power-Interest Matrix', option_b: 'Empathy Map', option_c: 'Gantt Chart', option_d: 'Bar Graph', correct_option: 'b' },
+              { order_index: 7, question_text: 'What should you do if an interviewee goes off-topic but shares an interesting story about their struggles?', option_a: 'Tell them to stop talking immediately', option_b: 'Listen, as it might uncover hidden needs and context', option_c: 'Walk away', option_d: 'Correct them', correct_option: 'b' },
+              { order_index: 8, question_text: 'Why is it important to interview extreme users (not just average users)?', option_a: 'Because they are louder', option_b: 'Extreme users highlight problems and needs more clearly, leading to better innovations', option_c: 'Because it\'s a university rule', option_d: 'It is not important; only average users matter', correct_option: 'b' },
+              { order_index: 9, question_text: 'After completing an interview, what is the most crucial next step?', option_a: 'Forget about it and start building', option_b: 'Document the findings and highlight key insights immediately', option_c: 'Ask another team to do your work', option_d: 'Change your project entirely', correct_option: 'b' }
+            ]
+          },
+          {
+            title: ' Session 6: Documentation of Field Visit',
+            questions: [
+              { order_index: 0, question_text: 'What is the main purpose of a group discussion after a field visit?', option_a: 'To decide where to eat lunch', option_b: 'To merge different viewpoints and create a shared understanding of the problem', option_c: 'To argue about who asked the best questions', option_d: 'To complain about the weather', correct_option: 'b' },
+              { order_index: 1, question_text: 'Why is it important to share field findings with the facilitators?', option_a: 'To get them to do the work for you', option_b: 'To get guidance, challenge assumptions, and identify gaps in understanding', option_c: 'To impress them with how far you traveled', option_d: 'So they can grade you immediately', correct_option: 'b' },
+              { order_index: 2, question_text: 'Which of the following is crucial to include in your field documentation?', option_a: 'Exact user quotes and environmental details', option_b: 'A fictional story about the user', option_c: 'Code for the final app', option_d: 'Random internet pictures', correct_option: 'a' },
+              { order_index: 3, question_text: 'Taking photos during a field visit requires...', option_a: 'A highly professional DSLR camera', option_b: 'Explicit permission from the people being photographed', option_c: 'Perfect lighting', option_d: 'Posting them on social media immediately', correct_option: 'b' },
+              { order_index: 4, question_text: 'Converting field insights into usable information supports which next stages?', option_a: 'Prototyping and Testing only', option_b: 'Problem Definition and Ideation', option_c: 'Financing and Marketing', option_d: 'Packing up and going home', correct_option: 'b' },
+              { order_index: 5, question_text: 'What is a common pitfall when documenting field visits?', option_a: 'Writing down too many exact quotes', option_b: 'Relying on memory instead of taking immediate notes', option_c: 'Drawing sketches of the environment', option_d: 'Taking notes collaboratively', correct_option: 'b' },
+              { order_index: 6, question_text: '"Challenges noticed" during the field visit are often symptoms of...', option_a: 'A bad day', option_b: 'Deeper root causes', option_c: 'The facilitator\'s strict grading', option_d: 'Lack of budget', correct_option: 'b' },
+              { order_index: 7, question_text: 'If two team members have conflicting observations from the same interview, what should they do?', option_a: 'Ignore both observations', option_b: 'Discuss the context to find out why they perceived it differently', option_c: 'Flip a coin to decide who is right', option_d: 'Kick one member out of the team', correct_option: 'b' },
+              { order_index: 8, question_text: 'Why are environmental details (where the user is) important to document?', option_a: 'They aren\'t important at all', option_b: 'Context heavily influences how the user interacts with the problem', option_c: 'To practice descriptive writing', option_d: 'To make the report look colorful', correct_option: 'b' },
+              { order_index: 9, question_text: '"Challenging Assumptions" means...', option_a: 'Being rude to team members', option_b: 'Questioning what you previously believed was true based on new evidence', option_c: 'Assuming the user is always wrong', option_d: 'Taking wild guesses', correct_option: 'b' }
+            ]
+          },
+          {
+            title: ' Session 7: Problem Definition',
+            questions: [
+              { order_index: 0, question_text: 'What does the TRUNK of a Problem Tree represent?', option_a: 'The root causes', option_b: 'The core problem statement', option_c: 'The visible effects', option_d: 'The solution', correct_option: 'b' },
+              { order_index: 1, question_text: 'What do the LEAVES/BRANCHES of a Problem Tree represent?', option_a: 'The root causes', option_b: 'The core problem', option_c: 'The symptoms or visible effects of the problem', option_d: 'The budget', correct_option: 'c' },
+              { order_index: 2, question_text: 'What do the ROOTS of a Problem Tree represent?', option_a: 'The underlying root causes of the problem', option_b: 'The visible effects', option_c: 'The project timeline', option_d: 'The final prototype', correct_option: 'a' },
+              { order_index: 3, question_text: 'A well-framed problem statement focuses on...', option_a: 'The technology you want to use', option_b: 'The user\'s needs and the core challenge', option_c: 'Making money', option_d: 'How easy it is to build', correct_option: 'b' },
+              { order_index: 4, question_text: 'What does HMW stand for in Design Thinking?', option_a: 'How Might We', option_b: 'How Much Weight', option_c: 'Have More Wealth', option_d: 'Hide My Work', correct_option: 'a' },
+              { order_index: 5, question_text: 'Why do we use "How Might We" questions?', option_a: 'To admit defeat', option_b: 'To turn problems into open-ended opportunities for brainstorming', option_c: 'To ask the teacher for answers', option_d: 'To make the problem sound more difficult', correct_option: 'b' },
+              { order_index: 6, question_text: '"Students are failing because they are lazy." This is an example of...', option_a: 'A great empathetic problem statement', option_b: 'A biased assumption that ignores deeper root causes', option_c: 'A How Might We question', option_d: 'A Problem Tree branch', correct_option: 'b' },
+              { order_index: 7, question_text: 'Which of these is a properly formatted HMW question?', option_a: 'How might we build an app with AI?', option_b: 'How might we make waiting in line less stressful for patients?', option_c: 'How might we get rich quickly?', option_d: 'How might we force users to buy our product?', correct_option: 'b' },
+              { order_index: 8, question_text: 'Why do we separate symptoms from root causes?', option_a: 'Because symptoms are fake', option_b: 'Fixing symptoms is temporary; fixing root causes solves the problem long-term', option_c: 'To make the tree look taller', option_d: 'It\'s just a drawing exercise', correct_option: 'b' },
+              { order_index: 9, question_text: 'The Define stage converts observations from the Empathy stage into...', option_a: 'A working prototype', option_b: 'A precise definition of the problem', option_c: 'A business model', option_d: 'A printed certificate', correct_option: 'b' }
+            ]
+          },
+          {
+            title: ' Session 8: Ideation',
+            questions: [
+              { order_index: 0, question_text: 'What is the primary goal of the Ideation stage?', option_a: 'To pick the one perfect idea immediately', option_b: 'To generate a large quantity and wide variety of ideas', option_c: 'To build the product', option_d: 'To define the problem', correct_option: 'b' },
+              { order_index: 1, question_text: 'During a brainstorming session, which rule is essential?', option_a: 'Criticize bad ideas immediately', option_b: 'Defer judgment and encourage wild ideas', option_c: 'Only the smartest person speaks', option_d: 'Focus only on the budget', correct_option: 'b' },
+              { order_index: 2, question_text: 'What is "Affinity Clustering"?', option_a: 'A type of computer server', option_b: 'Grouping similar ideas or insights together to find patterns', option_c: 'A biological term for plants', option_d: 'A way to exclude team members', correct_option: 'b' },
+              { order_index: 3, question_text: 'Why are "Wild Ideas" encouraged in brainstorming?', option_a: 'They are always the ones chosen', option_b: 'They stretch the imagination and often lead to innovative, practical solutions', option_c: 'To waste time', option_d: 'Because the facilitator likes jokes', correct_option: 'b' },
+              { order_index: 4, question_text: 'After generating many ideas, what is the next logical step?', option_a: 'Build all of them', option_b: 'Idea Filtering and selection based on feasibility and impact', option_c: 'Throw them all away', option_d: 'Ask the user to build it', correct_option: 'b' },
+              { order_index: 5, question_text: 'What makes an idea "Feasible"?', option_a: 'It sounds really cool', option_b: 'It can realistically be built with the available time, skills, and resources', option_c: 'It is completely impossible', option_d: 'It costs a million dollars', correct_option: 'b' },
+              { order_index: 6, question_text: 'Which tool can be used to visually organize brainstorming ideas?', option_a: 'A Mind Map', option_b: 'A Calculator', option_c: 'A Stopwatch', option_d: 'A Microscope', correct_option: 'a' },
+              { order_index: 7, question_text: 'In Idea Filtering, an "eco-friendly" idea means...', option_a: 'It is painted green', option_b: 'It is sustainable and does not harm the environment', option_c: 'It uses a lot of electricity', option_d: 'It is very expensive', correct_option: 'b' },
+              { order_index: 8, question_text: '"Yes, and..." is a brainstorming technique used to...', option_a: 'Shut down an argument', option_b: 'Build upon someone else\'s idea positively', option_c: 'Disagree politely', option_d: 'Change the subject', correct_option: 'b' },
+              { order_index: 9, question_text: 'What is a common outcome of the Ideation Sprint?', option_a: 'A completed app', option_b: 'Shortlist of creative, feasible ideas ready for prototyping', option_c: 'A final exam', option_d: 'A signed contract', correct_option: 'b' }
+            ]
+          },
+          {
+            title: ' Session 9: Prototyping Tool - Digital Prototype (Figma)',
+            questions: [
+              { order_index: 0, question_text: 'What is "Figma" primarily used for?', option_a: '3D Printing', option_b: 'Writing essays', option_c: 'Collaborative UI/UX design and digital prototyping', option_d: 'Laser cutting', correct_option: 'c' },
+              { order_index: 1, question_text: 'What is the difference between UI and UX?', option_a: 'They are exactly the same', option_b: 'UI is how it looks (Interface), UX is how it feels and works (Experience)', option_c: 'UI is for hardware, UX is for software', option_d: 'UI is the backend code, UX is the database', correct_option: 'b' },
+              { order_index: 2, question_text: 'What is a "Wireframe"?', option_a: 'A frame made of actual metal wire', option_b: 'A low-fidelity, skeletal outline of a digital interface', option_c: 'A fully coded website', option_d: 'A 3D printed model', correct_option: 'b' },
+              { order_index: 3, question_text: 'What is a "High-Fidelity" prototype in Figma?', option_a: 'A sketch on paper', option_b: 'A design that looks and interacts almost exactly like the final product', option_c: 'A wireframe with no colors', option_d: 'An audio recording', correct_option: 'b' },
+              { order_index: 4, question_text: 'Which of the following is a common UI design element?', option_a: 'A hammer', option_b: 'A Button', option_c: 'A laser beam', option_d: 'A screwdriver', correct_option: 'b' },
+              { order_index: 5, question_text: 'What is a major advantage of using Figma for teams?', option_a: 'Only one person can use it at a time', option_b: 'It requires downloading massive files', option_c: 'Multiple users can design and collaborate in real-time', option_d: 'It costs thousands of dollars', correct_option: 'c' },
+              { order_index: 6, question_text: 'What does "Handoff" mean in the context of digital design?', option_a: 'Giving a physical phone to someone', option_b: 'Preparing the design files and specs so developers can code it', option_c: 'Shaking hands after a meeting', option_d: 'Deleting the file', correct_option: 'b' },
+              { order_index: 7, question_text: 'Why do designers use Plugins in Figma?', option_a: 'To play video games', option_b: 'To add extra functionality and speed up the workflow (like adding icons or dummy text)', option_c: 'To hack into websites', option_d: 'To crash the software', correct_option: 'b' },
+              { order_index: 8, question_text: 'Designing a wireframe FIRST helps you focus on...', option_a: 'Which exact shade of blue to use', option_b: 'Layout, structure, and user flow before worrying about colors and fonts', option_c: 'The background music', option_d: 'The final logo design', correct_option: 'b' },
+              { order_index: 9, question_text: 'In Figma, what allows you to link screens together to simulate the user journey?', option_a: 'The Prototyping tab', option_b: 'The Design tab', option_c: 'The Inspect tab', option_d: 'The Export tab', correct_option: 'a' }
+            ]
+          },
+          {
+            title: ' Session 11: Prototyping Tool - Digital Fabrication',
+            questions: [
+              { order_index: 0, question_text: 'What does CAD stand for?', option_a: 'Computer-Aided Design', option_b: 'Creative Art Department', option_c: 'Centralized Application Data', option_d: 'Computerized Audio Device', correct_option: 'a' },
+              { order_index: 1, question_text: 'What is Onshape?', option_a: 'A photo editing tool', option_b: 'A cloud-based 3D CAD software', option_c: 'A video game', option_d: 'A type of 3D printer', correct_option: 'b' },
+              { order_index: 2, question_text: 'Which software is specifically mentioned for slicing models before 3D printing?', option_a: 'Figma', option_b: 'Ultimaker Cura', option_c: 'Adobe Photoshop', option_d: 'Microsoft Excel', correct_option: 'b' },
+              { order_index: 3, question_text: 'What does "Slicing" mean in 3D printing?', option_a: 'Cutting the physical printed model in half', option_b: 'Translating a 3D model into 2D layers and G-code instructions for the printer', option_c: 'Removing the supports with a knife', option_d: 'Designing the model', correct_option: 'b' },
+              { order_index: 4, question_text: 'How does a laser cutter generally work?', option_a: 'By shooting physical blades very fast', option_b: 'By directing a high-power laser beam to precisely burn, melt, or vaporize material', option_c: 'By using high-pressure water', option_d: 'By printing plastic layer by layer', correct_option: 'b' },
+              { order_index: 5, question_text: 'What makes a Product Design "Iconic"?', option_a: 'It is very cheap', option_b: 'It perfectly blends functionality, aesthetics, and usability to stand the test of time', option_c: 'It is completely useless but looks cool', option_d: 'It breaks easily', correct_option: 'b' },
+              { order_index: 6, question_text: 'Which of these is a Rapid Prototyping technique for physical objects?', option_a: '3D Printing', option_b: 'Mind Mapping', option_c: 'Writing a poem', option_d: 'Empathy Mapping', correct_option: 'a' },
+              { order_index: 7, question_text: 'Onshape uses a "Parametric Feature-Based" approach. What does this mean?', option_a: 'You can only draw 2D squares', option_b: 'Your design is driven by parameters (dimensions) that can be easily changed to update the model', option_c: 'It is based on magic features', option_d: 'You cannot change the size once drawn', correct_option: 'b' },
+              { order_index: 8, question_text: 'What is the main advantage of Rapid Prototyping?', option_a: 'It takes years to finish', option_b: 'It allows you to quickly create physical models to test form and function', option_c: 'It is always made of solid gold', option_d: 'It eliminates the need for user testing', correct_option: 'b' },
+              { order_index: 9, question_text: 'Before using a 3D printer, your digital design must usually be exported as which file type?', option_a: '.DOCX', option_b: '.MP3', option_c: '.STL or .OBJ', option_d: '.PDF', correct_option: 'c' }
+            ]
+          },
+          {
+            title: ' Session 12 & 13: Prototyping Sessions',
+            questions: [
+              { order_index: 0, question_text: 'What is the main activity during these Prototyping Sessions?', option_a: 'Reading textbooks silently', option_b: 'Translating ideas into low-fidelity and working models using lab tools', option_c: 'Memorizing the periodic table', option_d: 'Only writing reports', correct_option: 'b' },
+              { order_index: 1, question_text: 'Which of the following is an electronics prototyping platform commonly used in Makers Spaces?', option_a: 'Microsoft Word', option_b: 'Arduino', option_c: 'Canva', option_d: 'Excel', correct_option: 'b' },
+              { order_index: 2, question_text: 'When using recycled materials to build a low-fidelity model, what are you primarily testing?', option_a: 'How expensive it looks', option_b: 'The core concept, functionality, and form', option_c: 'How heavy it is', option_d: 'Nothing, it\'s just for decoration', correct_option: 'b' },
+              { order_index: 3, question_text: 'Iteration in prototyping means...', option_a: 'Giving up after the first try', option_b: 'Repeating the design-build-test cycle to improve the prototype continuously', option_c: 'Only building one version forever', option_d: 'Throwing the prototype away', correct_option: 'b' },
+              { order_index: 4, question_text: 'What is a "Breadboard" used for in electronics prototyping?', option_a: 'Cutting actual bread', option_b: 'Slicing 3D models', option_c: 'Quickly plugging in and testing electronic circuits without soldering', option_d: 'Coding the Arduino', correct_option: 'c' },
+              { order_index: 5, question_text: 'Why might a team choose to build a Low-Fidelity prototype instead of a High-Fidelity one at first?', option_a: 'It is faster, cheaper, and allows for quick changes without attachment', option_b: 'Because High-Fidelity is illegal', option_c: 'Because they forgot their laptops', option_d: 'To make it look unprofessional', correct_option: 'a' },
+              { order_index: 6, question_text: 'Which lab facility is specifically mentioned in the syllabus for prototyping?', option_a: 'Chemistry Lab', option_b: 'Atal Idea Lab / Makers Space', option_c: 'Biology Lab', option_d: 'Cooking Lab', correct_option: 'b' },
+              { order_index: 7, question_text: 'If a prototype fails during testing, how should the team view this?', option_a: 'As a complete disaster', option_b: 'As valuable feedback to learn what doesn\'t work and improve', option_c: 'As a reason to drop the course', option_d: 'As the user\'s fault', correct_option: 'b' },
+              { order_index: 8, question_text: 'What is the role of sensors in an Arduino project?', option_a: 'To make the code look longer', option_b: 'To detect environmental inputs like light, temperature, or motion', option_c: 'To power the laptop', option_d: 'To print 3D objects', correct_option: 'b' },
+              { order_index: 9, question_text: '"Digital Fabrication" typically includes which combination of tools?', option_a: 'Scissors and glue', option_b: '3D printers, Laser Cutters, and CNC machines', option_c: 'Pencils and paper', option_d: 'Paint and canvas', correct_option: 'b' }
+            ]
+          },
+          {
+            title: ' Session 14: User Testing & Iteration',
+            questions: [
+              { order_index: 0, question_text: 'What is the primary purpose of User Testing?', option_a: 'To prove the user is wrong', option_b: 'To observe how real users interact with the prototype and collect feedback', option_c: 'To sell them the prototype immediately', option_d: 'To get a good grade without asking questions', correct_option: 'b' },
+              { order_index: 1, question_text: 'During User Testing, what should you do if the user struggles to use your prototype?', option_a: 'Grab it from them and do it yourself', option_b: 'Quietly observe their struggle and take notes on the usability issue', option_c: 'Yell at them for doing it wrong', option_d: 'End the test immediately', correct_option: 'b' },
+              { order_index: 2, question_text: 'What is an "Observation Note"?', option_a: 'A love letter', option_b: 'A documented record of what the user did, said, and struggled with during the test', option_c: 'A grade given by the facilitator', option_d: 'A receipt for materials', correct_option: 'b' },
+              { order_index: 3, question_text: 'A "Business Model" is created to ensure the project is...', option_a: 'As expensive as possible', option_b: 'Economically feasible, scalable, and sustainable', option_c: 'Never going to make money', option_d: 'Secret from the public', correct_option: 'b' },
+              { order_index: 4, question_text: 'What does "Scalability" mean in a Social Venture Plan?', option_a: 'How heavy the prototype is on a scale', option_b: 'The ability of the solution to grow and impact more people without failing', option_c: 'The size of the UI buttons', option_d: 'Climbing a mountain', correct_option: 'b' },
+              { order_index: 5, question_text: 'Feedback Forms are primarily used to...', option_a: 'Waste paper', option_b: 'Systematically collect quantitative and qualitative data from users', option_c: 'Test the team\'s grammar', option_d: 'Keep the users busy', correct_option: 'b' },
+              { order_index: 6, question_text: 'When aligning your project with SDGs in the Venture Plan, you are highlighting its...', option_a: 'Social impact and relevance', option_b: 'Coding language', option_c: 'Circuit diagram', option_d: 'Weight', correct_option: 'a' },
+              { order_index: 7, question_text: 'If 9 out of 10 users complain about a specific feature, what is the best Iteration step?', option_a: 'Ignore them, they don\'t know design', option_b: 'Redesign that specific feature based on their feedback', option_c: 'Start a completely different project', option_d: 'Tell the facilitator the users were biased', correct_option: 'b' },
+              { order_index: 8, question_text: 'What is a key component of a "Sustainability Plan"?', option_a: 'How the project will continue to operate and be funded in the long term', option_b: 'What color to paint the prototype', option_c: 'Who will present first', option_d: 'The list of software shortcuts', correct_option: 'a' },
+              { order_index: 9, question_text: 'The ultimate goal of this week is to prepare a draft for the...', option_a: 'Mathematics Exam', option_b: 'Social Venture Pitch', option_c: 'Chemistry Practical', option_d: 'Extracurricular sports day', correct_option: 'b' }
+            ]
+          },
+          {
+            title: ' Session 15 & 16: Final Demo & SEE (Semester End Exam)',
+            questions: [
+              { order_index: 0, question_text: 'The Final Demo day involves showcasing your innovation and...', option_a: 'A poster display and project pitching to a jury', option_b: 'Taking a written 3-hour exam', option_c: 'Running a marathon', option_d: 'Doing a silent play', correct_option: 'a' },
+              { order_index: 1, question_text: 'During the SEE, what is the maximum total marks awarded?', option_a: '50', option_b: '100', option_c: '200', option_d: '10', correct_option: 'b' },
+              { order_index: 2, question_text: 'Which of these evaluation parameters carries the most weight (30 Marks) in the SEE?', option_a: 'Viva Voce', option_b: 'Final Presentation', option_c: 'Prototype / Solution Demonstration', option_d: 'Documentation Report', correct_option: 'c' },
+              { order_index: 3, question_text: 'What is assessed during the "Viva Voce" (20 Marks)?', option_a: 'Group dancing skills', option_b: 'Individual understanding, contribution, and learning outcomes', option_c: 'The exact code typed by the leader', option_d: 'The team\'s poster color choice', correct_option: 'b' },
+              { order_index: 4, question_text: 'A great "Social Pitch" must include...', option_a: 'Clarity, storytelling, problem-solution fit, and visual aids', option_b: 'Whispering so the jury pays attention', option_c: 'Only reading text directly off the slides', option_d: 'Arguing with the judges', correct_option: 'a' },
+              { order_index: 5, question_text: 'What must you submit regarding your Activity Book for the SEE?', option_a: 'A digital copy only', option_b: 'The handwritten activity book with CIE marks', option_c: 'You don\'t need to submit it', option_d: 'A blank notebook', correct_option: 'b' },
+              { order_index: 6, question_text: 'To pass the SEE specifically, what is the minimum score required out of 50?', option_a: '10', option_b: '15', option_c: '18', option_d: '25', correct_option: 'c' },
+              { order_index: 7, question_text: 'The SEE is conducted by...', option_a: 'Only the internal facilitator', option_b: 'One Internal and one External Examiner', option_c: 'A robot', option_d: 'The students themselves', correct_option: 'b' },
+              { order_index: 8, question_text: 'When pitching to the jury, "Storytelling" is used to...', option_a: 'Put them to sleep', option_b: 'Emotionally connect the jury to the problem and the user\'s journey', option_c: 'Hide the fact that the prototype doesn\'t work', option_d: 'Tell fairy tales', correct_option: 'b' },
+              { order_index: 9, question_text: '"Feasibility, cost-effectiveness, and alignment with SDGs" are evaluated under which parameter?', option_a: 'Viva Voce', option_b: 'Documentation Report', option_c: 'Business Model / Sustainability Plan', option_d: 'Prototype Demonstration', correct_option: 'c' }
+            ]
+          }
+        ];
 
-      for (const template of fdpCurriculum) {
+      for (const template of idtCurriculum) {
         // Create quiz
         const { data: qz, error: qzErr } = await HQ_SUPABASE.from('quizzes')
           .insert([{ title: template.title, created_by: State.user.id }])
@@ -420,9 +571,9 @@ async function showDashboard() {
       }
 
       await loadQuizList();
-      alert('Success! FDP Quizzes have been imported into your account.');
+      alert('Success! IDT Quizzes have been imported into your account.');
     } catch (err) {
-      alert('Error importing FDP Quizzes: ' + err.message);
+      alert('Error importing IDT Quizzes: ' + err.message);
     } finally {
       btn.textContent = originalText;
       btn.disabled = false;
