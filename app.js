@@ -179,7 +179,7 @@ async function showDashboard() {
 
   renderView('dashboard'); // Render dashboard first so modals overlay it, not the login view.
   
-  const ADMIN_ID = '3a161b9f-96a0-4440-b2d5-1db1881d4e88';
+  const ADMIN_ID = '961e9563-848e-4fda-a754-891ed3732dd4';
   if (State.user.id === ADMIN_ID) {
     document.getElementById('template-idt-btn').style.display = 'inline-flex';
   } else {
@@ -858,7 +858,7 @@ async function deleteQuiz(quizId) {
 // ============================================================
 
 async function startSession(quizId) {
-  const ADMIN_ID = '3a161b9f-96a0-4440-b2d5-1db1881d4e88';
+  const ADMIN_ID = '961e9563-848e-4fda-a754-891ed3732dd4';
   const isUdit = State.user.id === ADMIN_ID;
 
   if (!isUdit) {
