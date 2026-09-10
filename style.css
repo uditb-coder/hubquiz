@@ -2293,13 +2293,26 @@ body.gameplay img[src*="logo.jpg"] {
   z-index: 0;
 }
 
-#view-student-lobby .sl-name   { color: var(--game-gold) !important; }
-#view-student-lobby .sl-status { color: var(--game-white-dim) !important; }
+#view-student-lobby .sl-name   { color: var(--navy) !important; font-weight: 900 !important; }
+#view-student-lobby .sl-status { color: var(--grey-600) !important; font-weight: 600 !important; }
+#view-student-lobby > div[style] { color: var(--grey-500) !important; }
 
 /* Pulsing gold glow orb behind the name */
 #view-student-lobby .sl-emoji {
-  filter: drop-shadow(0 0 20px var(--game-gold-glow));
-  animation: goldPulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(0,0,0,0.1));
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ============================================================
+   HOST LOBBY QR CODE ENLARGEMENT FIXES
+   ============================================================ */
+.pin-section:has(.qr-enlarged) {
+  position: relative !important;
+  z-index: 99999 !important;
+}
+#lobby-qr-img.qr-enlarged {
+  border-color: white !important;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,0.85), 0 24px 48px rgba(0,0,0,0.5) !important;
 }
 
 /* ============================================================
