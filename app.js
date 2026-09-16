@@ -61,32 +61,35 @@ document.addEventListener('DOMContentLoaded', async () => {
   AudioEngine.setMute(State.muted);
 
   // ---- SSO auto-login: detect ?at=...&rt=... query params from SSO Worker ----
-  // The Cloudflare SSO Worker passes tokens as query params (not hash - HTTP
-  // 302 redirects strip hash fragments but preserve query params).
-  // We call setSession() directly and await it - no race conditions.
   const urlParams = new URLSearchParams(window.location.search);
   const ssoAt = urlParams.get('at');
   const ssoRt = urlParams.get('rt');
 
+  console.log('[SSO] URL search:', window.location.search);
+  console.log('[SSO] URL hash:', window.location.hash);
+  console.log('[SSO] at param:', ssoAt ? 'FOUND (len=' + ssoAt.length + ')' : 'NOT FOUND');
+  console.log('[SSO] rt param:', ssoRt ? 'FOUND' : 'NOT FOUND');
+
   if (ssoAt && ssoRt) {
-    // Clean the URL immediately so tokens are not bookmarked or shared
+    console.log('[SSO] Tokens found in query params. Calling setSession...');
     window.history.replaceState(null, '', window.location.pathname);
 
-    // Explicitly set the session - this is synchronous and reliable
     const { data, error } = await HQ_SUPABASE.auth.setSession({
       access_token:  ssoAt,
       refresh_token: ssoRt,
     });
 
+    console.log('[SSO] setSession result - session:', !!data?.session, 'error:', error?.message);
+
     if (data?.session) {
       State.user = data.session.user;
-      // Set up the ongoing auth listener for session refresh/expiry
       HQ_SUPABASE.auth.onAuthStateChange((_event, session) => {
         State.user = session?.user ?? null;
       });
+      console.log('[SSO] Success! Navigating to /host');
       navigate('/host');
     } else {
-      console.warn('SSO setSession failed:', error?.message);
+      console.warn('[SSO] setSession failed:', error?.message);
       navigate('/login');
     }
     return;
