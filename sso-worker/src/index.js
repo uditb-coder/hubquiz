@@ -71,8 +71,9 @@ export default {
       );
 
       if (!authRes.ok) {
-        console.error('Auth failed:', authRes.status, await authRes.text());
-        return Response.redirect(HUBQUIZ_URL, 302);
+        const errorText = await authRes.text();
+        console.error('Auth failed:', authRes.status, errorText);
+        return spinnerPage(`${HUBQUIZ_URL}/?sso_error=${encodeURIComponent('Supabase HTTP ' + authRes.status + ': ' + errorText)}`);
       }
 
       const { access_token, refresh_token } = await authRes.json();
@@ -84,7 +85,7 @@ export default {
 
     } catch (err) {
       console.error('Worker error:', err.message);
-      return Response.redirect(HUBQUIZ_URL, 302);
+      return spinnerPage(`${HUBQUIZ_URL}/?worker_error=${encodeURIComponent(err.message)}`);
     }
   },
 };
