@@ -1,4 +1,4 @@
-﻿// HubQuiz SSO Worker - v3
+// HubQuiz SSO Worker - v3
 // Uses JS redirect with query params (not hash - hash is stripped by HTTP redirects).
 // app.js reads at/rt params and calls setSession() directly.
 
@@ -61,7 +61,11 @@ export default {
         `${supabaseUrl}/auth/v1/token?grant_type=password`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'apikey': anonKey },
+          headers: { 
+            'Content-Type': 'application/json', 
+            'apikey': anonKey,
+            'ngrok-skip-browser-warning': 'true'
+          },
           body: JSON.stringify({ email, password }),
         }
       );

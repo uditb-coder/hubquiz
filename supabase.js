@@ -10,6 +10,11 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 
 // Create and export the Supabase client
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  global: {
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  },
   auth: {
     autoRefreshToken: true,
     persistSession: true,
