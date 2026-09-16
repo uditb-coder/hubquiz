@@ -13,7 +13,7 @@ const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: false,
+    detectSessionInUrl: true,  // Reads SSO tokens from URL hash on auto-login
   },
   realtime: {
     params: {
