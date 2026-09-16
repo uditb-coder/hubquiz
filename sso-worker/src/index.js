@@ -57,13 +57,14 @@ export default {
     const anonKey    = env.SUPABASE_ANON_KEY;
 
     try {
+      const targetUrl = `${supabaseUrl}/auth/v1/token?grant_type=password`;
       const authRes = await fetch(
-        `${supabaseUrl}/auth/v1/token?grant_type=password`,
+        targetUrl,
         {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json', 
-            'apikey': anonKey,
+            'apikey': anonKey || 'missing',
             'ngrok-skip-browser-warning': 'true'
           },
           body: JSON.stringify({ email, password }),
@@ -72,8 +73,9 @@ export default {
 
       if (!authRes.ok) {
         const errorText = await authRes.text();
-        console.error('Auth failed:', authRes.status, errorText);
-        return spinnerPage(`${HUBQUIZ_URL}/?sso_error=${encodeURIComponent('Supabase HTTP ' + authRes.status + ': ' + errorText)}`);
+        const debugInfo = `URL: ${targetUrl} | Email: ${email} | Status: ${authRes.status} | Body: ${errorText}`;
+        console.error('Auth failed:', debugInfo);
+        return spinnerPage(`${HUBQUIZ_URL}/?sso_error=${encodeURIComponent(debugInfo)}`);
       }
 
       const { access_token, refresh_token } = await authRes.json();
