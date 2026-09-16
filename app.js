@@ -60,11 +60,49 @@ document.addEventListener('DOMContentLoaded', async () => {
   State.muted = localStorage.getItem('hq_muted') === 'true';
   AudioEngine.setMute(State.muted);
 
-  // Check auth
+  // ---- SSO auto-login: detect access_token in URL hash ----
+  // The Cloudflare SSO Worker redirects here with #access_token=...
+  // detectSessionInUrl: true makes Supabase process it, but it is async.
+  // We wait for the SIGNED_IN event before routing so the user lands on the dashboard.
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  const hasSSOTokens = hashParams.has('access_token') && hashParams.get('type') === 'sso';
+
+  if (hasSSOTokens) {
+    // Show a brief loading screen while Supabase processes the session
+    document.body.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:16px;font-family:sans-serif;background:#f9fafb;">
+        <div style="width:48px;height:48px;border:5px solid #e5e7eb;border-top-color:#1a234e;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+        <p style="color:#1a234e;font-size:1.1rem;font-weight:600;">Signing you in...</p>
+        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+      </div>`;
+
+    // Listen for Supabase to confirm the session
+    const { data: { subscription } } = HQ_SUPABASE.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        subscription.unsubscribe();
+        State.user = session.user;
+        // Clean the hash from the URL so it does not persist
+        window.history.replaceState(null, '', window.location.pathname);
+        navigate('/host');
+      }
+    });
+
+    // Safety fallback: if no session within 6 seconds, redirect to login
+    setTimeout(() => {
+      if (!State.user) {
+        window.history.replaceState(null, '', window.location.pathname);
+        navigate('/login');
+      }
+    }, 6000);
+
+    return; // Do not call route() yet — wait for auth state change above
+  }
+
+  // ---- Normal startup ----
   const { data: { session } } = await HQ_SUPABASE.auth.getSession();
   State.user = session?.user ?? null;
 
-  // Listen for auth changes
+  // Listen for auth changes (e.g. session expiry)
   HQ_SUPABASE.auth.onAuthStateChange((_event, session) => {
     State.user = session?.user ?? null;
   });
