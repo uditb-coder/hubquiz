@@ -58,14 +58,16 @@ export default {
 
     try {
       const targetUrl = `${supabaseUrl}/auth/v1/token?grant_type=password`;
+      const cleanAnonKey = (anonKey || 'missing').trim();
       const authRes = await fetch(
         targetUrl,
         {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json', 
-            'apikey': anonKey || 'missing',
-            'ngrok-skip-browser-warning': 'true'
+            'apikey': cleanAnonKey,
+            'ngrok-skip-browser-warning': 'true',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
           },
           body: JSON.stringify({ email, password }),
         }
@@ -73,7 +75,8 @@ export default {
 
       if (!authRes.ok) {
         const errorText = await authRes.text();
-        const debugInfo = `URL: ${targetUrl} | Email: ${email} | Status: ${authRes.status} | Body: ${errorText}`;
+        const serverHeader = authRes.headers.get('server') || 'unknown';
+        const debugInfo = `URL: ${targetUrl} | Server: ${serverHeader} | Status: ${authRes.status} | Body: ${errorText}`;
         console.error('Auth failed:', debugInfo);
         return spinnerPage(`${HUBQUIZ_URL}/?sso_error=${encodeURIComponent(debugInfo)}`);
       }
