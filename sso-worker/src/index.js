@@ -53,12 +53,12 @@ export default {
     }
 
     const { email, password } = HUB_MAP[hubId];
-    const supabaseUrl = env.SUPABASE_URL;
-    const anonKey    = env.SUPABASE_ANON_KEY;
+    const supabaseUrl = (env.SUPABASE_URL || '').trim();
+    const anonKey    = (env.SUPABASE_ANON_KEY || '').trim();
 
     try {
       const targetUrl = `${supabaseUrl}/auth/v1/token?grant_type=password`;
-      const cleanAnonKey = (anonKey || 'missing').trim();
+      const cleanAnonKey = anonKey || 'missing';
       const authRes = await fetch(
         targetUrl,
         {
