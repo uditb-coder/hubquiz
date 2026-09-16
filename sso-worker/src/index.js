@@ -58,14 +58,12 @@ export default {
 
     try {
       const targetUrl = `${supabaseUrl}/auth/v1/token?grant_type=password`;
-      const cleanAnonKey = anonKey || 'missing';
       const authRes = await fetch(
         targetUrl,
         {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json', 
-            'apikey': cleanAnonKey,
             'ngrok-skip-browser-warning': 'true',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
           },
