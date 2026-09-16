@@ -1,7 +1,6 @@
 ﻿// HubQuiz SSO Worker
-// Accepts ?hub=<hub_id>, signs in the hub account against local Supabase,
-// and redirects to hubquiz.vercel.app with the session tokens in the URL hash.
-// The browser/HubQuiz app detects the tokens and logs the user in automatically.
+// Returns an HTML page that does a JS redirect with tokens in the hash.
+// HTTP 302 redirects cannot carry hash fragments, but JS window.location.href can.
 
 const HUB_MAP = {
   yelahanka:  { email: 'blryelahanka.hub@comedkares.org',   password: 'B#SU9^My8AE81!'  },
@@ -17,14 +16,44 @@ const HUB_MAP = {
 
 const HUBQUIZ_URL = 'https://hubquiz.vercel.app';
 
+function htmlRedirect(url, message = 'Signing you in...') {
+  // JS redirect preserves the hash fragment, HTTP 302 does not.
+  return new Response(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HubQuiz - Signing In</title>
+  <style>
+    body { margin:0; display:flex; align-items:center; justify-content:center;
+           height:100vh; flex-direction:column; gap:16px;
+           font-family:sans-serif; background:#f9fafb; }
+    .spinner { width:48px; height:48px; border:5px solid #e5e7eb;
+               border-top-color:#1a234e; border-radius:50%;
+               animation:spin 0.8s linear infinite; }
+    p { color:#1a234e; font-size:1.1rem; font-weight:600; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="spinner"></div>
+  <p>${message}</p>
+  <script>
+    // Use JS redirect so the hash fragment is preserved by the browser
+    window.location.href = ${JSON.stringify(url)};
+  </script>
+</body>
+</html>`, {
+    headers: { 'Content-Type': 'text/html;charset=UTF-8' },
+  });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const hubId = url.searchParams.get('hub');
 
-    // ---- Unknown hub: fall through to normal login ----
     if (!hubId || !HUB_MAP[hubId]) {
-      return Response.redirect(HUBQUIZ_URL, 302);
+      return htmlRedirect(HUBQUIZ_URL, 'Redirecting...');
     }
 
     const { email, password } = HUB_MAP[hubId];
@@ -32,7 +61,6 @@ export default {
     const anonKey    = env.SUPABASE_ANON_KEY;
 
     try {
-      // Call Supabase's password grant endpoint to exchange creds for a session
       const authRes = await fetch(
         `${supabaseUrl}/auth/v1/token?grant_type=password`,
         {
@@ -46,31 +74,22 @@ export default {
       );
 
       if (!authRes.ok) {
-        const err = await authRes.text();
-        console.error('Supabase auth failed:', authRes.status, err);
-        // Redirect to login page on failure — user can log in manually
-        return Response.redirect(HUBQUIZ_URL, 302);
+        console.error('Supabase auth failed:', authRes.status, await authRes.text());
+        return htmlRedirect(HUBQUIZ_URL, 'Redirecting to login...');
       }
 
       const session = await authRes.json();
       const { access_token, refresh_token, expires_in } = session;
 
-      // Build the redirect URL with tokens in the hash fragment.
-      // supabase-js with detectSessionInUrl: true will pick these up automatically.
-      const redirectTo = new URL(HUBQUIZ_URL);
-      redirectTo.hash = [
-        `access_token=${encodeURIComponent(access_token)}`,
-        `refresh_token=${encodeURIComponent(refresh_token)}`,
-        `expires_in=${expires_in}`,
-        `token_type=bearer`,
-        `type=sso`,
-      ].join('&');
+      // Build the redirect URL with tokens in the hash.
+      // We use JS redirect (not HTTP 302) so the hash is preserved.
+      const redirectUrl = `${HUBQUIZ_URL}/#access_token=${encodeURIComponent(access_token)}&refresh_token=${encodeURIComponent(refresh_token)}&expires_in=${expires_in}&token_type=bearer&type=sso`;
 
-      return Response.redirect(redirectTo.toString(), 302);
+      return htmlRedirect(redirectUrl, 'Signing you in...');
 
     } catch (err) {
       console.error('Worker error:', err.message);
-      return Response.redirect(HUBQUIZ_URL, 302);
+      return htmlRedirect(HUBQUIZ_URL, 'Redirecting...');
     }
   },
 };
