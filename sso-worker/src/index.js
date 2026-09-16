@@ -1,6 +1,6 @@
-﻿// HubQuiz SSO Worker
-// Returns an HTML page that does a JS redirect with tokens in the hash.
-// HTTP 302 redirects cannot carry hash fragments, but JS window.location.href can.
+﻿// HubQuiz SSO Worker - v3
+// Uses JS redirect with query params (not hash - hash is stripped by HTTP redirects).
+// app.js reads at/rt params and calls setSession() directly.
 
 const HUB_MAP = {
   yelahanka:  { email: 'blryelahanka.hub@comedkares.org',   password: 'B#SU9^My8AE81!'  },
@@ -16,35 +16,31 @@ const HUB_MAP = {
 
 const HUBQUIZ_URL = 'https://hubquiz.vercel.app';
 
-function htmlRedirect(url, message = 'Signing you in...') {
-  // JS redirect preserves the hash fragment, HTTP 302 does not.
+function spinnerPage(destination) {
   return new Response(`<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>HubQuiz - Signing In</title>
+  <title>Signing In - HubQuiz</title>
   <style>
-    body { margin:0; display:flex; align-items:center; justify-content:center;
-           height:100vh; flex-direction:column; gap:16px;
-           font-family:sans-serif; background:#f9fafb; }
-    .spinner { width:48px; height:48px; border:5px solid #e5e7eb;
-               border-top-color:#1a234e; border-radius:50%;
-               animation:spin 0.8s linear infinite; }
-    p { color:#1a234e; font-size:1.1rem; font-weight:600; }
-    @keyframes spin { to { transform:rotate(360deg); } }
+    body{margin:0;display:flex;align-items:center;justify-content:center;
+         height:100vh;flex-direction:column;gap:16px;font-family:sans-serif;background:#f9fafb;}
+    .spinner{width:48px;height:48px;border:5px solid #e5e7eb;
+             border-top-color:#1a234e;border-radius:50%;animation:spin 0.8s linear infinite;}
+    p{color:#1a234e;font-size:1.1rem;font-weight:600;margin:0;}
+    @keyframes spin{to{transform:rotate(360deg);}}
   </style>
 </head>
 <body>
   <div class="spinner"></div>
-  <p>${message}</p>
+  <p>Signing you in...</p>
   <script>
-    // Use JS redirect so the hash fragment is preserved by the browser
-    window.location.href = ${JSON.stringify(url)};
+    // window.location.href preserves query params; HTTP 302 does too.
+    // We use JS here so this spinner page is visible briefly.
+    window.location.href = ${JSON.stringify(destination)};
   </script>
 </body>
-</html>`, {
-    headers: { 'Content-Type': 'text/html;charset=UTF-8' },
-  });
+</html>`, { headers: { 'Content-Type': 'text/html;charset=UTF-8' } });
 }
 
 export default {
@@ -53,7 +49,7 @@ export default {
     const hubId = url.searchParams.get('hub');
 
     if (!hubId || !HUB_MAP[hubId]) {
-      return htmlRedirect(HUBQUIZ_URL, 'Redirecting...');
+      return Response.redirect(HUBQUIZ_URL, 302);
     }
 
     const { email, password } = HUB_MAP[hubId];
@@ -65,31 +61,26 @@ export default {
         `${supabaseUrl}/auth/v1/token?grant_type=password`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': anonKey,
-          },
+          headers: { 'Content-Type': 'application/json', 'apikey': anonKey },
           body: JSON.stringify({ email, password }),
         }
       );
 
       if (!authRes.ok) {
-        console.error('Supabase auth failed:', authRes.status, await authRes.text());
-        return htmlRedirect(HUBQUIZ_URL, 'Redirecting to login...');
+        console.error('Auth failed:', authRes.status, await authRes.text());
+        return Response.redirect(HUBQUIZ_URL, 302);
       }
 
-      const session = await authRes.json();
-      const { access_token, refresh_token, expires_in } = session;
+      const { access_token, refresh_token } = await authRes.json();
 
-      // Build the redirect URL with tokens in the hash.
-      // We use JS redirect (not HTTP 302) so the hash is preserved.
-      const redirectUrl = `${HUBQUIZ_URL}/#access_token=${encodeURIComponent(access_token)}&refresh_token=${encodeURIComponent(refresh_token)}&expires_in=${expires_in}&token_type=bearer&type=sso`;
-
-      return htmlRedirect(redirectUrl, 'Signing you in...');
+      // Pass tokens as query params - they survive both HTTP redirects and JS redirects.
+      // app.js reads ?at=...&rt=... and calls supabase.auth.setSession() directly.
+      const dest = `${HUBQUIZ_URL}/?at=${encodeURIComponent(access_token)}&rt=${encodeURIComponent(refresh_token)}`;
+      return spinnerPage(dest);
 
     } catch (err) {
       console.error('Worker error:', err.message);
-      return htmlRedirect(HUBQUIZ_URL, 'Redirecting...');
+      return Response.redirect(HUBQUIZ_URL, 302);
     }
   },
 };

@@ -60,42 +60,36 @@ document.addEventListener('DOMContentLoaded', async () => {
   State.muted = localStorage.getItem('hq_muted') === 'true';
   AudioEngine.setMute(State.muted);
 
-  // ---- SSO auto-login: detect access_token in URL hash ----
-  // The Cloudflare SSO Worker redirects here with #access_token=...
-  // detectSessionInUrl: true makes Supabase process it, but it is async.
-  // We wait for the SIGNED_IN event before routing so the user lands on the dashboard.
-  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-  const hasSSOTokens = hashParams.has('access_token') && hashParams.get('type') === 'sso';
+  // ---- SSO auto-login: detect ?at=...&rt=... query params from SSO Worker ----
+  // The Cloudflare SSO Worker passes tokens as query params (not hash - HTTP
+  // 302 redirects strip hash fragments but preserve query params).
+  // We call setSession() directly and await it - no race conditions.
+  const urlParams = new URLSearchParams(window.location.search);
+  const ssoAt = urlParams.get('at');
+  const ssoRt = urlParams.get('rt');
 
-  if (hasSSOTokens) {
-    // Show a brief loading screen while Supabase processes the session
-    document.body.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:16px;font-family:sans-serif;background:#f9fafb;">
-        <div style="width:48px;height:48px;border:5px solid #e5e7eb;border-top-color:#1a234e;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
-        <p style="color:#1a234e;font-size:1.1rem;font-weight:600;">Signing you in...</p>
-        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-      </div>`;
+  if (ssoAt && ssoRt) {
+    // Clean the URL immediately so tokens are not bookmarked or shared
+    window.history.replaceState(null, '', window.location.pathname);
 
-    // Listen for Supabase to confirm the session
-    const { data: { subscription } } = HQ_SUPABASE.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        subscription.unsubscribe();
-        State.user = session.user;
-        // Clean the hash from the URL so it does not persist
-        window.history.replaceState(null, '', window.location.pathname);
-        navigate('/host');
-      }
+    // Explicitly set the session - this is synchronous and reliable
+    const { data, error } = await HQ_SUPABASE.auth.setSession({
+      access_token:  ssoAt,
+      refresh_token: ssoRt,
     });
 
-    // Safety fallback: if no session within 6 seconds, redirect to login
-    setTimeout(() => {
-      if (!State.user) {
-        window.history.replaceState(null, '', window.location.pathname);
-        navigate('/login');
-      }
-    }, 6000);
-
-    return; // Do not call route() yet — wait for auth state change above
+    if (data?.session) {
+      State.user = data.session.user;
+      // Set up the ongoing auth listener for session refresh/expiry
+      HQ_SUPABASE.auth.onAuthStateChange((_event, session) => {
+        State.user = session?.user ?? null;
+      });
+      navigate('/host');
+    } else {
+      console.warn('SSO setSession failed:', error?.message);
+      navigate('/login');
+    }
+    return;
   }
 
   // ---- Normal startup ----
