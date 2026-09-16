@@ -1,6 +1,6 @@
-﻿name = "hubquiz-sso"
+name = "hubquiz-sso"
 main = "src/index.js"
 compatibility_date = "2024-09-16"
 
 [vars]
-SUPABASE_URL = "https://specialties-gene-psi-mass.trycloudflare.com"
+SUPABASE_URL = "https://noon-serve-holly-amanda.trycloudflare.com"
