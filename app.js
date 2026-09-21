@@ -33,6 +33,7 @@ const routes = {
   '/login':  showLogin,
   '/host':   showDashboard,
   '/play':   showStudentJoin,
+  '/admin':  showAdminDashboard,
 };
 
 function navigate(path, params = {}) {
@@ -60,16 +61,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   State.muted = localStorage.getItem('hq_muted') === 'true';
   AudioEngine.setMute(State.muted);
 
-  // ---- SSO auto-login: detect ?at=...&rt=... query params from SSO Worker ----
+  // ---- Read SSO and server params BEFORE initializing Supabase ----
   const urlParams = new URLSearchParams(window.location.search);
-  const ssoAt = urlParams.get('at');
-  const ssoRt = urlParams.get('rt');
+  const ssoAt     = urlParams.get('at');
+  const ssoRt     = urlParams.get('rt');
+  const ssoServer = urlParams.get('server'); // 'jpnagar' or 'cloud' from SSO Worker
 
   console.log('[SSO] URL search:', window.location.search);
-  console.log('[SSO] URL hash:', window.location.hash);
   console.log('[SSO] at param:', ssoAt ? 'FOUND (len=' + ssoAt.length + ')' : 'NOT FOUND');
   console.log('[SSO] rt param:', ssoRt ? 'FOUND' : 'NOT FOUND');
+  console.log('[SSO] server param:', ssoServer || 'NOT SET (will auto-detect)');
 
+  // ---- Initialize Supabase with failover ----
+  // If SSO Worker told us which server the token was minted on, use that server.
+  // Otherwise, auto-detect by pinging JP Nagar with a 3s timeout.
+  await initSupabase(ssoServer || null);
+
+  // ---- SSO auto-login ----
   if (ssoAt && ssoRt) {
     console.log('[SSO] Tokens found in query params. Calling setSession...');
     window.history.replaceState(null, '', window.location.pathname);
@@ -87,6 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         State.user = session?.user ?? null;
       });
       console.log('[SSO] Success! Navigating to /host');
+      injectServerBadge();
       navigate('/host');
     } else {
       console.warn('[SSO] setSession failed:', error?.message);
@@ -114,6 +123,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  injectServerBadge();
   route();
 });
 
@@ -2257,4 +2267,146 @@ async function showSessionHistoryDetails(sessionId) {
     tbHtml += '</tr>';
   });
   tbody.innerHTML = tbHtml;
+}
+
+// ============================================================
+// ---- SERVER STATUS BADGE ----
+// Injects a small colored badge into the dashboard header
+// showing which backend server the app is connected to.
+// ============================================================
+
+function injectServerBadge() {
+  // Remove any existing badge first
+  document.querySelectorAll('.server-badge').forEach(el => el.remove());
+
+  const serverKey  = window.HQ_ACTIVE_SERVER || 'cloud';
+  const serverName = window.HQ_SERVER_NAME   || 'Cloud';
+  const cssClass   = serverKey === 'jpnagar' ? 'server-jpnagar' : 'server-cloud';
+
+  const badge = document.createElement('div');
+  badge.className = `server-badge ${cssClass}`;
+  badge.innerHTML = `<span class="server-dot"></span>${serverName}`;
+
+  // Try to inject into the dashboard header actions area
+  const headerActions = document.querySelector('.dash-header-actions');
+  if (headerActions) {
+    headerActions.insertBefore(badge, headerActions.firstChild);
+  }
+}
+
+// ============================================================
+// ---- ADMIN DASHBOARD ----
+// Only accessible by admin@comedkares.org
+// Shows live session counts, connected players, and hub activity
+// ============================================================
+
+let _adminRealtimeCh = null;
+
+// Hub email to display name mapping
+const HUB_EMAIL_MAP = {
+  'blryelahanka.hub@comedkares.org': 'Yelahanka',
+  'internship@erafoundationindia.org': 'Tumkur',
+  'blrjpnagar.hub@comedkares.org': 'JP Nagar',
+  'blrgopalan.hub@comedkares.org': 'Mysore Road',
+  'mysuru.hub@comedkares.org': 'Mysuru',
+  'mangaluru.hub@comedkares.org': 'Mangaluru',
+  'belagavi.hub@comedkares.org': 'Belagavi',
+  'kalaburagi.hub@comedkares.org': 'Kalaburagi',
+  'hubballi.hub@comedkares.org': 'Hubballi',
+};
+
+async function showAdminDashboard() {
+  if (!State.user) { navigate('/login'); return; }
+  if (State.user.email !== 'admin@comedkares.org') {
+    console.warn('[Admin] Access denied. Redirecting to /host.');
+    navigate('/host');
+    return;
+  }
+
+  renderView('admin');
+  injectServerBadge();
+
+  // Set server status indicator
+  const serverKey  = window.HQ_ACTIVE_SERVER || 'cloud';
+  const serverName = window.HQ_SERVER_NAME   || 'Cloud';
+  const dotEl    = document.getElementById('admin-server-dot');
+  const labelEl  = document.getElementById('admin-server-label');
+  if (dotEl) {
+    dotEl.className = `server-dot-lg dot-${serverKey}`;
+  }
+  if (labelEl) {
+    labelEl.textContent = `Connected to: ${serverName} Server`;
+  }
+
+  // Fetch and render stats
+  await refreshAdminStats();
+
+  // Subscribe to realtime updates on game_sessions and players
+  if (_adminRealtimeCh) {
+    HQ_SUPABASE.removeChannel(_adminRealtimeCh);
+    _adminRealtimeCh = null;
+  }
+
+  _adminRealtimeCh = HQ_SUPABASE.channel('admin-live')
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'game_sessions',
+    }, () => refreshAdminStats())
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'players',
+    }, () => refreshAdminStats())
+    .subscribe();
+
+  // Wire up sign out
+  const logoutBtn = document.getElementById('admin-logout-btn');
+  if (logoutBtn) {
+    logoutBtn.onclick = async () => {
+      await HQ_SUPABASE.auth.signOut();
+      State.user = null;
+      navigate('/login');
+    };
+  }
+}
+
+async function refreshAdminStats() {
+  try {
+    const { data, error } = await HQ_SUPABASE.rpc('get_admin_stats');
+    if (error) {
+      console.error('[Admin] Stats error:', error.message);
+      return;
+    }
+
+    // Update stat cards
+    const sessionsEl = document.getElementById('admin-live-sessions');
+    const playersEl  = document.getElementById('admin-live-players');
+    if (sessionsEl) sessionsEl.textContent = data.live_sessions || 0;
+    if (playersEl)  playersEl.textContent  = data.live_players  || 0;
+
+    // Update hub table
+    const tbody = document.getElementById('admin-hub-tbody');
+    if (!tbody) return;
+
+    const sessions = data.sessions || [];
+    if (sessions.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" class="admin-no-sessions">No active quiz sessions right now</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = sessions.map(s => {
+      const hubName = HUB_EMAIL_MAP[s.host_email] || s.host_email;
+      const statusClass = s.status === 'lobby' ? 'status-lobby' : 'status-active';
+      const statusLabel = s.status.replace('_', ' ');
+      return `<tr>
+        <td>${escHtml(hubName)}</td>
+        <td>${escHtml(s.quiz_title)}</td>
+        <td style="font-weight:700;">${s.player_count}</td>
+        <td><span class="${statusClass}">${statusLabel}</span></td>
+      </tr>`;
+    }).join('');
+  } catch (err) {
+    console.error('[Admin] Failed to fetch stats:', err);
+  }
 }

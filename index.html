@@ -85,6 +85,55 @@
 </section>
 
 <!-- ============================================================
+     VIEW: ADMIN DASHBOARD
+     ============================================================ -->
+<section id="view-admin" class="view hidden">
+  <header class="dash-header">
+    <div class="dash-logo">
+      HubQuiz<span>Admin Dashboard</span>
+    </div>
+    <div class="dash-header-actions">
+      <button id="admin-logout-btn" class="btn btn-ghost">Sign Out</button>
+    </div>
+  </header>
+
+  <main class="admin-container">
+    <!-- Server Status -->
+    <div class="admin-server-status">
+      <span id="admin-server-dot" class="server-dot-lg"></span>
+      <span id="admin-server-label" class="admin-server-label">Detecting server...</span>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="admin-stats">
+      <div class="stat-card">
+        <div class="stat-value" id="admin-live-sessions">0</div>
+        <div class="stat-label">Live Sessions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="admin-live-players">0</div>
+        <div class="stat-label">Connected Players</div>
+      </div>
+    </div>
+
+    <!-- Active Hubs Table -->
+    <table class="admin-hub-table">
+      <thead>
+        <tr>
+          <th>Hub</th>
+          <th>Quiz</th>
+          <th>Players</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="admin-hub-tbody">
+        <tr><td colspan="4" class="admin-no-sessions">No active quiz sessions right now</td></tr>
+      </tbody>
+    </table>
+  </main>
+</section>
+
+<!-- ============================================================
      VIEW: DASHBOARD
      ============================================================ -->
 <section id="view-dashboard" class="view hidden">

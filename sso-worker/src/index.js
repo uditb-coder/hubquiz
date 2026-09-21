@@ -1,6 +1,6 @@
-// HubQuiz SSO Worker - v3
-// Uses JS redirect with query params (not hash - hash is stripped by HTTP redirects).
-// app.js reads at/rt params and calls setSession() directly.
+// HubQuiz SSO Worker - v4 (with failover)
+// Tries JP Nagar first, falls back to Cloud Supabase if unreachable.
+// Passes &server= param so the frontend knows which backend to connect to.
 
 const HUB_MAP = {
   yelahanka:  { email: 'blryelahanka.hub@comedkares.org',   password: 'B#SU9^My8AE81!'  },
@@ -35,12 +35,49 @@ function spinnerPage(destination) {
   <div class="spinner"></div>
   <p>Signing you in...</p>
   <script>
-    // window.location.href preserves query params; HTTP 302 does too.
-    // We use JS here so this spinner page is visible briefly.
     window.location.href = ${JSON.stringify(destination)};
   </script>
 </body>
 </html>`, { headers: { 'Content-Type': 'text/html;charset=UTF-8' } });
+}
+
+/**
+ * Attempt to authenticate against a Supabase server.
+ * @param {object} server - { name, url, anonKey, headers }
+ * @param {string} email
+ * @param {string} password
+ * @param {number} timeoutMs
+ * @returns {Promise<{ok: boolean, access_token?: string, refresh_token?: string, error?: string}>}
+ */
+async function tryAuth(server, email, password, timeoutMs) {
+  const targetUrl = `${server.url}/auth/v1/token?grant_type=password`;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(targetUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        ...server.headers,
+      },
+      body: JSON.stringify({ email, password }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      return { ok: false, error: `Status ${res.status}: ${errorText}` };
+    }
+
+    const { access_token, refresh_token } = await res.json();
+    return { ok: true, access_token, refresh_token };
+  } catch (err) {
+    clearTimeout(timeoutId);
+    return { ok: false, error: err.message };
+  }
 }
 
 export default {
@@ -53,42 +90,45 @@ export default {
     }
 
     const { email, password } = HUB_MAP[hubId];
-    const supabaseUrl = (env.SUPABASE_URL || '').trim();
-    const anonKey    = (env.SUPABASE_ANON_KEY || '').trim();
 
-    try {
-      const targetUrl = `${supabaseUrl}/auth/v1/token?grant_type=password`;
-      const authRes = await fetch(
-        targetUrl,
-        {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json', 
-            'ngrok-skip-browser-warning': 'true',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+    // Define servers to try in order: JP Nagar first, then Cloud
+    const servers = [
+      {
+        name: 'jpnagar',
+        url: (env.SUPABASE_URL || '').trim(),
+        anonKey: '',
+        headers: {
+          'ngrok-skip-browser-warning': 'true',
+        },
+      },
+      {
+        name: 'cloud',
+        url: (env.SUPABASE_CLOUD_URL || '').trim(),
+        anonKey: (env.SUPABASE_CLOUD_ANON_KEY || '').trim(),
+        headers: {
+          'apikey': (env.SUPABASE_CLOUD_ANON_KEY || '').trim(),
+        },
+      },
+    ];
 
-      if (!authRes.ok) {
-        const errorText = await authRes.text();
-        const serverHeader = authRes.headers.get('server') || 'unknown';
-        const debugInfo = `URL: ${targetUrl} | Server: ${serverHeader} | Status: ${authRes.status} | Body: ${errorText}`;
-        console.error('Auth failed:', debugInfo);
-        return spinnerPage(`${HUBQUIZ_URL}/?sso_error=${encodeURIComponent(debugInfo)}`);
+    for (const server of servers) {
+      if (!server.url) continue;
+
+      console.log(`[SSO] Trying ${server.name}: ${server.url}`);
+      const timeoutMs = server.name === 'jpnagar' ? 4000 : 8000;
+      const result = await tryAuth(server, email, password, timeoutMs);
+
+      if (result.ok) {
+        console.log(`[SSO] Success on ${server.name}`);
+        const dest = `${HUBQUIZ_URL}/?at=${encodeURIComponent(result.access_token)}&rt=${encodeURIComponent(result.refresh_token)}&server=${server.name}`;
+        return spinnerPage(dest);
       }
 
-      const { access_token, refresh_token } = await authRes.json();
-
-      // Pass tokens as query params - they survive both HTTP redirects and JS redirects.
-      // app.js reads ?at=...&rt=... and calls supabase.auth.setSession() directly.
-      const dest = `${HUBQUIZ_URL}/?at=${encodeURIComponent(access_token)}&rt=${encodeURIComponent(refresh_token)}`;
-      return spinnerPage(dest);
-
-    } catch (err) {
-      console.error('Worker error:', err.message);
-      return spinnerPage(`${HUBQUIZ_URL}/?worker_error=${encodeURIComponent(err.message)}`);
+      console.warn(`[SSO] Failed on ${server.name}: ${result.error}`);
     }
+
+    // Both servers failed
+    const debugInfo = 'Both JP Nagar and Cloud servers are unreachable. Please try again later.';
+    return spinnerPage(`${HUBQUIZ_URL}/login?sso_error=${encodeURIComponent(debugInfo)}`);
   },
 };

@@ -2514,3 +2514,156 @@ body.gameplay img[src*="logo.jpg"] {
 .hc-meta { font-size: 0.9rem; color: var(--grey-500); margin: 0; }
 .hc-stats { text-align: right; }
 .hc-score { font-size: 1.5rem; font-weight: 800; color: var(--yellow); margin: 0; }
+
+/* ============================================================
+   SERVER STATUS BADGE
+   ============================================================ */
+.server-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-right: 12px;
+  user-select: none;
+}
+.server-badge.server-jpnagar {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.server-badge.server-cloud {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.server-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse-dot 2s infinite;
+}
+.server-jpnagar .server-dot { background: #10b981; }
+.server-cloud .server-dot   { background: #f59e0b; }
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+/* ============================================================
+   ADMIN DASHBOARD
+   ============================================================ */
+.admin-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+.admin-container h2 {
+  font-size: 1.5rem;
+  color: #f1f5f9;
+  margin-bottom: 24px;
+}
+.admin-server-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+}
+.admin-server-status .server-dot-lg {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  animation: pulse-dot 2s infinite;
+}
+.admin-server-status .server-dot-lg.dot-jpnagar { background: #10b981; }
+.admin-server-status .server-dot-lg.dot-cloud   { background: #f59e0b; }
+.admin-server-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+.stat-card .stat-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #38bdf8;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.stat-card .stat-label {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+.admin-hub-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.admin-hub-table thead th {
+  background: rgba(30, 41, 59, 0.8);
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.admin-hub-table tbody td {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.admin-hub-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.admin-hub-table .status-active {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+.admin-hub-table .status-lobby {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+}
+.admin-no-sessions {
+  text-align: center;
+  color: #64748b;
+  padding: 40px 20px;
+  font-style: italic;
+}

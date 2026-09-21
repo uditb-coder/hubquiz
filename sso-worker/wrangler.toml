@@ -4,3 +4,5 @@ compatibility_date = "2024-09-16"
 
 [vars]
 SUPABASE_URL = "https://acid-tribute-ninth.ngrok-free.dev"
+SUPABASE_CLOUD_URL = "https://pxsemvrbchajuqhnetti.supabase.co"
+SUPABASE_CLOUD_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4c2VtdnJiY2hhanVxaG5ldHRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5Njk2NTcsImV4cCI6MjEwMjU0NTY1N30.wBgG5qUjrRLC8Od41RrM_dIjC8VXrb9FeyvfO4dIBkE"
