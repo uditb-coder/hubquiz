@@ -3,15 +3,15 @@
 // Passes &server= param so the frontend knows which backend to connect to.
 
 const HUB_MAP = {
-  yelahanka:  { email: 'blryelahanka.hub@comedkares.org',   password: 'B#SU9^My8AE81!'  },
-  tumkur:     { email: 'internship@erafoundationindia.org',  password: 'dpDCm@3GTu!a1!'  },
-  jpnagar:    { email: 'blrjpnagar.hub@comedkares.org',     password: 'P#%YBFzOggnO1!'  },
-  mysoreroad: { email: 'blrgopalan.hub@comedkares.org',     password: 'qICrvHAtN^q41!'  },
-  mysuru:     { email: 'mysuru.hub@comedkares.org',         password: 'U7UPozn%%z#n1!'  },
-  mangaluru:  { email: 'mangaluru.hub@comedkares.org',      password: 'PkZAfPyp8@IJ1!'  },
-  belagavi:   { email: 'belagavi.hub@comedkares.org',       password: 'ACKzkc@qToba1!'  },
-  kalaburagi: { email: 'kalaburagi.hub@comedkares.org',     password: 'G*jUOl9X8BG&1!' },
-  hubballi:   { email: 'hubballi.hub@comedkares.org',       password: 'eZ7w!sF9BY0X1!'  },
+  yelahanka:  { email: 'blryelahanka.hub@comedkares.org',   password: 'tDPt&b*nO!@V1!'  },
+  tumkur:     { email: 'internship@erafoundationindia.org',  password: 'dQc2jlaF9MqO1!'  },
+  jpnagar:    { email: 'blrjpnagar.hub@comedkares.org',     password: 'FCApyCD0C57J1!'  },
+  mysoreroad: { email: 'blrgopalan.hub@comedkares.org',     password: 'GCV!K^Q3lhUu1!'  },
+  mysuru:     { email: 'mysuru.hub@comedkares.org',         password: '$^fty&rP9oV#1!'  },
+  mangaluru:  { email: 'mangaluru.hub@comedkares.org',      password: '%8!pu5Ys#RU*1!'  },
+  belagavi:   { email: 'belagavi.hub@comedkares.org',       password: 'V0T$Pl5ADTW91!'  },
+  kalaburagi: { email: 'kalaburagi.hub@comedkares.org',     password: 'XnQJ5@g78M#g1!'  },
+  hubballi:   { email: 'hubballi.hub@comedkares.org',       password: 'lSh3F4tQ3P181!'  },
 };
 
 const HUBQUIZ_URL = 'https://hubquiz.vercel.app';
