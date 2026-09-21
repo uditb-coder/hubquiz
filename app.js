@@ -2296,15 +2296,13 @@ function injectServerBadge() {
 
   const cssClass = serverKey === 'jpnagar' ? 'server-jpnagar' : 'server-cloud';
 
-  const badge = document.createElement('div');
-  badge.className = `server-badge ${cssClass}`;
-  badge.innerHTML = `<span class="server-dot"></span>${serverName}`;
-
-  // Try to inject into the dashboard header actions area
-  const headerActions = document.querySelector('.dash-header-actions');
-  if (headerActions) {
+  // Try to inject into ALL dashboard header actions areas
+  document.querySelectorAll('.dash-header-actions').forEach(headerActions => {
+    const badge = document.createElement('div');
+    badge.className = `server-badge ${cssClass}`;
+    badge.innerHTML = `<span class="server-dot"></span>${serverName}`;
     headerActions.insertBefore(badge, headerActions.firstChild);
-  }
+  });
 }
 
 // ============================================================
