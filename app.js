@@ -2284,9 +2284,17 @@ function injectServerBadge() {
   // Remove any existing badge first
   document.querySelectorAll('.server-badge').forEach(el => el.remove());
 
-  const serverKey  = window.HQ_ACTIVE_SERVER || 'cloud';
-  const serverName = window.HQ_SERVER_NAME   || 'Cloud';
-  const cssClass   = serverKey === 'jpnagar' ? 'server-jpnagar' : 'server-cloud';
+  const serverKey = window.HQ_ACTIVE_SERVER || 'cloud';
+  let serverName  = window.HQ_SERVER_NAME   || 'Cloud';
+
+  // Add explicitly visible limits for the mentors
+  if (serverKey === 'cloud') {
+    serverName = 'Cloud (Max 200 Players)';
+  } else {
+    serverName = 'JP Nagar (Unlimited)';
+  }
+
+  const cssClass = serverKey === 'jpnagar' ? 'server-jpnagar' : 'server-cloud';
 
   const badge = document.createElement('div');
   badge.className = `server-badge ${cssClass}`;
