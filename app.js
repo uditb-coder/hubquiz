@@ -222,6 +222,11 @@ function showLogin() {
 async function showDashboard() {
   if (!State.user) { navigate('/login'); return; }
 
+  if (State.user.email === 'admin@comedkares.org') {
+    navigate('/admin');
+    return;
+  }
+
   renderView('dashboard'); // Render dashboard first so modals overlay it, not the login view.
   
   document.getElementById('template-idt-btn').style.display = 'inline-flex';
