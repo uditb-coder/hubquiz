@@ -298,6 +298,238 @@ async function showDashboard() {
     showQuizModal(null);
   });
 
+
+  document.getElementById('template-rnsit-btn')?.addEventListener('click', async (e) => {
+    const btn = e.target;
+    const originalText = btn.textContent;
+    btn.textContent = 'Importing Quiz...';
+    btn.disabled = true;
+
+    try {
+      const questionsData = [
+            {
+                        "order_index": 0,
+                        "question_text": "A team interviews bus commuters before designing a ticket app. Which Design Thinking stage is this?",
+                        "option_a": "Empathize",
+                        "option_b": "Define",
+                        "option_c": "Ideate",
+                        "option_d": "Test",
+                        "correct_option": "a"
+            },
+            {
+                        "order_index": 1,
+                        "question_text": "Which is the correct order of the Design Thinking stages?",
+                        "option_a": "Empathize, Define, Ideate, Prototype, Test",
+                        "option_b": "Define, Empathize, Prototype, Ideate, Test",
+                        "option_c": "Ideate, Define, Empathize, Test, Prototype",
+                        "option_d": "Prototype, Test, Empathize, Define, Ideate",
+                        "correct_option": "a"
+            },
+            {
+                        "order_index": 2,
+                        "question_text": "First aeroplane built vs. flights made affordable for all. Which is the invention and which the innovation?",
+                        "option_a": "Aeroplane = invention; cheap flights = innovation",
+                        "option_b": "Aeroplane = innovation; cheap flights = invention",
+                        "option_c": "Both are inventions",
+                        "option_d": "Both are innovations",
+                        "correct_option": "a"
+            },
+            {
+                        "order_index": 3,
+                        "question_text": "You are designing a school bag for Class 1 children. What is the most human-centred first step?",
+                        "option_a": "Pick the cheapest material",
+                        "option_b": "Observe children and parents carrying bags daily",
+                        "option_c": "Copy the most popular brand",
+                        "option_d": "Let engineers decide the size",
+                        "correct_option": "b"
+            },
+            {
+                        "order_index": 4,
+                        "question_text": "In an empathy map, 'checks phone every 2 minutes' belongs under which quadrant?",
+                        "option_a": "Says",
+                        "option_b": "Thinks",
+                        "option_c": "Does",
+                        "option_d": "Feels",
+                        "correct_option": "c"
+            },
+            {
+                        "order_index": 5,
+                        "question_text": "Which is a good, solution-free problem statement?",
+                        "option_a": "We need an app for farmers",
+                        "option_b": "Farmers lose crops because they learn of rain only after it starts",
+                        "option_c": "Build a drone to spray water",
+                        "option_d": "Farmers are poor at using technology",
+                        "correct_option": "b"
+            },
+            {
+                        "order_index": 6,
+                        "question_text": "Which is a well-framed 'How Might We' question?",
+                        "option_a": "HMW build a mobile app for hostel food?",
+                        "option_b": "HMW help hostel students get hot meals without long queues?",
+                        "option_c": "HMW make students stop complaining?",
+                        "option_d": "HMW buy a bigger canteen?",
+                        "correct_option": "b"
+            },
+            {
+                        "order_index": 7,
+                        "question_text": "Designing a ramp for a college library: who is a SECONDARY stakeholder?",
+                        "option_a": "Wheelchair-using students",
+                        "option_b": "Library staff who help and maintain it",
+                        "option_c": "A student who never visits",
+                        "option_d": "The ramp's paint",
+                        "correct_option": "b"
+            },
+            {
+                        "order_index": 8,
+                        "question_text": "Which statement is an observation, not an assumption?",
+                        "option_a": "Users hate the app",
+                        "option_b": "Three users quit at the payment screen",
+                        "option_c": "Users want more colours",
+                        "option_d": "The app is too slow",
+                        "correct_option": "b"
+            },
+            {
+                        "order_index": 9,
+                        "question_text": "Which is the best interview question to learn how a user buys vegetables?",
+                        "option_a": "Do you like vegetables?",
+                        "option_b": "Don't you think the market is dirty?",
+                        "option_c": "Walk me through the last time you bought vegetables",
+                        "option_d": "Would you pay Rs 50 for an app?",
+                        "correct_option": "c"
+            },
+            {
+                        "order_index": 10,
+                        "question_text": "Student is late daily. Why 1: the bus is late. What is the best next 5 Why question?",
+                        "option_a": "Why do students never wake up?",
+                        "option_b": "Why is the bus late?",
+                        "option_c": "Who is to blame?",
+                        "option_d": "How can we buy a bike?",
+                        "correct_option": "b"
+            },
+            {
+                        "order_index": 11,
+                        "question_text": "Which rule helps a brainstorm produce the most ideas?",
+                        "option_a": "Criticize weak ideas quickly",
+                        "option_b": "Defer judgement and go for quantity",
+                        "option_c": "Let the senior member speak first",
+                        "option_d": "Pick one idea early",
+                        "correct_option": "b"
+            },
+            {
+                        "order_index": 12,
+                        "question_text": "What does the 'Crazy 8s' method ask you to do?",
+                        "option_a": "Sketch 8 ideas in 8 minutes",
+                        "option_b": "Vote 8 times",
+                        "option_c": "Build 8 prototypes in a day",
+                        "option_d": "Interview 8 users",
+                        "correct_option": "a"
+            },
+            {
+                        "order_index": 13,
+                        "question_text": "Why build a cardboard model before the final product?",
+                        "option_a": "To impress investors",
+                        "option_b": "To learn cheaply what works and what does not",
+                        "option_c": "Because cardboard is eco-friendly",
+                        "option_d": "To skip user testing",
+                        "correct_option": "b"
+            },
+            {
+                        "order_index": 14,
+                        "question_text": "A hand-drawn app screen with sticky-note buttons is what type of prototype?",
+                        "option_a": "Low-fidelity",
+                        "option_b": "Mid-fidelity",
+                        "option_c": "High-fidelity",
+                        "option_d": "Final product",
+                        "correct_option": "a"
+            },
+            {
+                        "order_index": 15,
+                        "question_text": "In a test, a user cannot find the 'Pay' button. What should the designer do?",
+                        "option_a": "Tell the user where it is and move on",
+                        "option_b": "Note it as a usability issue and improve the design",
+                        "option_c": "Say the user is careless",
+                        "option_d": "Ignore it, one user is not enough",
+                        "correct_option": "b"
+            },
+            {
+                        "order_index": 16,
+                        "question_text": "Your paper prototype failed its first test. The Design Thinking mindset treats this as:",
+                        "option_a": "A failure to hide",
+                        "option_b": "Cheap learning to improve the next version",
+                        "option_c": "Proof the idea is bad",
+                        "option_d": "A sign to quit",
+                        "correct_option": "b"
+            },
+            {
+                        "order_index": 17,
+                        "question_text": "Users love your idea but it costs 10x what they can pay. Which lens fails?",
+                        "option_a": "Desirability",
+                        "option_b": "Feasibility",
+                        "option_c": "Viability",
+                        "option_d": "None",
+                        "correct_option": "c"
+            },
+            {
+                        "order_index": 18,
+                        "question_text": "What is the best MVP for a hostel food-delivery idea?",
+                        "option_a": "A full app with payments and tracking",
+                        "option_b": "A WhatsApp group taking orders and delivering manually for a week",
+                        "option_c": "A logo and brand name",
+                        "option_d": "A 20-page business plan",
+                        "correct_option": "b"
+            },
+            {
+                        "order_index": 19,
+                        "question_text": "Which is NOT a Design Thinking activity?",
+                        "option_a": "Shadowing users",
+                        "option_b": "Sketching ideas",
+                        "option_c": "Fixing the solution first and finding users to agree",
+                        "option_d": "Testing a prototype",
+                        "correct_option": "c"
+            }
+];
+
+      const { data: existing } = await HQ_SUPABASE.from('quizzes')
+        .select('id')
+        .eq('title', 'RNSIT Pre Assesment')
+        .eq('created_by', State.user.id);
+
+      if (existing && existing.length > 0) {
+        if (!confirm('RNSIT Pre Assesment already exists in your account. Do you want to import another copy?')) {
+          return;
+        }
+      }
+
+      const { data: qz, error: qzErr } = await HQ_SUPABASE.from('quizzes')
+        .insert([{ title: 'RNSIT Pre Assesment', created_by: State.user.id }])
+        .select().single();
+
+      if (qzErr) throw qzErr;
+
+      const questionsToInsert = questionsData.map(q => ({
+        order_index: q.order_index,
+        question_text: q.question_text,
+        option_a: q.option_a,
+        option_b: q.option_b,
+        option_c: q.option_c,
+        option_d: q.option_d,
+        correct_option: q.correct_option,
+        quiz_id: qz.id
+      }));
+
+      const { error: questErr } = await HQ_SUPABASE.from('questions').insert(questionsToInsert);
+      if (questErr) throw questErr;
+
+      await loadQuizList();
+      alert('Success! RNSIT Pre-Assessment has been imported into your account.');
+    } catch (err) {
+      alert('Error importing quiz: ' + err.message);
+    } finally {
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }
+  });
+
   document.getElementById('template-vtu-btn')?.addEventListener('click', async (e) => {
     const btn = e.target;
     const originalText = btn.textContent;
