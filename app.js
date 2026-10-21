@@ -345,24 +345,6 @@ async function showDashboard() {
             },
             {
                         "order_index": 4,
-                        "question_text": "In an empathy map, 'checks phone every 2 minutes' belongs under which quadrant?",
-                        "option_a": "Says",
-                        "option_b": "Thinks",
-                        "option_c": "Does",
-                        "option_d": "Feels",
-                        "correct_option": "c"
-            },
-            {
-                        "order_index": 5,
-                        "question_text": "Which is a good, solution-free problem statement?",
-                        "option_a": "We need an app for farmers",
-                        "option_b": "Farmers lose crops because they learn of rain only after it starts",
-                        "option_c": "Build a drone to spray water",
-                        "option_d": "Farmers are poor at using technology",
-                        "correct_option": "b"
-            },
-            {
-                        "order_index": 6,
                         "question_text": "Which is a well-framed 'How Might We' question?",
                         "option_a": "HMW build a mobile app for hostel food?",
                         "option_b": "HMW help hostel students get hot meals without long queues?",
@@ -371,7 +353,7 @@ async function showDashboard() {
                         "correct_option": "b"
             },
             {
-                        "order_index": 7,
+                        "order_index": 5,
                         "question_text": "Designing a ramp for a college library: who is a SECONDARY stakeholder?",
                         "option_a": "Wheelchair-using students",
                         "option_b": "Library staff who help and maintain it",
@@ -380,7 +362,7 @@ async function showDashboard() {
                         "correct_option": "b"
             },
             {
-                        "order_index": 8,
+                        "order_index": 6,
                         "question_text": "Which statement is an observation, not an assumption?",
                         "option_a": "Users hate the app",
                         "option_b": "Three users quit at the payment screen",
@@ -389,7 +371,7 @@ async function showDashboard() {
                         "correct_option": "b"
             },
             {
-                        "order_index": 9,
+                        "order_index": 7,
                         "question_text": "Which is the best interview question to learn how a user buys vegetables?",
                         "option_a": "Do you like vegetables?",
                         "option_b": "Don't you think the market is dirty?",
@@ -398,7 +380,7 @@ async function showDashboard() {
                         "correct_option": "c"
             },
             {
-                        "order_index": 10,
+                        "order_index": 8,
                         "question_text": "Student is late daily. Why 1: the bus is late. What is the best next 5 Why question?",
                         "option_a": "Why do students never wake up?",
                         "option_b": "Why is the bus late?",
@@ -407,16 +389,7 @@ async function showDashboard() {
                         "correct_option": "b"
             },
             {
-                        "order_index": 11,
-                        "question_text": "Which rule helps a brainstorm produce the most ideas?",
-                        "option_a": "Criticize weak ideas quickly",
-                        "option_b": "Defer judgement and go for quantity",
-                        "option_c": "Let the senior member speak first",
-                        "option_d": "Pick one idea early",
-                        "correct_option": "b"
-            },
-            {
-                        "order_index": 12,
+                        "order_index": 9,
                         "question_text": "What does the 'Crazy 8s' method ask you to do?",
                         "option_a": "Sketch 8 ideas in 8 minutes",
                         "option_b": "Vote 8 times",
@@ -425,7 +398,7 @@ async function showDashboard() {
                         "correct_option": "a"
             },
             {
-                        "order_index": 13,
+                        "order_index": 10,
                         "question_text": "Why build a cardboard model before the final product?",
                         "option_a": "To impress investors",
                         "option_b": "To learn cheaply what works and what does not",
@@ -434,7 +407,7 @@ async function showDashboard() {
                         "correct_option": "b"
             },
             {
-                        "order_index": 14,
+                        "order_index": 11,
                         "question_text": "A hand-drawn app screen with sticky-note buttons is what type of prototype?",
                         "option_a": "Low-fidelity",
                         "option_b": "Mid-fidelity",
@@ -443,43 +416,16 @@ async function showDashboard() {
                         "correct_option": "a"
             },
             {
-                        "order_index": 15,
-                        "question_text": "In a test, a user cannot find the 'Pay' button. What should the designer do?",
-                        "option_a": "Tell the user where it is and move on",
-                        "option_b": "Note it as a usability issue and improve the design",
-                        "option_c": "Say the user is careless",
-                        "option_d": "Ignore it, one user is not enough",
-                        "correct_option": "b"
+                        "order_index": 12,
+                        "question_text": "What is a Minimum Viable Product (MVP)?",
+                        "option_a": "The simplest version built to test assumptions with real users",
+                        "option_b": "A complete product with all features ready for market launch",
+                        "option_c": "A business plan and financial forecast",
+                        "option_d": "A visual logo and brand design",
+                        "correct_option": "a"
             },
             {
-                        "order_index": 16,
-                        "question_text": "Your paper prototype failed its first test. The Design Thinking mindset treats this as:",
-                        "option_a": "A failure to hide",
-                        "option_b": "Cheap learning to improve the next version",
-                        "option_c": "Proof the idea is bad",
-                        "option_d": "A sign to quit",
-                        "correct_option": "b"
-            },
-            {
-                        "order_index": 17,
-                        "question_text": "Users love your idea but it costs 10x what they can pay. Which lens fails?",
-                        "option_a": "Desirability",
-                        "option_b": "Feasibility",
-                        "option_c": "Viability",
-                        "option_d": "None",
-                        "correct_option": "c"
-            },
-            {
-                        "order_index": 18,
-                        "question_text": "What is the best MVP for a hostel food-delivery idea?",
-                        "option_a": "A full app with payments and tracking",
-                        "option_b": "A WhatsApp group taking orders and delivering manually for a week",
-                        "option_c": "A logo and brand name",
-                        "option_d": "A 20-page business plan",
-                        "correct_option": "b"
-            },
-            {
-                        "order_index": 19,
+                        "order_index": 13,
                         "question_text": "Which is NOT a Design Thinking activity?",
                         "option_a": "Shadowing users",
                         "option_b": "Sketching ideas",
