@@ -1613,6 +1613,7 @@ async function hostShowReveal(questionId) {
 async function hostShowFinalLeaderboard() {
   await HQ_SUPABASE.from('game_sessions').update({ status: 'finished' }).eq('id', State.session.id);
   State.session.status = 'finished';
+  if (window.va) { try { window.va('event', { name: 'quiz_finished' }); } catch (_) {} }
 
   await broadcastGameEvent('game:finished');
 
@@ -1811,6 +1812,7 @@ async function joinSession(pin, name, btn) {
 
   State.playerSelf = player;
   State.session    = session;
+  if (window.va) { try { window.va('event', { name: 'student_joined' }); } catch (_) {} }
 
   setLoading(btn, false);
   
