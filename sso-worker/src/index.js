@@ -3,6 +3,7 @@
 // Passes &server= param so the frontend knows which backend to connect to.
 
 const HUB_MAP = {
+  admin:      { email: 'admin@comedkares.org',         password: '@*QWqnkfV&zc1!'  },
   yelahanka:  { email: 'blryelahanka.hub@comedkares.org',   password: 'tDPt&b*nO!@V1!'  },
   tumkur:     { email: 'internship@erafoundationindia.org',  password: 'dQc2jlaF9MqO1!'  },
   jpnagar:    { email: 'blrjpnagar.hub@comedkares.org',     password: 'FCApyCD0C57J1!'  },

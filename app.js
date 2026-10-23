@@ -94,9 +94,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       HQ_SUPABASE.auth.onAuthStateChange((_event, session) => {
         State.user = session?.user ?? null;
       });
-      console.log('[SSO] Success! Navigating to /host');
+      console.log('[SSO] Success! Navigating to dashboard');
       injectServerBadge();
-      navigate('/host');
+      if (State.user?.email?.toLowerCase() === 'admin@comedkares.org') {
+        navigate('/admin');
+      } else {
+        navigate('/host');
+      }
     } else {
       console.warn('[SSO] setSession failed:', error?.message);
       navigate('/login');
@@ -133,7 +137,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function showJoinOrDashboard() {
   if (State.user) {
-    navigate('/host');
+    if (State.user.email?.toLowerCase() === 'admin@comedkares.org') {
+      navigate('/admin');
+    } else {
+      navigate('/host');
+    }
   } else {
     navigate('/play');
   }
@@ -145,10 +153,17 @@ function showLogin() {
   const signupLink = document.getElementById('show-signup');
   const signupForm = document.getElementById('signup-form');
   const backLink = document.getElementById('back-to-login');
+  const toggleBtn = document.getElementById('toggle-password-btn');
+  const passwordInput = document.getElementById('login-password');
+  toggleBtn?.addEventListener('click', () => {
+    const isPass = passwordInput.type === 'password';
+    passwordInput.type = isPass ? 'text' : 'password';
+    toggleBtn.textContent = isPass ? '🙈' : '👁️';
+  });
 
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email    = document.getElementById('login-email').value.trim();
+    const email    = document.getElementById('login-email').value.trim().toLowerCase();
     const password = document.getElementById('login-password').value;
     const btn      = document.getElementById('login-btn');
     setLoading(btn, true);
@@ -162,7 +177,11 @@ function showLogin() {
       } else {
         const { data: { session } } = await HQ_SUPABASE.auth.getSession();
         State.user = session?.user;
-        navigate('/host');
+        if (State.user?.email?.toLowerCase() === 'admin@comedkares.org') {
+          navigate('/admin');
+        } else {
+          navigate('/host');
+        }
       }
     } catch (err) {
       setLoading(btn, false);
