@@ -74,7 +74,7 @@ async function checkPrimaryHealth() {
   const primary = HQ_SERVERS.jpnagar;
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
 
     const res = await fetch(primary.url + '/rest/v1/', {
       method: 'HEAD',
