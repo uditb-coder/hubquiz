@@ -147,8 +147,42 @@ function showJoinOrDashboard() {
   }
 }
 
-function showLogin() {
+async function showLogin() {
+  // If user is already authenticated, route them immediately
+  if (!State.user) {
+    try {
+      const { data: { session } } = await HQ_SUPABASE.auth.getSession();
+      if (session?.user) {
+        State.user = session.user;
+      }
+    } catch (_) {}
+  }
+  if (State.user) {
+    if (State.user.email?.toLowerCase() === 'admin@comedkares.org') {
+      navigate('/admin');
+      return;
+    } else {
+      navigate('/host');
+      return;
+    }
+  }
+
   renderView('login');
+  const serverKey = window.HQ_ACTIVE_SERVER || 'cloud';
+  const serverEl = document.getElementById('login-server-name');
+  const switchLink = document.getElementById('login-switch-server-link');
+  if (serverEl) {
+    serverEl.textContent = serverKey === 'jpnagar' ? '🟢 JP Nagar (Local)' : '🟠 Cloud';
+    serverEl.style.color = serverKey === 'jpnagar' ? '#10b981' : '#f59e0b';
+  }
+  if (switchLink) {
+    const target = serverKey === 'jpnagar' ? 'cloud' : 'jpnagar';
+    switchLink.textContent = `Switch to ${target === 'jpnagar' ? 'JP Nagar' : 'Cloud'}`;
+    switchLink.onclick = (e) => {
+      e.preventDefault();
+      window.switchServer(target);
+    };
+  }
   const form = document.getElementById('login-form');
   const signupLink = document.getElementById('show-signup');
   const signupForm = document.getElementById('signup-form');
@@ -170,18 +204,30 @@ function showLogin() {
     clearError('login-error');
 
     try {
-      const { error } = await HQ_SUPABASE.auth.signInWithPassword({ email, password });
+      const { data, error } = await HQ_SUPABASE.auth.signInWithPassword({ email, password });
       setLoading(btn, false);
       if (error) {
         showError('login-error', error.message);
+        return;
+      }
+
+      const user = data?.user || data?.session?.user;
+      if (user) {
+        State.user = user;
       } else {
-        const { data: { session } } = await HQ_SUPABASE.auth.getSession();
-        State.user = session?.user;
-        if (State.user?.email?.toLowerCase() === 'admin@comedkares.org') {
-          navigate('/admin');
-        } else {
-          navigate('/host');
-        }
+        const { data: sessionData } = await HQ_SUPABASE.auth.getSession();
+        State.user = sessionData?.session?.user;
+      }
+
+      if (!State.user) {
+        showError('login-error', 'Login succeeded but user profile was not found. Please refresh.');
+        return;
+      }
+
+      if (State.user.email?.toLowerCase() === 'admin@comedkares.org') {
+        navigate('/admin');
+      } else {
+        navigate('/host');
       }
     } catch (err) {
       setLoading(btn, false);
@@ -239,9 +285,18 @@ function showLogin() {
 // ============================================================
 
 async function showDashboard() {
+  if (!State.user) {
+    try {
+      const { data: { session } } = await HQ_SUPABASE.auth.getSession();
+      if (session?.user) {
+        State.user = session.user;
+      }
+    } catch (_) {}
+  }
+
   if (!State.user) { navigate('/login'); return; }
 
-  if (State.user.email === 'admin@comedkares.org') {
+  if (State.user.email?.toLowerCase() === 'admin@comedkares.org') {
     navigate('/admin');
     return;
   }
@@ -2499,7 +2554,15 @@ function injectServerBadge() {
   document.querySelectorAll('.dash-header-actions').forEach(headerActions => {
     const badge = document.createElement('div');
     badge.className = `server-badge ${cssClass}`;
-    badge.innerHTML = `<span class="server-dot"></span>${serverName}`;
+    badge.style.cursor = 'pointer';
+    badge.title = 'Click to switch server';
+    badge.innerHTML = `<span class="server-dot"></span>${serverName} <span style="font-size:0.65rem; opacity:0.75; margin-left:4px;">⇄</span>`;
+    badge.onclick = () => {
+      const target = serverKey === 'jpnagar' ? 'cloud' : 'jpnagar';
+      if (confirm(`Switch connection to ${target === 'jpnagar' ? 'JP Nagar (Local)' : 'Cloud'} server?`)) {
+        window.switchServer(target);
+      }
+    };
     headerActions.insertBefore(badge, headerActions.firstChild);
   });
 }
@@ -2526,8 +2589,18 @@ const HUB_EMAIL_MAP = {
 };
 
 async function showAdminDashboard() {
+  if (!State.user) {
+    try {
+      const { data: { session } } = await HQ_SUPABASE.auth.getSession();
+      if (session?.user) {
+        State.user = session.user;
+      }
+    } catch (_) {}
+  }
+
   if (!State.user) { navigate('/login'); return; }
-  if (State.user.email !== 'admin@comedkares.org') {
+
+  if (State.user.email?.toLowerCase() !== 'admin@comedkares.org') {
     console.warn('[Admin] Access denied. Redirecting to /host.');
     navigate('/host');
     return;

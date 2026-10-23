@@ -29,12 +29,30 @@ const CLOUD_REALTIME_LIMIT = 200;
 async function initSupabase(forceServer) {
   let serverKey;
 
+  // 1. Check URL parameter (?server=jpnagar or ?server=cloud)
+  const urlParam = new URLSearchParams(window.location.search).get('server');
+
+  // 2. Check saved user preference in localStorage
+  const savedServer = localStorage.getItem('hq_forced_server');
+
   if (forceServer && HQ_SERVERS[forceServer]) {
-    // SSO Worker told us which server the token was minted on
     serverKey = forceServer;
-    console.log(`[Failover] Forced server: ${forceServer} (from SSO)`);
+    localStorage.setItem('hq_forced_server', forceServer);
+    console.log(`[Failover] Forced server from SSO: ${forceServer}`);
+  } else if (urlParam && HQ_SERVERS[urlParam]) {
+    serverKey = urlParam;
+    localStorage.setItem('hq_forced_server', urlParam);
+    console.log(`[Failover] Forced server from URL: ${urlParam}`);
+  } else if (savedServer && HQ_SERVERS[savedServer]) {
+    // If user explicitly chose JP Nagar, verify it is reachable first
+    if (savedServer === 'jpnagar') {
+      serverKey = await checkPrimaryHealth();
+    } else {
+      serverKey = 'cloud';
+    }
+    console.log(`[Failover] Using saved server preference: ${serverKey}`);
   } else {
-    // Auto-detect: try JP Nagar with 3s timeout
+    // Auto-detect: check JP Nagar
     serverKey = await checkPrimaryHealth();
   }
 
@@ -68,33 +86,44 @@ async function initSupabase(forceServer) {
 
 /**
  * Check if the JP Nagar primary server is reachable.
+ * Uses /auth/v1/health which has open CORS and doesn't require an API key.
  * Returns 'jpnagar' if alive, 'cloud' if unreachable.
  */
 async function checkPrimaryHealth() {
   const primary = HQ_SERVERS.jpnagar;
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-    const res = await fetch(primary.url + '/rest/v1/', {
-      method: 'HEAD',
+    const res = await fetch(primary.url + '/auth/v1/health', {
+      method: 'GET',
       headers: {
         ...primary.extraHeaders,
-        'apikey': primary.anonKey,
       },
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
 
-    if (res.ok || res.status === 404 || res.status === 406) {
-      // Server is alive (404/406 is fine, it means PostgREST responded)
-      console.log('[Failover] JP Nagar is ONLINE');
+    if (res.ok) {
+      console.log('[Failover] JP Nagar is ONLINE (/auth/v1/health OK)');
       return 'jpnagar';
     }
-    console.warn('[Failover] JP Nagar returned unexpected status:', res.status);
+    console.warn('[Failover] JP Nagar returned status:', res.status);
     return 'cloud';
   } catch (err) {
     console.warn('[Failover] JP Nagar is OFFLINE:', err.message);
     return 'cloud';
   }
 }
+
+/**
+ * Manual Server Switcher helper
+ */
+window.switchServer = function(target) {
+  const current = window.HQ_ACTIVE_SERVER || 'cloud';
+  const next = target || (current === 'jpnagar' ? 'cloud' : 'jpnagar');
+  localStorage.setItem('hq_forced_server', next);
+  const url = new URL(window.location.href);
+  url.searchParams.set('server', next);
+  window.location.href = url.toString();
+};
