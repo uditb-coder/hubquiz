@@ -22,44 +22,14 @@ const HQ_SERVERS = {
 const CLOUD_REALTIME_LIMIT = 200;
 
 /**
- * Initialize Supabase client with automatic failover.
- * @param {string|null} forceServer - 'jpnagar' or 'cloud' to skip health check (used by SSO)
- * @returns {Promise<object>} The initialized Supabase client
+ * Helper to construct a Supabase client for a given server configuration.
  */
-async function initSupabase(forceServer) {
-  let serverKey;
-
-  // 1. Check URL parameter (?server=jpnagar or ?server=cloud)
-  const urlParam = new URLSearchParams(window.location.search).get('server');
-
-  // 2. Check saved user preference in localStorage
-  const savedServer = localStorage.getItem('hq_forced_server');
-
-  if (forceServer && HQ_SERVERS[forceServer]) {
-    serverKey = forceServer;
-    localStorage.setItem('hq_forced_server', forceServer);
-    console.log(`[Failover] Forced server from SSO: ${forceServer}`);
-  } else if (urlParam && HQ_SERVERS[urlParam]) {
-    serverKey = urlParam;
-    localStorage.setItem('hq_forced_server', urlParam);
-    console.log(`[Failover] Forced server from URL: ${urlParam}`);
-  } else if (savedServer && HQ_SERVERS[savedServer]) {
-    // If user explicitly chose JP Nagar, verify it is reachable first
-    if (savedServer === 'jpnagar') {
-      serverKey = await checkPrimaryHealth();
-    } else {
-      serverKey = 'cloud';
-    }
-    console.log(`[Failover] Using saved server preference: ${serverKey}`);
-  } else {
-    // Auto-detect: check JP Nagar
-    serverKey = await checkPrimaryHealth();
+function createHQClient(server) {
+  if (typeof window === 'undefined' || !window.supabase) {
+    console.error('[Failover] Supabase SDK script not loaded yet');
+    return null;
   }
-
-  const server = HQ_SERVERS[serverKey];
-  console.log(`[Failover] Connecting to: ${server.name} (${server.url})`);
-
-  const client = window.supabase.createClient(server.url, server.anonKey, {
+  return window.supabase.createClient(server.url, server.anonKey, {
     global: {
       headers: { ...server.extraHeaders },
     },
@@ -74,14 +44,71 @@ async function initSupabase(forceServer) {
       },
     },
   });
+}
 
-  // Expose globally
-  window.HQ_SUPABASE = client;
-  window.HQ_ACTIVE_SERVER = serverKey;
-  window.HQ_SERVER_NAME   = server.name;
-  window.HQ_SERVER_URL    = server.url;
+// ------------------------------------------------------------
+// Synchronous initial client
+// Ensures HQ_SUPABASE and window.HQ_SUPABASE are NEVER undefined
+// ------------------------------------------------------------
+const _initialParam = (typeof window !== 'undefined' && window.location) 
+  ? new URLSearchParams(window.location.search).get('server') 
+  : null;
+const _initialSaved = (typeof localStorage !== 'undefined') 
+  ? localStorage.getItem('hq_forced_server') 
+  : null;
+const _initialKey = (_initialParam && HQ_SERVERS[_initialParam]) 
+  ? _initialParam 
+  : ((_initialSaved && HQ_SERVERS[_initialSaved]) ? _initialSaved : 'jpnagar');
+const _initialServerObj = HQ_SERVERS[_initialKey] || HQ_SERVERS.jpnagar;
 
-  return client;
+var HQ_SUPABASE = createHQClient(_initialServerObj);
+window.HQ_SUPABASE = HQ_SUPABASE;
+window.HQ_ACTIVE_SERVER = _initialKey;
+window.HQ_SERVER_NAME = _initialServerObj.name;
+window.HQ_SERVER_URL = _initialServerObj.url;
+
+/**
+ * Initialize Supabase client with automatic failover.
+ * @param {string|null} forceServer - 'jpnagar' or 'cloud' to skip health check (used by SSO)
+ * @returns {Promise<object>} The initialized Supabase client
+ */
+async function initSupabase(forceServer) {
+  let serverKey;
+
+  // 1. Check URL parameter (?server=jpnagar or ?server=cloud)
+  const urlParam = (typeof window !== 'undefined' && window.location) 
+    ? new URLSearchParams(window.location.search).get('server') 
+    : null;
+
+  if (forceServer && HQ_SERVERS[forceServer]) {
+    serverKey = forceServer;
+    localStorage.setItem('hq_forced_server', forceServer);
+    console.log(`[Failover] Forced server from parameter: ${forceServer}`);
+  } else if (urlParam && HQ_SERVERS[urlParam]) {
+    serverKey = urlParam;
+    localStorage.setItem('hq_forced_server', urlParam);
+    console.log(`[Failover] Forced server from URL: ${urlParam}`);
+  } else {
+    // Normal mentors / auto-detect: check JP Nagar health
+    serverKey = await checkPrimaryHealth();
+  }
+
+  const server = HQ_SERVERS[serverKey];
+  console.log(`[Failover] Connecting to: ${server.name} (${server.url})`);
+
+  // Update client if server changed or client missing
+  if (serverKey !== window.HQ_ACTIVE_SERVER || !HQ_SUPABASE) {
+    const client = createHQClient(server);
+    HQ_SUPABASE = client;
+    window.HQ_SUPABASE = client;
+    window.HQ_ACTIVE_SERVER = serverKey;
+    window.HQ_SERVER_NAME   = server.name;
+    window.HQ_SERVER_URL    = server.url;
+  } else {
+    console.log(`[Failover] Active server confirmed: ${window.HQ_SERVER_NAME}`);
+  }
+
+  return window.HQ_SUPABASE;
 }
 
 /**
@@ -93,7 +120,7 @@ async function checkPrimaryHealth() {
   const primary = HQ_SERVERS.jpnagar;
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
 
     const res = await fetch(primary.url + '/auth/v1/health', {
       method: 'GET',
@@ -117,7 +144,7 @@ async function checkPrimaryHealth() {
 }
 
 /**
- * Manual Server Switcher helper
+ * Manual Server Switcher helper (Used by Admin)
  */
 window.switchServer = function(target) {
   const current = window.HQ_ACTIVE_SERVER || 'cloud';

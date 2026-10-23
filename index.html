@@ -59,7 +59,7 @@
           </div>
         </div>
         <div id="login-error" class="form-msg error" role="alert"></div>
-        <div id="login-server-indicator" style="text-align: center; margin: 4px 0 10px 0; font-size: 0.8rem; color: var(--grey-500);">
+        <div id="login-server-indicator" style="display: none; text-align: center; margin: 4px 0 10px 0; font-size: 0.8rem; color: var(--grey-500);">
           Server: <span id="login-server-name" style="font-weight: 600;">...</span> 
           (<a href="#" id="login-switch-server-link" style="color: var(--navy); text-decoration: underline; font-weight: 500;">Switch</a>)
         </div>
@@ -116,6 +116,7 @@
     <div class="admin-server-status">
       <span id="admin-server-dot" class="server-dot-lg"></span>
       <span id="admin-server-label" class="admin-server-label">Detecting server...</span>
+      <button id="admin-switch-server-btn" class="btn btn-sm" style="margin-left: auto; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #e2e8f0; font-size: 0.8rem; padding: 6px 14px; border-radius: 8px; cursor: pointer;">Switch Server</button>
     </div>
 
     <!-- Stats Cards -->

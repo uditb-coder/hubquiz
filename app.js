@@ -1,9 +1,10 @@
 // ============================================================
-// app.js — HubQuiz Main Application
+// app.js - HubQuiz Main Application
 // Router + Auth + Host Game Logic + Student Game Logic
 // ============================================================
 
-/* global HQ_SUPABASE, AudioEngine, Confetti */
+/* global AudioEngine, Confetti */
+var HQ_SUPABASE = window.HQ_SUPABASE;
 
 // ---- Constants ----
 const QUESTION_TIME = 30; // seconds (global, fixed)
@@ -183,6 +184,20 @@ async function showLogin() {
       window.switchServer(target);
     };
   }
+  const serverIndicator = document.getElementById('login-server-indicator');
+  const emailInput = document.getElementById('login-email');
+
+  function checkAdminLoginVisibility() {
+    const email = (emailInput?.value || '').trim().toLowerCase();
+    if (serverIndicator) {
+      serverIndicator.style.display = (email === 'admin@comedkares.org') ? 'block' : 'none';
+    }
+  }
+
+  emailInput?.addEventListener('input', checkAdminLoginVisibility);
+  emailInput?.addEventListener('change', checkAdminLoginVisibility);
+  checkAdminLoginVisibility();
+
   const form = document.getElementById('login-form');
   const signupLink = document.getElementById('show-signup');
   const signupForm = document.getElementById('signup-form');
@@ -2538,6 +2553,11 @@ function injectServerBadge() {
   // Remove any existing badge first
   document.querySelectorAll('.server-badge').forEach(el => el.remove());
 
+  // Only allow admin@comedkares.org to see and use the server switch badge
+  if (State.user?.email?.toLowerCase() !== 'admin@comedkares.org') {
+    return;
+  }
+
   const serverKey = window.HQ_ACTIVE_SERVER || 'cloud';
   let serverName  = window.HQ_SERVER_NAME   || 'Cloud';
 
@@ -2619,6 +2639,17 @@ async function showAdminDashboard() {
   }
   if (labelEl) {
     labelEl.textContent = `Connected to: ${serverName} Server`;
+  }
+
+  const switchBtn = document.getElementById('admin-switch-server-btn');
+  if (switchBtn) {
+    const target = serverKey === 'jpnagar' ? 'cloud' : 'jpnagar';
+    switchBtn.textContent = `Switch to ${target === 'jpnagar' ? 'JP Nagar' : 'Cloud'}`;
+    switchBtn.onclick = () => {
+      if (confirm(`Switch connection to ${target === 'jpnagar' ? 'JP Nagar (Local)' : 'Cloud'} server?`)) {
+        window.switchServer(target);
+      }
+    };
   }
 
   // Fetch and render stats
