@@ -1,6 +1,6 @@
 // ============================================================
 // supabase.js - Supabase client with automatic failover
-// Tries JP Nagar (local) first, falls back to Cloud if unreachable
+// Resilient dual-tier architecture: Cloud (primary/fallback) + JP Nagar
 // ============================================================
 
 const HQ_SERVERS = {
@@ -48,7 +48,7 @@ function createHQClient(server) {
 
 // ------------------------------------------------------------
 // Synchronous initial client
-// Ensures HQ_SUPABASE and window.HQ_SUPABASE are NEVER undefined
+// Cloud is default high-availability tier unless explicitly requested
 // ------------------------------------------------------------
 const _initialParam = (typeof window !== 'undefined' && window.location) 
   ? new URLSearchParams(window.location.search).get('server') 
@@ -58,11 +58,25 @@ const _initialSaved = (typeof localStorage !== 'undefined')
   : null;
 const _initialKey = (_initialParam && HQ_SERVERS[_initialParam]) 
   ? _initialParam 
-  : ((_initialSaved && HQ_SERVERS[_initialSaved]) ? _initialSaved : 'jpnagar');
-const _initialServerObj = HQ_SERVERS[_initialKey] || HQ_SERVERS.jpnagar;
+  : ((_initialSaved && HQ_SERVERS[_initialSaved]) ? _initialSaved : 'cloud');
+const _initialServerObj = HQ_SERVERS[_initialKey] || HQ_SERVERS.cloud;
 
-var HQ_SUPABASE = createHQClient(_initialServerObj);
-window.HQ_SUPABASE = HQ_SUPABASE;
+let _activeClient = createHQClient(_initialServerObj);
+window._HQ_ACTIVE_CLIENT = _activeClient;
+
+// Define dynamic getter so HQ_SUPABASE and window.HQ_SUPABASE ALWAYS
+// point to the current active client and never get shadowed
+try {
+  Object.defineProperty(window, 'HQ_SUPABASE', {
+    get() { return window._HQ_ACTIVE_CLIENT; },
+    set(c) { window._HQ_ACTIVE_CLIENT = c; },
+    configurable: true,
+  });
+} catch (_) {
+  window.HQ_SUPABASE = _activeClient;
+}
+var HQ_SUPABASE = _activeClient;
+
 window.HQ_ACTIVE_SERVER = _initialKey;
 window.HQ_SERVER_NAME = _initialServerObj.name;
 window.HQ_SERVER_URL = _initialServerObj.url;
@@ -75,9 +89,11 @@ window.HQ_SERVER_URL = _initialServerObj.url;
 async function initSupabase(forceServer) {
   let serverKey;
 
-  // 1. Check URL parameter (?server=jpnagar or ?server=cloud)
   const urlParam = (typeof window !== 'undefined' && window.location) 
     ? new URLSearchParams(window.location.search).get('server') 
+    : null;
+  const savedServer = (typeof localStorage !== 'undefined') 
+    ? localStorage.getItem('hq_forced_server') 
     : null;
 
   if (forceServer && HQ_SERVERS[forceServer]) {
@@ -88,8 +104,16 @@ async function initSupabase(forceServer) {
     serverKey = urlParam;
     localStorage.setItem('hq_forced_server', urlParam);
     console.log(`[Failover] Forced server from URL: ${urlParam}`);
+  } else if (savedServer && HQ_SERVERS[savedServer]) {
+    // If user previously set a preference, verify or use it
+    if (savedServer === 'jpnagar') {
+      serverKey = await checkPrimaryHealth();
+    } else {
+      serverKey = 'cloud';
+    }
   } else {
-    // Normal mentors / auto-detect: check JP Nagar health
+    // Auto-detect: if JP Nagar is healthy within 2.5s, connect to local hub
+    // Otherwise, seamlessly use Cloud
     serverKey = await checkPrimaryHealth();
   }
 
@@ -97,10 +121,11 @@ async function initSupabase(forceServer) {
   console.log(`[Failover] Connecting to: ${server.name} (${server.url})`);
 
   // Update client if server changed or client missing
-  if (serverKey !== window.HQ_ACTIVE_SERVER || !HQ_SUPABASE) {
+  if (serverKey !== window.HQ_ACTIVE_SERVER || !window.HQ_SUPABASE) {
     const client = createHQClient(server);
-    HQ_SUPABASE = client;
+    window._HQ_ACTIVE_CLIENT = client;
     window.HQ_SUPABASE = client;
+    HQ_SUPABASE = client;
     window.HQ_ACTIVE_SERVER = serverKey;
     window.HQ_SERVER_NAME   = server.name;
     window.HQ_SERVER_URL    = server.url;
@@ -114,13 +139,13 @@ async function initSupabase(forceServer) {
 /**
  * Check if the JP Nagar primary server is reachable.
  * Uses /auth/v1/health which has open CORS and doesn't require an API key.
- * Returns 'jpnagar' if alive, 'cloud' if unreachable.
+ * Returns 'jpnagar' if alive within 2500ms, 'cloud' if unreachable or slow.
  */
 async function checkPrimaryHealth() {
   const primary = HQ_SERVERS.jpnagar;
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    const timeoutId = setTimeout(() => controller.abort(), 2500);
 
     const res = await fetch(primary.url + '/auth/v1/health', {
       method: 'GET',

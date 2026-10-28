@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>HubQuiz — Live Quiz by ComedKares</title>
-  <meta name="description" content="HubQuiz is a live Kahoot-style quiz platform by ComedKares. Mentors host, students play on their phones — real-time, no accounts needed.">
+  <base href="/">
+  <title>HubQuiz - Live Quiz by ComedKares</title>
+  <meta name="description" content="HubQuiz is a live Kahoot-style quiz platform by ComedKares. Mentors host, students play on their phones - real-time, no accounts needed.">
   <meta name="theme-color" content="#0F1B35">
 
   <!-- Open Graph -->
@@ -13,13 +14,13 @@
   <meta property="og:type" content="website">
 
   <!-- Supabase Library (Self-Hosted to avoid ISP blocking) -->
-  <script src="assets/supabase-js.min.js"></script>
+  <script src="/assets/supabase-js.min.js"></script>
 
   <!-- App styles -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/style.css">
 
   <!-- Favicon -->
-  <link rel="icon" href="assets/favicon.png" type="image/png">
+  <link rel="icon" href="/assets/favicon.png" type="image/png">
   <!-- Vercel Web Analytics & Speed Insights -->
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
@@ -38,7 +39,7 @@
 
     <!-- Logo + branding -->
     <div class="login-logo-wrap">
-      <img src="assets/logo.png" alt="ComedKares" style="max-height: 80px; margin-bottom: 12px;">
+      <img src="/assets/logo.png" alt="ComedKares" style="max-height: 80px; margin-bottom: 12px;">
       <div class="login-brand-name">COMEDKARES</div>
       <div class="login-hubquiz">HubQuiz</div>
     </div>
@@ -46,7 +47,7 @@
     <!-- Login panel -->
     <div id="login-panel" class="login-card">
       <div class="login-form-title">Mentor Sign In</div>
-      <form id="login-form" class="login-stack">
+      <form id="login-form" class="login-stack" onsubmit="event.preventDefault();">
         <div class="form-group">
           <label class="form-label" for="login-email">Email</label>
           <input type="email" id="login-email" class="input-field" placeholder="you@example.com" autocomplete="email" required>
@@ -73,7 +74,7 @@
     <!-- Sign-up panel (hidden by default) -->
     <div id="signup-panel" class="login-card hidden">
       <div class="login-form-title">Create Mentor Account</div>
-      <form id="signup-form" class="login-stack">
+      <form id="signup-form" class="login-stack" onsubmit="event.preventDefault();">
         <div class="form-group">
           <label class="form-label" for="signup-name">Display Name</label>
           <input type="text" id="signup-name" class="input-field" placeholder="Your name" autocomplete="name" required>
@@ -189,7 +190,7 @@
   <div id="quiz-modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal-box">
       <h2 id="modal-title" class="modal-title">Quiz</h2>
-      <form id="quiz-modal-form">
+      <form id="quiz-modal-form" onsubmit="event.preventDefault();">
         <div class="form-group">
           <label class="form-label" for="qm-title">Quiz Title</label>
           <input type="text" id="qm-title" class="input-field" placeholder="e.g. Python Basics Q1" required>
@@ -247,7 +248,7 @@
 
   <div class="lobby-content">
     <div class="lobby-hubquiz-logo" style="display:flex;align-items:center;justify-content:center;gap:12px;">
-      <img src="assets/logo.png" alt="Logo" style="height:48px;">
+      <img src="/assets/logo.png" alt="Logo" style="height:48px;">
       <span style="color:var(--navy);"><span style="color:var(--navy);">Hub</span><span style="color:var(--yellow);">Quiz</span></span>
     </div>
     <div class="lobby-quiz-title" id="lobby-quiz-title">Quiz Title</div>
@@ -407,12 +408,12 @@
 <section id="view-student-join" class="view hidden">
   <div class="join-card">
     <div class="join-logo">
-      <img src="assets/logo.png" alt="ComedKares" style="max-height: 80px; margin-bottom: 16px;">
+      <img src="/assets/logo.png" alt="ComedKares" style="max-height: 80px; margin-bottom: 16px;">
       <div class="join-hubquiz-name">Hub<span>Quiz</span></div>
       <div class="join-tagline">Enter your PIN to join the game</div>
     </div>
 
-    <form id="join-form" class="join-form-stack">
+    <form id="join-form" class="join-form-stack" onsubmit="event.preventDefault();">
       <div class="form-group">
         <label class="form-label" for="join-pin">Game PIN</label>
         <input type="tel" id="join-pin" class="input-field join-pin-input"
@@ -540,9 +541,9 @@
 <!-- ============================================================
      Scripts (order matters)
      ============================================================ -->
-<script src="supabase.js"></script>
-<script src="audio.js?v=2"></script>
-<script src="confetti.js"></script>
+<script src="/supabase.js"></script>
+<script src="/audio.js?v=2"></script>
+<script src="/confetti.js"></script>
   <!-- Resume Session Modal -->
   <div id="resume-modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal-box" style="max-width: 400px; text-align: center;">
@@ -567,7 +568,7 @@
     </div>
   </div>
   
-  <script src="app.js?v=2"></script>
+  <script src="/app.js?v=2"></script>
 
 <!-- History API polyfill for static hosting (Netlify/Vercel handle this via _redirects) -->
 <script>
