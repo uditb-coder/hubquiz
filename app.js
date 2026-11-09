@@ -746,6 +746,19 @@ async function showDashboard() {
 
   loadQuizList();
 
+  if (sessionStorage.getItem('hq_session_just_finished') === 'true') {
+    sessionStorage.removeItem('hq_session_just_finished');
+    (async () => {
+      try {
+        if (await shouldPromptMentorSurvey()) {
+          await promptMentorSurvey();
+        }
+      } catch (e) {
+        console.warn('[Survey] Dashboard mentor survey check error:', e);
+      }
+    })();
+  }
+
   loadSessionHistory();
 
   document.getElementById('logout-btn')?.addEventListener('click', async () => {
@@ -2411,6 +2424,7 @@ function showHostLobby() {
         await broadcastGameEvent('game:finished');
 
         State.session.status = 'finished';
+  try { sessionStorage.setItem('hq_session_just_finished', 'true'); } catch (_) {}
 
         navigate('/host');
 
@@ -2542,7 +2556,7 @@ function subscribeHostChannel() {
 
   ch.on('broadcast', { event: 'game:event' }, (payload) => {
 
-    // Host receives its own broadcast — ignore if we're the sender
+    // Host receives its own broadcast  -  ignore if we're the sender
 
   });
 
@@ -3132,6 +3146,272 @@ async function hostShowReveal(questionId) {
 
 }
 
+
+// ============================================================
+// POST-QUIZ MICRO-SURVEYS (Strict Anonymity and Decoupled State)
+// ============================================================
+
+const HQ_SURVEY_VERSION = 'v1';
+const HQ_MAX_SURVEY_DISMISSALS = 3;
+
+/**
+ * Checks whether the current mentor should be prompted for survey feedback.
+ * Decoupled from survey answers. Uses mentor_survey_state (with local fallback).
+ */
+async function shouldPromptMentorSurvey() {
+  if (!State.user?.id) return false;
+
+  const localDone = localStorage.getItem(`hq_mentor_survey_${HQ_SURVEY_VERSION}_completed`);
+  if (localDone === 'true') return false;
+
+  const localDismiss = parseInt(localStorage.getItem(`hq_mentor_survey_${HQ_SURVEY_VERSION}_dismiss_count`) || '0', 10);
+  if (localDismiss >= HQ_MAX_SURVEY_DISMISSALS) return false;
+
+  try {
+    const { data, error } = await HQ_SUPABASE
+      .from('mentor_survey_state')
+      .select('completed, dismiss_count')
+      .eq('user_id', State.user.id)
+      .eq('survey_version', HQ_SURVEY_VERSION)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('[Survey] Could not query mentor survey state:', error.message);
+      return localDismiss < HQ_MAX_SURVEY_DISMISSALS;
+    }
+
+    if (!data) {
+      return true;
+    }
+
+    if (data.completed || (data.dismiss_count || 0) >= HQ_MAX_SURVEY_DISMISSALS) {
+      if (data.completed) {
+        localStorage.setItem(`hq_mentor_survey_${HQ_SURVEY_VERSION}_completed`, 'true');
+      }
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.warn('[Survey] Survey state check error:', err);
+    return localDismiss < HQ_MAX_SURVEY_DISMISSALS;
+  }
+}
+
+/**
+ * Display Mentor Feedback Modal
+ * Submits strictly anonymous response, and decouples user state tracking.
+ */
+function promptMentorSurvey() {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById('mentor-feedback-modal');
+    if (!overlay) { resolve(); return; }
+
+    const form = document.getElementById('mentor-survey-form');
+    const notNowBtn = document.getElementById('mf-not-now-btn');
+    const submitBtn = document.getElementById('mf-submit-btn');
+    const errEl = document.getElementById('mf-error');
+
+    form.reset();
+    if (errEl) { errEl.textContent = ''; errEl.classList.add('hidden'); }
+    overlay.querySelectorAll('.survey-opt-label').forEach(lbl => lbl.classList.remove('selected'));
+
+    overlay.classList.remove('hidden');
+
+    // Highlight selected options
+    const radioInputs = overlay.querySelectorAll('input[type="radio"]');
+    radioInputs.forEach(input => {
+      input.onchange = () => {
+        const groupName = input.name;
+        overlay.querySelectorAll(`input[name="${groupName}"]`).forEach(r => {
+          r.closest('.survey-opt-label')?.classList.toggle('selected', r.checked);
+        });
+      };
+    });
+
+    const closeSurvey = () => {
+      overlay.classList.add('hidden');
+      resolve();
+    };
+
+    notNowBtn.onclick = async () => {
+      try {
+        const curDismiss = parseInt(localStorage.getItem(`hq_mentor_survey_${HQ_SURVEY_VERSION}_dismiss_count`) || '0', 10) + 1;
+        localStorage.setItem(`hq_mentor_survey_${HQ_SURVEY_VERSION}_dismiss_count`, String(curDismiss));
+
+        if (State.user?.id) {
+          await HQ_SUPABASE.from('mentor_survey_state').upsert({
+            user_id: State.user.id,
+            survey_version: HQ_SURVEY_VERSION,
+            dismiss_count: curDismiss,
+            completed: false,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id,survey_version' });
+        }
+      } catch (e) {
+        console.warn('[Survey] Not now update error:', e);
+      }
+      closeSurvey();
+    };
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const q1 = form.elements['mf_q1']?.value;
+      const q2 = form.elements['mf_q2']?.value;
+      const q3 = form.elements['mf_q3']?.value;
+
+      if (!q1 || !q2 || !q3) {
+        if (errEl) {
+          errEl.textContent = 'Please answer all three questions before submitting.';
+          errEl.classList.remove('hidden');
+        }
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+
+      try {
+        // 1. Strictly Anonymous Insert (Zero user IDs, zero names, zero emails, zero session IDs)
+        const { error: insErr } = await HQ_SUPABASE.from('hubquiz_survey_responses').insert({
+          survey_version: HQ_SURVEY_VERSION,
+          audience: 'mentor',
+          q1_answer: q1,
+          q2_answer: q2,
+          q3_answer: q3
+        });
+
+        if (insErr) {
+          console.warn('[Survey] Response insert warning:', insErr.message);
+        }
+
+        // 2. Decoupled State Update (Keeps tracking completely independent from answers)
+        localStorage.setItem(`hq_mentor_survey_${HQ_SURVEY_VERSION}_completed`, 'true');
+
+        if (State.user?.id) {
+          await HQ_SUPABASE.from('mentor_survey_state').upsert({
+            user_id: State.user.id,
+            survey_version: HQ_SURVEY_VERSION,
+            completed: true,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id,survey_version' });
+        }
+
+        if (errEl) {
+          errEl.className = 'form-msg success';
+          errEl.textContent = 'Thank you! Your feedback has been recorded.';
+          errEl.classList.remove('hidden');
+        }
+        setTimeout(closeSurvey, 700);
+      } catch (err) {
+        console.error('[Survey] Submission failed:', err);
+        closeSurvey();
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Feedback';
+      }
+    };
+  });
+}
+
+/**
+ * Checks whether the current student should be prompted for survey feedback.
+ * Uses localStorage with support for natural device repeats.
+ */
+function shouldPromptStudentSurvey() {
+  const completed = localStorage.getItem(`hq_student_survey_${HQ_SURVEY_VERSION}_completed`);
+  if (completed === 'true') return false;
+
+  const dismissCount = parseInt(localStorage.getItem(`hq_student_survey_${HQ_SURVEY_VERSION}_dismiss_count`) || '0', 10);
+  if (dismissCount >= HQ_MAX_SURVEY_DISMISSALS) return false;
+
+  return true;
+}
+
+/**
+ * Display Student Feedback Modal
+ */
+function promptStudentSurvey() {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById('student-feedback-modal');
+    if (!overlay) { resolve(); return; }
+
+    const form = document.getElementById('student-survey-form');
+    const notNowBtn = document.getElementById('sf-not-now-btn');
+    const submitBtn = document.getElementById('sf-submit-btn');
+    const errEl = document.getElementById('sf-error');
+
+    form.reset();
+    if (errEl) { errEl.textContent = ''; errEl.classList.add('hidden'); }
+    overlay.querySelectorAll('.survey-opt-label').forEach(lbl => lbl.classList.remove('selected'));
+
+    overlay.classList.remove('hidden');
+
+    const radioInputs = overlay.querySelectorAll('input[type="radio"]');
+    radioInputs.forEach(input => {
+      input.onchange = () => {
+        const groupName = input.name;
+        overlay.querySelectorAll(`input[name="${groupName}"]`).forEach(r => {
+          r.closest('.survey-opt-label')?.classList.toggle('selected', r.checked);
+        });
+      };
+    });
+
+    const closeSurvey = () => {
+      overlay.classList.add('hidden');
+      resolve();
+    };
+
+    notNowBtn.onclick = () => {
+      const curDismiss = parseInt(localStorage.getItem(`hq_student_survey_${HQ_SURVEY_VERSION}_dismiss_count`) || '0', 10) + 1;
+      localStorage.setItem(`hq_student_survey_${HQ_SURVEY_VERSION}_dismiss_count`, String(curDismiss));
+      closeSurvey();
+    };
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const q1 = form.elements['sf_q1']?.value;
+      const q2 = form.elements['sf_q2']?.value;
+
+      if (!q1 || !q2) {
+        if (errEl) {
+          errEl.textContent = 'Please answer both questions before submitting.';
+          errEl.classList.remove('hidden');
+        }
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+
+      try {
+        // Strictly Anonymous Insert (Zero player IDs, zero student names, zero session IDs)
+        await HQ_SUPABASE.from('hubquiz_survey_responses').insert({
+          survey_version: HQ_SURVEY_VERSION,
+          audience: 'student',
+          q1_answer: q1,
+          q2_answer: q2
+        });
+
+        localStorage.setItem(`hq_student_survey_${HQ_SURVEY_VERSION}_completed`, 'true');
+
+        if (errEl) {
+          errEl.className = 'form-msg success';
+          errEl.textContent = 'Thank you! Your feedback has been recorded.';
+          errEl.classList.remove('hidden');
+        }
+        setTimeout(closeSurvey, 700);
+      } catch (err) {
+        console.warn('[Survey] Student survey submission warning:', err);
+        closeSurvey();
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Feedback';
+      }
+    };
+  });
+}
+
 async function hostShowFinalLeaderboard() {
 
   await HQ_SUPABASE.from('game_sessions').update({ status: 'finished' }).eq('id', State.session.id);
@@ -3220,15 +3500,23 @@ async function hostShowFinalLeaderboard() {
 
   ).join('');
 
-  document.getElementById('hl-end-btn')?.addEventListener('click', () => {
-
-    Confetti.stop();
-
-    cleanupSession();
-
-    navigate('/host');
-
-  });
+  const endBtn = document.getElementById('hl-end-btn');
+  if (endBtn) {
+    endBtn.onclick = async () => {
+      endBtn.disabled = true;
+      Confetti.stop();
+      try {
+        const shouldPrompt = await shouldPromptMentorSurvey();
+        if (shouldPrompt) {
+          await promptMentorSurvey();
+        }
+      } catch (err) {
+        console.warn('[Survey] Mentor survey prompt error:', err);
+      }
+      cleanupSession();
+      navigate('/host');
+    };
+  }
 
 }
 
@@ -4228,7 +4516,17 @@ async function studentShowFinalScreen() {
 
   // Play again button
 
-  document.getElementById('sf-play-again')?.addEventListener('click', () => navigate('/play'));
+  document.getElementById('sf-play-again')?.addEventListener('click', () => {
+    const sModal = document.getElementById('student-feedback-modal');
+    if (sModal) sModal.classList.add('hidden');
+    navigate('/play');
+  });
+
+  if (shouldPromptStudentSurvey()) {
+    setTimeout(() => {
+      promptStudentSurvey();
+    }, 1200);
+  }
 
 }
 

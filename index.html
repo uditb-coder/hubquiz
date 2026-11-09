@@ -568,7 +568,101 @@
     </div>
   </div>
   
-  <script src="/app.js?v=2"></script>
+  
+  <!-- Mentor Feedback Modal (Post-Quiz Micro-Survey) -->
+  <div id="mentor-feedback-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mf-title">
+    <div class="modal-box survey-modal-box">
+      <div class="survey-header">
+        <div class="survey-badge">Mentor Feedback</div>
+        <h2 id="mf-title" class="modal-title" style="margin-bottom: 6px;">How was your session?</h2>
+        <p class="survey-desc">This survey is completely anonymous. No mentor names, emails, or user accounts are recorded. Please do not enter personal names.</p>
+      </div>
+
+      <form id="mentor-survey-form" onsubmit="event.preventDefault();">
+        <!-- Q1 -->
+        <div class="survey-group">
+          <label class="survey-question">1. Compared to how you checked understanding before, how quickly did this show you how the class did?</label>
+          <div class="survey-options">
+            <label class="survey-opt-label"><input type="radio" name="mf_q1" value="Much faster" required> <span>Much faster</span></label>
+            <label class="survey-opt-label"><input type="radio" name="mf_q1" value="Somewhat faster"> <span>Somewhat faster</span></label>
+            <label class="survey-opt-label"><input type="radio" name="mf_q1" value="About the same"> <span>About the same</span></label>
+            <label class="survey-opt-label"><input type="radio" name="mf_q1" value="Slower"> <span>Slower</span></label>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="survey-group">
+          <label class="survey-question">2. Did the results change what you did next?</label>
+          <div class="survey-options">
+            <label class="survey-opt-label"><input type="radio" name="mf_q2" value="Yes, I changed my plan" required> <span>Yes, I changed my plan</span></label>
+            <label class="survey-opt-label"><input type="radio" name="mf_q2" value="They confirmed my plan"> <span>They confirmed my plan</span></label>
+            <label class="survey-opt-label"><input type="radio" name="mf_q2" value="I didn't use them"> <span>I didn't use them</span></label>
+            <label class="survey-opt-label"><input type="radio" name="mf_q2" value="I couldn't read them clearly"> <span>I couldn't read them clearly</span></label>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="survey-group">
+          <label class="survey-question">3. If HubQuiz weren't available next time, how would you feel?</label>
+          <div class="survey-options">
+            <label class="survey-opt-label"><input type="radio" name="mf_q3" value="Very disappointed" required> <span>Very disappointed</span></label>
+            <label class="survey-opt-label"><input type="radio" name="mf_q3" value="Somewhat"> <span>Somewhat</span></label>
+            <label class="survey-opt-label"><input type="radio" name="mf_q3" value="Not disappointed"> <span>Not disappointed</span></label>
+          </div>
+        </div>
+
+        <div id="mf-error" class="form-msg error hidden" style="margin-top:12px;"></div>
+
+        <div class="modal-footer" style="margin-top: 24px;">
+          <button type="button" id="mf-not-now-btn" class="btn btn-ghost">Not now</button>
+          <button type="submit" id="mf-submit-btn" class="btn btn-primary">Submit Feedback</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Student Feedback Modal (Post-Quiz Micro-Survey) -->
+  <div id="student-feedback-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="sf-title">
+    <div class="modal-box survey-modal-box">
+      <div class="survey-header">
+        <div class="survey-badge">Student Feedback</div>
+        <h2 id="sf-title" class="modal-title" style="margin-bottom: 6px;">Tell us what you think!</h2>
+        <p class="survey-desc">This survey is completely anonymous. Your answers help us make HubQuiz better for everyone.</p>
+      </div>
+
+      <form id="student-survey-form" onsubmit="event.preventDefault();">
+        <!-- Q1 -->
+        <div class="survey-group">
+          <label class="survey-question">1. Did you have any trouble joining or answering?</label>
+          <div class="survey-options">
+            <label class="survey-opt-label"><input type="radio" name="sf_q1" value="No" required> <span>No</span></label>
+            <label class="survey-opt-label"><input type="radio" name="sf_q1" value="Yes, my phone"> <span>Yes, my phone</span></label>
+            <label class="survey-opt-label"><input type="radio" name="sf_q1" value="Yes, the network"> <span>Yes, the network</span></label>
+            <label class="survey-opt-label"><input type="radio" name="sf_q1" value="Yes, something else"> <span>Yes, something else</span></label>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="survey-group">
+          <label class="survey-question">2. Did the quiz show you what you still need to practise?</label>
+          <div class="survey-options">
+            <label class="survey-opt-label"><input type="radio" name="sf_q2" value="Yes" required> <span>Yes</span></label>
+            <label class="survey-opt-label"><input type="radio" name="sf_q2" value="A little"> <span>A little</span></label>
+            <label class="survey-opt-label"><input type="radio" name="sf_q2" value="No"> <span>No</span></label>
+          </div>
+        </div>
+
+        <div id="sf-error" class="form-msg error hidden" style="margin-top:12px;"></div>
+
+        <div class="modal-footer" style="margin-top: 24px;">
+          <button type="button" id="sf-not-now-btn" class="btn btn-ghost">Not now</button>
+          <button type="submit" id="sf-submit-btn" class="btn btn-primary">Submit Feedback</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+<script src="/app.js?v=2"></script>
 
 <!-- History API polyfill for static hosting (Netlify/Vercel handle this via _redirects) -->
 <script>

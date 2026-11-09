@@ -1,5 +1,5 @@
 /* ============================================================
-   style.css — HubQuiz Design System
+   style.css  -  HubQuiz Design System
    ComedKares branding: dark navy + yellow, white/light-grey UI
    ============================================================ */
 
@@ -7,7 +7,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap');
 
 /* ============================================================
-   CSS Variables — Design Tokens
+   CSS Variables  -  Design Tokens
    ============================================================ */
 :root {
   /* Brand */
@@ -1452,7 +1452,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   opacity:       0.6;
 }
 
-/* Answer blocks — full screen grid */
+/* Answer blocks  -  full screen grid */
 #sq-answer-blocks {
   display:               grid;
   grid-template-columns: 1fr 1fr;
@@ -1862,7 +1862,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
 }
 
 /* ============================================================
-   GAMEPLAY THEME — Deep Navy & Gold Game Show
+   GAMEPLAY THEME  -  Deep Navy & Gold Game Show
    Applies to all live gameplay screens:
    host-lobby, host-question, host-reveal, host-leaderboard,
    student-lobby, student-question, student-final
@@ -1881,7 +1881,7 @@ h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
   --game-white:     rgba(255,255,255,0.92);
   --game-white-dim: rgba(255,255,255,0.45);
 
-  /* Answer colors — vibrant, rich, distinct */
+  /* Answer colors  -  vibrant, rich, distinct */
   --answer-a: #E8A317;   /* vibrant gold */
   --answer-b: #1B85B8;   /* vibrant blue */
   --answer-c: #D65A24;   /* vibrant orange */
@@ -1952,7 +1952,7 @@ body.gameplay img[src*="logo.jpg"] {
 }
 
 /* ============================================================
-   HOST LOBBY — Dark game-show lobby
+   HOST LOBBY  -  Dark game-show lobby
    ============================================================ */
 #view-host-lobby {
   background: transparent !important;
@@ -1988,7 +1988,7 @@ body.gameplay img[src*="logo.jpg"] {
 #view-host-lobby .pin-url   { color: var(--game-white-dim) !important; }
 #view-host-lobby .pin-url strong { color: var(--game-gold) !important; }
 
-/* Giant PIN — gold, glowing */
+/* Giant PIN  -  gold, glowing */
 #view-host-lobby #lobby-pin {
   font-size:     clamp(3.5rem, 10vw, 6rem) !important;
   font-weight:   900 !important;
@@ -2014,7 +2014,7 @@ body.gameplay img[src*="logo.jpg"] {
 #view-host-lobby .lobby-players-title { color: var(--navy) !important; }
 #view-host-lobby .waiting-text        { color: var(--game-white-dim) !important; }
 
-/* Player chips — bounce in */
+/* Player chips  -  bounce in */
 #view-host-lobby .player-chip {
   background: var(--grey-100) !important;
   color: var(--navy) !important;
@@ -2094,7 +2094,7 @@ body.gameplay img[src*="logo.jpg"] {
 /* Override timer ring track color for light mode */
 #view-host-question .timer-ring-bg { stroke: rgba(0,0,0,0.1) !important; }
 
-/* Answer blocks — 2×2 grid on host */
+/* Answer blocks  -  2×2 grid on host */
 #view-host-question #hq-answer-blocks {
   display:               grid !important;
   grid-template-columns: 1fr 1fr !important;
@@ -2102,7 +2102,7 @@ body.gameplay img[src*="logo.jpg"] {
   max-width:             1100px !important;
 }
 
-/* Host answer block look — raised, dark, colorful */
+/* Host answer block look  -  raised, dark, colorful */
 .host-answer-block {
   box-shadow:    0 8px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15) !important;
   border:        1px solid rgba(255,255,255,0.1) !important;
@@ -2156,7 +2156,7 @@ body.gameplay img[src*="logo.jpg"] {
 #view-host-question #hq-skip-btn:hover { transform: scale(1.04) !important; }
 
 /* ============================================================
-   HOST REVEAL — Dark reveal screen
+   HOST REVEAL  -  Dark reveal screen
    ============================================================ */
 #view-host-reveal {
   background: transparent !important;
@@ -2188,7 +2188,7 @@ body.gameplay img[src*="logo.jpg"] {
 }
 #view-host-reveal #hr-next-btn:hover { transform: scale(1.04) !important; }
 
-/* Correct block — glows gold+green and scales up */
+/* Correct block  -  glows gold+green and scales up */
 .reveal-correct {
   transform: scale(1.06) !important;
   z-index: 10;
@@ -2197,7 +2197,7 @@ body.gameplay img[src*="logo.jpg"] {
   animation: glowCorrect 2s ease-in-out infinite;
 }
 
-/* Incorrect blocks — fade, retain color */
+/* Incorrect blocks  -  fade, retain color */
 .reveal-incorrect {
   opacity: 0.35;
   transform: scale(0.93);
@@ -2215,7 +2215,7 @@ body.gameplay img[src*="logo.jpg"] {
 .reveal-bar-fill.answer-d { background: var(--answer-d) !important; }
 
 /* ============================================================
-   HOST LEADERBOARD — Dark podium with gold framing
+   HOST LEADERBOARD  -  Dark podium with gold framing
    ============================================================ */
 #view-host-leaderboard {
   background: transparent !important;
@@ -2259,9 +2259,9 @@ body.gameplay img[src*="logo.jpg"] {
 }
 
 /* Podium suspense reveal: 3rd → 2nd → 1st */
-.podium-slot:nth-child(1) { animation-delay: 0.8s; }   /* 1st place — last */
-.podium-slot:nth-child(2) { animation-delay: 0.15s; }  /* 3rd place — first */
-.podium-slot:nth-child(3) { animation-delay: 0.45s; }  /* 2nd place — middle */
+.podium-slot:nth-child(1) { animation-delay: 0.8s; }   /* 1st place  -  last */
+.podium-slot:nth-child(2) { animation-delay: 0.15s; }  /* 3rd place  -  first */
+.podium-slot:nth-child(3) { animation-delay: 0.45s; }  /* 2nd place  -  middle */
 
 /* Gold glow around 1st place podium base */
 .rank-1 .podium-base {
@@ -2270,7 +2270,7 @@ body.gameplay img[src*="logo.jpg"] {
 }
 
 /* ============================================================
-   STUDENT LOBBY — "You're in!" waiting screen
+   STUDENT LOBBY  -  "You're in!" waiting screen
    ============================================================ */
 #view-student-lobby {
   background: transparent !important;
@@ -2361,11 +2361,11 @@ body.gameplay img[src*="logo.jpg"] {
 }
 #sq-locked-msg { color: var(--grey-600) !important; }
 
-/* Timer bar — glows gold in final seconds */
+/* Timer bar  -  glows gold in final seconds */
 #sq-timer-bar { border-radius: 0 3px 3px 0; }
 
 /* ============================================================
-   STUDENT FINAL SCREEN — Dark celebratory result
+   STUDENT FINAL SCREEN  -  Dark celebratory result
    ============================================================ */
 #view-student-final {
   background: transparent !important;
@@ -2383,7 +2383,7 @@ body.gameplay img[src*="logo.jpg"] {
 }
 
 /* ============================================================
-   CROSS-SCREEN — Mute button on dark backgrounds
+   CROSS-SCREEN  -  Mute button on dark backgrounds
    ============================================================ */
 #lobby-mute, #hq-mute, #hr-mute, #hl-mute, #sl-mute {
   background:   rgba(255,255,255,0.08) !important;
@@ -2392,7 +2392,7 @@ body.gameplay img[src*="logo.jpg"] {
 }
 
 /* ============================================================
-   TIMER — Color transitions and final-second pulse
+   TIMER  -  Color transitions and final-second pulse
    ============================================================ */
 .timer-shake {
   animation: timerShake 0.35s infinite, goldGlow 0.5s ease-in-out infinite;
@@ -2400,7 +2400,7 @@ body.gameplay img[src*="logo.jpg"] {
 }
 
 /* ============================================================
-   QR Code — dark border to show on dark backgrounds
+   QR Code  -  dark border to show on dark backgrounds
    ============================================================ */
 #lobby-qr-img {
   border-color: var(--game-gold) !important;
@@ -2428,7 +2428,7 @@ body.gameplay img[src*="logo.jpg"] {
 .view { animation: slideUpStagger 0.25s ease-out; }
 
 /* ============================================================
-   FLASH OVERLAYS — Correct / Incorrect
+   FLASH OVERLAYS  -  Correct / Incorrect
    ============================================================ */
 .flash-overlay {
   position: fixed;
@@ -2666,4 +2666,99 @@ body.gameplay img[src*="logo.jpg"] {
   color: #64748b;
   padding: 40px 20px;
   font-style: italic;
+}
+
+
+/* ============================================================
+   Post-Quiz Micro-Surveys (Mentor and Student)
+   ============================================================ */
+.survey-modal-box {
+  max-width: 580px;
+  border-top: 4px solid var(--gold);
+}
+
+.survey-header {
+  margin-bottom: 20px;
+}
+
+.survey-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  background: rgba(229, 169, 59, 0.15);
+  color: #a37217;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: var(--radius-full);
+  margin-bottom: 8px;
+}
+
+.survey-desc {
+  font-size: 0.88rem;
+  color: var(--grey-500);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.survey-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.survey-question {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.survey-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+@media (max-width: 520px) {
+  .survey-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+.survey-opt-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--grey-200);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: var(--grey-50);
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--grey-800);
+  user-select: none;
+}
+
+.survey-opt-label:hover {
+  background: var(--grey-100);
+  border-color: var(--gold);
+}
+
+.survey-opt-label input[type="radio"] {
+  accent-color: var(--gold);
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.survey-opt-label.selected {
+  border-color: var(--gold);
+  background: #fffdf5;
+  font-weight: 600;
+  color: var(--navy);
+  box-shadow: 0 0 0 1px var(--gold);
 }
